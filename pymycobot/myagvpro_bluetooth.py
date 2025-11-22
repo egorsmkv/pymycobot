@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 import asyncio
-from .myagvpro import MyAGVProCommandProtocolApi, ProtocolCode, PLAINTEXT_REPLY_PROTOCOL_CODE
+from .myagvpro import (
+    MyAGVProCommandProtocolApi,
+    ProtocolCode,
+    PLAINTEXT_REPLY_PROTOCOL_CODE,
+)
 
 
 class MyAGVProCommandApi(MyAGVProCommandProtocolApi):
-
     async def _match_protocol_data(self, genre, timeout=0.1):
         for _ in range(5):
             reply_data = await self.read()
@@ -33,7 +36,9 @@ class MyAGVProCommandApi(MyAGVProCommandProtocolApi):
             timeout = self.genre_timeout_table.get(genre, 0.1)
             if not ProtocolCode.GET_AUTO_REPORT_MESSAGE.equal(genre):
                 real_command = self._combination(genre, args)
-                self.log.info(f"write: {' '.join(f'{x:02x}' for x in real_command)}")
+                self.log.info(
+                    f"write: {' '.join(f'{x:02x}' for x in real_command)}"
+                )
                 await self.write(real_command)
 
             reply_data = await self._match_protocol_data(genre, timeout)
@@ -123,8 +128,12 @@ class MyAGVProCommandApi(MyAGVProCommandProtocolApi):
             raise ValueError("Speed must be between 0.01 and 1.50")
 
         if self.get_significant_bit(speed) > 2:
-            raise ValueError(f"speed must be a number with 2 significant bits, but got {speed}")
-        return await self._merge(ProtocolCode.AGV_MOTION_CONTROL, [int(speed * 100 * 1), 0x00])
+            raise ValueError(
+                f"speed must be a number with 2 significant bits, but got {speed}"
+            )
+        return await self._merge(
+            ProtocolCode.AGV_MOTION_CONTROL, [int(speed * 100 * 1), 0x00]
+        )
 
     async def move_backward(self, speed):
         """Pan the robot backward
@@ -139,8 +148,12 @@ class MyAGVProCommandApi(MyAGVProCommandProtocolApi):
             raise ValueError("Speed must be between 0.01 and 1.50")
 
         if self.get_significant_bit(speed) > 2:
-            raise ValueError(f"speed must be a number with 2 significant bits, but got {speed}")
-        return await self._merge(ProtocolCode.AGV_MOTION_CONTROL, [int(speed * 100 * -1)])
+            raise ValueError(
+                f"speed must be a number with 2 significant bits, but got {speed}"
+            )
+        return await self._merge(
+            ProtocolCode.AGV_MOTION_CONTROL, [int(speed * 100 * -1)]
+        )
 
     async def move_left_lateral(self, speed):
         """Pan the robot left
@@ -155,8 +168,12 @@ class MyAGVProCommandApi(MyAGVProCommandProtocolApi):
             raise ValueError("Speed must be between 0.01 and 1.00")
 
         if self.get_significant_bit(speed) > 2:
-            raise ValueError(f"speed must be a number with 2 significant bits, but got {speed}")
-        return await self._merge(ProtocolCode.AGV_MOTION_CONTROL, [0x00, int(speed * 100 * -1)])
+            raise ValueError(
+                f"speed must be a number with 2 significant bits, but got {speed}"
+            )
+        return await self._merge(
+            ProtocolCode.AGV_MOTION_CONTROL, [0x00, int(speed * 100 * -1)]
+        )
 
     async def move_right_lateral(self, speed):
         """Pan the robot right
@@ -171,8 +188,12 @@ class MyAGVProCommandApi(MyAGVProCommandProtocolApi):
             raise ValueError("Speed must be between 0.00 and 1.00")
 
         if self.get_significant_bit(speed) > 2:
-            raise ValueError(f"speed must be a number with 2 significant bits, but got {speed}")
-        return await self._merge(ProtocolCode.AGV_MOTION_CONTROL, [0x00, int(speed * 100 * 1)])
+            raise ValueError(
+                f"speed must be a number with 2 significant bits, but got {speed}"
+            )
+        return await self._merge(
+            ProtocolCode.AGV_MOTION_CONTROL, [0x00, int(speed * 100 * 1)]
+        )
 
     async def turn_left(self, speed):
         """Rotate to the left
@@ -184,8 +205,13 @@ class MyAGVProCommandApi(MyAGVProCommandProtocolApi):
             int: 1: Success, 0: Failed
         """
         if self.get_significant_bit(speed) > 2:
-            raise ValueError(f"speed must be a number with 2 significant bits, but got {speed}")
-        return await self._merge(ProtocolCode.AGV_MOTION_CONTROL, [0x00, 0x00, int(speed * 100 * -1), 0x00])
+            raise ValueError(
+                f"speed must be a number with 2 significant bits, but got {speed}"
+            )
+        return await self._merge(
+            ProtocolCode.AGV_MOTION_CONTROL,
+            [0x00, 0x00, int(speed * 100 * -1), 0x00],
+        )
 
     async def turn_right(self, speed):
         """Rotate to the right
@@ -197,8 +223,13 @@ class MyAGVProCommandApi(MyAGVProCommandProtocolApi):
             int: 1: Success, 0: Failed
         """
         if self.get_significant_bit(speed) > 2:
-            raise ValueError(f"speed must be a number with 2 significant bits, but got {speed}")
-        return await self._merge(ProtocolCode.AGV_MOTION_CONTROL, [0x00, 0x00, int(speed * 100 * 1), 0x00])
+            raise ValueError(
+                f"speed must be a number with 2 significant bits, but got {speed}"
+            )
+        return await self._merge(
+            ProtocolCode.AGV_MOTION_CONTROL,
+            [0x00, 0x00, int(speed * 100 * 1), 0x00],
+        )
 
     async def stop(self):
         """Stop moving
@@ -267,7 +298,9 @@ class MyAGVProCommandApi(MyAGVProCommandProtocolApi):
         if state not in (0, 1):
             raise ValueError("State must be 0 or 1")
 
-        return await self._merge(ProtocolCode.SET_MOTOR_ENABLED, motor_id, state)
+        return await self._merge(
+            ProtocolCode.SET_MOTOR_ENABLED, motor_id, state
+        )
 
     async def get_motor_status(self):
         """Get the motor status
@@ -373,7 +406,9 @@ class MyAGVProCommandApi(MyAGVProCommandProtocolApi):
         if any(map(lambda c: not 0 <= c <= 255, color)):
             raise ValueError("Color must be between 0 and 255")
 
-        return await self._merge(ProtocolCode.SET_LED_COLOR, position, brightness, *color)
+        return await self._merge(
+            ProtocolCode.SET_LED_COLOR, position, brightness, *color
+        )
 
     async def set_led_mode(self, mode):
         """Set the LED mode
@@ -484,14 +519,22 @@ class MyAGVProCommandApi(MyAGVProCommandProtocolApi):
 
 
 class MyAGVProBluetooth(MyAGVProCommandApi):
-    def __init__(self, address, service_uuid, char_uuid, debug=False, save_serial_log=False):
+    def __init__(
+        self,
+        address,
+        service_uuid,
+        char_uuid,
+        debug=False,
+        save_serial_log=False,
+    ):
         super().__init__(debug=debug, save_serial_log=save_serial_log)
         from bleak import BleakClient
+
         self._bluetooth = BleakClient(address, timeout=10)
         self._address = address
         self._char_uuid = char_uuid
         self._service_uuid = service_uuid
-        self._serial_filename = 'agvpro_bluetooth_serial.log'
+        self._serial_filename = "agvpro_bluetooth_serial.log"
         self._communication_mode = 2
         self._queue = asyncio.Queue()
 
@@ -513,7 +556,9 @@ class MyAGVProBluetooth(MyAGVProCommandApi):
 
     async def connect(self):
         await self._bluetooth.connect()
-        await self._bluetooth.start_notify(self._char_uuid, self._handle_notification)
+        await self._bluetooth.start_notify(
+            self._char_uuid, self._handle_notification
+        )
 
     async def _handle_notification(self, _, data):
         await self._queue.put(data)
@@ -526,8 +571,11 @@ class MyAGVProBluetooth(MyAGVProCommandApi):
         return self._bluetooth.is_connected
 
     @classmethod
-    async def connect_by_name(cls, name, service_uuid, char_uuid, debug=False, save_serial_log=False):
+    async def connect_by_name(
+        cls, name, service_uuid, char_uuid, debug=False, save_serial_log=False
+    ):
         from bleak import BleakScanner
+
         device = await BleakScanner.find_device_by_name(name=name)
         if device is None:
             return None
@@ -537,5 +585,5 @@ class MyAGVProBluetooth(MyAGVProCommandApi):
             service_uuid=service_uuid,
             char_uuid=char_uuid,
             debug=debug,
-            save_serial_log=save_serial_log
+            save_serial_log=save_serial_log,
         )

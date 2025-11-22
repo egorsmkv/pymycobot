@@ -120,14 +120,15 @@ class MyCobot630Controller(BaseControllerApi):
         self._cobot.jog_coord(axis_dir_table[axis - 1], direction, 3000)
 
     def go_home(self):
-        self._cobot.write_angles([0, -97.509, 39.049, -120.34, -95.609, 66.717], 3000)
+        self._cobot.write_angles(
+            [0, -97.509, 39.049, -120.34, -95.609, 66.717], 3000
+        )
 
     def stop(self):
         self._cobot.task_stop()
 
 
 class UndefinedController(BaseControllerApi):
-
     def open_suction_pump(self):
         print(" # UndefinedController not support suction pump")
 

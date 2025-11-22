@@ -3,16 +3,17 @@
 import socket
 import typing as T
 from serial.tools import list_ports
+
 _T = T.TypeVar("_T")
 
 
 def select(
-        message: str,
-        options: T.List[_T],
-        default: int = None,
-        level: int = 1,
-        echo: T.Callable = lambda msg: msg,
-        start: int = 1
+    message: str,
+    options: T.List[_T],
+    default: int = None,
+    level: int = 1,
+    echo: T.Callable = lambda msg: msg,
+    start: int = 1,
 ) -> T.Optional[_T]:
     print(f"{message}\r\n")
     p = "    " * level
@@ -21,12 +22,18 @@ def select(
     else:
         print()
 
-    tips = f" # (Info) Select ({echo(options[default - 1])}) >" if default is not None else f" # (Info) Select: "
+    tips = (
+        f" # (Info) Select ({echo(options[default - 1])}) >"
+        if default is not None
+        else f" # (Info) Select: "
+    )
 
     while True:
         try:
             user_input = input(f"{tips}").lower().strip()
-            if len(user_input) == 0 and (default is not None or len(options) == 1):
+            if len(user_input) == 0 and (
+                default is not None or len(options) == 1
+            ):
                 return options[default - 1]
 
             if user_input.isdigit():

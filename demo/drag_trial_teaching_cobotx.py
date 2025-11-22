@@ -85,17 +85,16 @@ class TeachingTest(Helper):
     def record(self):
         self.record_list = []
         self.recording = True
-        #self.mc.set_fresh_mode(0)
-        def _record():
-            
 
+        # self.mc.set_fresh_mode(0)
+        def _record():
             while self.recording:
                 start_t = time.time()
                 angles = self.mc.get_encoders()
                 speeds = self.mc.get_servo_speeds()
                 # gripper_value = self.mc.get_encoder(7)
                 interval_time = time.time() - start_t
-                #print(angles)
+                # print(angles)
                 if angles:
                     self.record_list.append([angles, speeds, 0, interval_time])
                     # time.sleep(0.1)
@@ -115,8 +114,8 @@ class TeachingTest(Helper):
         self.echo("Start play")
         i = 0
         for angles in self.record_list:
-            #print(angles)
-            self.mc.set_encoders_drag(angles[0],angles[1])
+            # print(angles)
+            self.mc.set_encoders_drag(angles[0], angles[1])
             # self.mc.set_encoder(7, angles[2])
             if i == 0:
                 time.sleep(3)
@@ -132,7 +131,9 @@ class TeachingTest(Helper):
             while self.playing:
                 idx_ = i % len_
                 i += 1
-                self.mc.set_encoders_drag(self.record_list[idx_][0],self.record_list[idx_][1])
+                self.mc.set_encoders_drag(
+                    self.record_list[idx_][0], self.record_list[idx_][1]
+                )
                 # self.mc.set_encoder(7, self.record_list[idx_][2])
                 if idx_ == 0:
                     time.sleep(3)

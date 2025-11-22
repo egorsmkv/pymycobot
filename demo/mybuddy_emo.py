@@ -1,9 +1,7 @@
 from pymycobot import MyBuddyEmoticon
 import time
 
-file_path = [
-    ['/home/er/emo/look_happy.mp4', 10]
-]
+file_path = [["/home/er/emo/look_happy.mp4", 10]]
 
 em = MyBuddyEmoticon(file_path, loop=True)
 

@@ -1,5 +1,3 @@
-
-
 import sys
 import logging
 import time
@@ -36,7 +34,7 @@ class PublicCommandGenerator(DataProcessor):
 
     #     if genre == 178:
     #         command_data = self._encode_int16(command_data)
-            
+
     #     elif genre in [76, 77]:
     #         command_data = [command_data[0]] + self._encode_int16(command_data[1]*10)
     #     elif genre == 115:

@@ -32,21 +32,75 @@ The default model is the 260PI.
 
 """
 
-has_return = [0x01,0x02,0x03,0x04,0x09,0x12, 0x14, 0x15, 0x17,0x1B, 0x20,0x23, 0x27, 0x2A,0x2B,0x2D,0x2E, 0x3B,0x3D, 0x40,0x42,0x43,0x44,0x4A, 0x4B,0x50,0x51,0x53,0x62,0x65,0x69,0x90,0x91,0x92,0xC0, 0xC3,0x82,0x84,0x86,0x88,0x8A,0xD0,0xD1,0xD5,0xE1,0xE2,0xE3,0xE4,0xE5,0XE6, 0xB0]
+has_return = [
+    0x01,
+    0x02,
+    0x03,
+    0x04,
+    0x09,
+    0x12,
+    0x14,
+    0x15,
+    0x17,
+    0x1B,
+    0x20,
+    0x23,
+    0x27,
+    0x2A,
+    0x2B,
+    0x2D,
+    0x2E,
+    0x3B,
+    0x3D,
+    0x40,
+    0x42,
+    0x43,
+    0x44,
+    0x4A,
+    0x4B,
+    0x50,
+    0x51,
+    0x53,
+    0x62,
+    0x65,
+    0x69,
+    0x90,
+    0x91,
+    0x92,
+    0xC0,
+    0xC3,
+    0x82,
+    0x84,
+    0x86,
+    0x88,
+    0x8A,
+    0xD0,
+    0xD1,
+    0xD5,
+    0xE1,
+    0xE2,
+    0xE3,
+    0xE4,
+    0xE5,
+    0xE6,
+    0xB0,
+]
+
 
 def get_logger(name):
     logger = logging.getLogger(name)
     logger.setLevel(logging.DEBUG)
 
     LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
-    #DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"
+    # DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"
 
     formatter = logging.Formatter(LOG_FORMAT)
     console = logging.StreamHandler()
     console.setFormatter(formatter)
 
     save = logging.handlers.RotatingFileHandler(
-        "server.log", maxBytes=10485760, backupCount=1)
+        "server.log", maxBytes=10485760, backupCount=1
+    )
     save.setFormatter(formatter)
 
     logger.addHandler(save)
@@ -55,10 +109,9 @@ def get_logger(name):
 
 
 class MyPalletizerServer(object):
-
-    def __init__(self, host, port, serial_num = "/dev/ttyAMA0", baud = 1000000):
+    def __init__(self, host, port, serial_num="/dev/ttyAMA0", baud=1000000):
         """Server class
-        
+
         Args:
             host: server ip address.
             port: server port.
@@ -99,9 +152,13 @@ class MyPalletizerServer(object):
                         if self.mc.isOpen() == False:
                             self.mc.open()
                         else:
-                            self.logger.info("get command: {}".format([hex(v) for v in command]))
-                            #command = self.re_data_2(command)
-                            if command[3] == 170: 
+                            self.logger.info(
+                                "get command: {}".format(
+                                    [hex(v) for v in command]
+                                )
+                            )
+                            # command = self.re_data_2(command)
+                            if command[3] == 170:
                                 if command[4] == 0:
                                     GPIO.setmode(GPIO.BCM)
                                 else:
@@ -121,8 +178,12 @@ class MyPalletizerServer(object):
                             self.write(command)
                             if command[3] in has_return:
                                 res = self.read(command)
-                                self.logger.info("return datas: {}".format([hex(v) for v in res]))
-                                
+                                self.logger.info(
+                                    "return datas: {}".format(
+                                        [hex(v) for v in res]
+                                    )
+                                )
+
                                 conn.sendall(res)
                     except Exception as e:
                         self.logger.error(traceback.format_exc())
@@ -137,7 +198,7 @@ class MyPalletizerServer(object):
         self.mc.write(command)
         self.mc.flush()
 
-    def read(self,command):
+    def read(self, command):
         datas = b""
         data_len = -1
         k = 0
@@ -150,7 +211,7 @@ class MyPalletizerServer(object):
             if data_len == 1 and data == b"\xfa":
                 datas += data
                 if [i for i in datas] == command:
-                    datas = b''
+                    datas = b""
                     data_len = -1
                     k = 0
                     pre = 0
@@ -173,11 +234,11 @@ class MyPalletizerServer(object):
                         datas = b"\xfe"
                         pre = k
         else:
-            datas = b''
+            datas = b""
         return datas
 
     def re_data_2(self, command):
-        r2 = re.compile(r'[[](.*?)[]]')
+        r2 = re.compile(r"[[](.*?)[]]")
         data_str = re.findall(r2, command)[0]
         data_list = data_str.split(",")
         data_list = [int(i) for i in data_list]
@@ -187,7 +248,13 @@ class MyPalletizerServer(object):
 if __name__ == "__main__":
     ifname = "wlan0"
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    HOST = socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8915, struct.pack('256s', bytes(ifname,encoding="utf8")))[20:24])
+    HOST = socket.inet_ntoa(
+        fcntl.ioctl(
+            s.fileno(),
+            0x8915,
+            struct.pack("256s", bytes(ifname, encoding="utf8")),
+        )[20:24]
+    )
     PORT = 9000
     print("ip: {} port: {}".format(HOST, PORT))
     MyPalletizerServer(HOST, PORT, "/dev/ttyAMA0", 1000000)

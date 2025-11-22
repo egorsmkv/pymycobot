@@ -1,7 +1,7 @@
 import time
 from pymycobot.myarm import MyArm
 
-mc = MyArm('/dev/ttyAMA0')
+mc = MyArm("/dev/ttyAMA0")
 time.sleep(0.1)
 
 
@@ -88,5 +88,5 @@ def main():
 # mc.send_angles(init_angles[2], 50)
 # time.sleep(3)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

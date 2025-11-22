@@ -1,7 +1,7 @@
 import time
 from pymycobot.myarm import MyArm
 
-mc = MyArm('/dev/ttyAMA0')
+mc = MyArm("/dev/ttyAMA0")
 
 time.sleep(0.1)
 
@@ -29,14 +29,14 @@ def main():
 
     for i in range(1, 8):
         if i == 1:
-            mc.send_angle(i,140 , 60)
+            mc.send_angle(i, 140, 60)
             time.sleep(3)
-            mc.send_angle(i,40 , 60)
+            mc.send_angle(i, 40, 60)
             time.sleep(3)
             mc.send_angle(i, 90, 60)
             time.sleep(2)
         elif i == 6:
-            mc.send_angle(i,50 , 60)
+            mc.send_angle(i, 50, 60)
             time.sleep(2)
             mc.send_angle(i, -50, 60)
             time.sleep(2)
@@ -60,5 +60,5 @@ def main():
     time.sleep(3)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

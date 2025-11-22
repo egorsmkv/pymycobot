@@ -6,11 +6,12 @@ Function: This script is used to control the switch of the dexterous hand of the
 Atom Version: V1.1
 pymycobot Version: 3.3.0
 """
+
 import time
 from pymycobot.myarm import MyArm
 
 # Initialize the MyArm object with the appropriate port
-ma = MyArm('/dev/ttyAMA0')
+ma = MyArm("/dev/ttyAMA0")
 
 # Perform dexterity hand switch action 3 times
 for i in range(3):

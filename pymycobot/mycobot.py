@@ -48,7 +48,14 @@ class MyCobot(CommandGenerator, PublicCommandGenerator, sms_sts):
             wait() *
     """
 
-    def __init__(self, port, baudrate="115200", timeout=0.1, debug=False, thread_lock=True):
+    def __init__(
+        self,
+        port,
+        baudrate="115200",
+        timeout=0.1,
+        debug=False,
+        thread_lock=True,
+    ):
         """
         Args:
             port     : port string
@@ -57,9 +64,12 @@ class MyCobot(CommandGenerator, PublicCommandGenerator, sms_sts):
             debug    : whether show debug info
         """
         super(MyCobot, self).__init__(debug)
-        print("Note: This class is no longer maintained since v3.6.0, please refer to the project documentation: https://github.com/elephantrobotics/pymycobot/blob/main/README.md")
+        print(
+            "Note: This class is no longer maintained since v3.6.0, please refer to the project documentation: https://github.com/elephantrobotics/pymycobot/blob/main/README.md"
+        )
         self.calibration_parameters = calibration_parameters
         import serial
+
         self._serial_port = serial.Serial()
         self._serial_port.port = port
         self._serial_port.baudrate = baudrate
@@ -86,20 +96,21 @@ class MyCobot(CommandGenerator, PublicCommandGenerator, sms_sts):
             **kwargs: support `has_reply`
                 has_reply: Whether there is a return value to accept.
         """
-        real_command, has_reply, _async = super(
-            MyCobot, self)._mesg(genre, *args, **kwargs)
+        real_command, has_reply, _async = super(MyCobot, self)._mesg(
+            genre, *args, **kwargs
+        )
         if self.thread_lock:
             with self.lock:
                 return self._res(real_command, has_reply, genre)
         else:
             return self._res(real_command, has_reply, genre)
-            
+
     def _res(self, real_command, has_reply, genre):
         try_count = 0
         while try_count < 3:
             self._write(self._flatten(real_command))
             data = self._read(genre)
-            if data is not None and data != b'':
+            if data is not None and data != b"":
                 break
             try_count += 1
         else:
@@ -141,12 +152,16 @@ class MyCobot(CommandGenerator, PublicCommandGenerator, sms_sts):
             ProtocolCode.GetHTSGripperTorque,
             ProtocolCode.GetGripperProtectCurrent,
             ProtocolCode.InitGripper,
-            ProtocolCode.SET_FOUR_PIECES_ZERO
+            ProtocolCode.SET_FOUR_PIECES_ZERO,
         ]:
             return self._process_single(res)
         elif genre in [ProtocolCode.GET_ANGLES]:
             return [self._int2angle(angle) for angle in res]
-        elif genre in [ProtocolCode.GET_COORDS, ProtocolCode.GET_TOOL_REFERENCE, ProtocolCode.GET_WORLD_REFERENCE]:
+        elif genre in [
+            ProtocolCode.GET_COORDS,
+            ProtocolCode.GET_TOOL_REFERENCE,
+            ProtocolCode.GET_WORLD_REFERENCE,
+        ]:
             if res:
                 r = []
                 for idx in range(3):
@@ -158,9 +173,16 @@ class MyCobot(CommandGenerator, PublicCommandGenerator, sms_sts):
                 return res
         elif genre in [ProtocolCode.GET_SERVO_VOLTAGES]:
             return [self._int2coord(angle) for angle in res]
-        elif genre in [ProtocolCode.GET_JOINT_MAX_ANGLE, ProtocolCode.GET_JOINT_MIN_ANGLE]:
+        elif genre in [
+            ProtocolCode.GET_JOINT_MAX_ANGLE,
+            ProtocolCode.GET_JOINT_MIN_ANGLE,
+        ]:
             return self._int2coord(res[0])
-        elif genre in [ProtocolCode.GET_BASIC_VERSION, ProtocolCode.SOFTWARE_VERSION, ProtocolCode.GET_ATOM_VERSION]:
+        elif genre in [
+            ProtocolCode.GET_BASIC_VERSION,
+            ProtocolCode.SOFTWARE_VERSION,
+            ProtocolCode.GET_ATOM_VERSION,
+        ]:
             return self._int2coord(self._process_single(res))
         elif genre == ProtocolCode.GET_ANGLES_COORDS:
             r = []
@@ -192,13 +214,14 @@ class MyCobot(CommandGenerator, PublicCommandGenerator, sms_sts):
             speed: (int )0 ~ 100
         """
         calibration_parameters(len6=radians, speed=speed)
-        degrees = [self._angle2int(radian * (180 / math.pi))
-                   for radian in radians]
+        degrees = [
+            self._angle2int(radian * (180 / math.pi)) for radian in radians
+        ]
         return self._mesg(ProtocolCode.SEND_ANGLES, degrees, speed)
 
     def sync_send_angles(self, degrees, speed, timeout=30):
         """Send the angle in synchronous state and return when the target point is reached
-            
+
         Args:
             degrees: a list of degree values(List[float]), length 6.
             speed: (int) 0 ~ 100
@@ -215,7 +238,7 @@ class MyCobot(CommandGenerator, PublicCommandGenerator, sms_sts):
 
     def sync_send_coords(self, coords, speed, mode=0, timeout=15):
         """Send the coord in synchronous state and return when the target point is reached
-            
+
         Args:
             coords: a list of coord values(List[float])
             speed: (int) 0 ~ 100
@@ -252,13 +275,13 @@ class MyCobot(CommandGenerator, PublicCommandGenerator, sms_sts):
     def wait(self, t):
         time.sleep(t)
         return self
-    
+
     def close(self):
         self._serial_port.close()
-        
+
     def open(self):
         self._serial_port.open()
-        
+
     def get_acceleration(self):
         """get acceleration"""
         return self._process_single(
@@ -267,19 +290,19 @@ class MyCobot(CommandGenerator, PublicCommandGenerator, sms_sts):
 
     def set_acceleration(self, acc):
         """Set speed for all moves
-        
+
         Args:
             acc: int
         """
         return self._mesg(ProtocolCode.SET_ACCELERATION, acc)
-    
+
     def go_home(self):
-        return self.send_angles([0,0,0,0,0,0], 10)
-    
+        return self.send_angles([0, 0, 0, 0, 0, 0], 10)
+
     def angles_to_coords(self, angles):
         angles = [self._angle2int(angle) for angle in angles]
         return self._mesg(ProtocolCode.GET_COORDS, angles, has_reply=True)
-    
+
     def solve_inv_kinematics(self, target_coords, current_angles):
         angles = [self._angle2int(angle) for angle in current_angles]
         coord_list = []
@@ -287,5 +310,9 @@ class MyCobot(CommandGenerator, PublicCommandGenerator, sms_sts):
             coord_list.append(self._coord2int(target_coords[idx]))
         for angle in target_coords[3:]:
             coord_list.append(self._angle2int(angle))
-        return self._mesg(ProtocolCode.SOLVE_INV_KINEMATICS, coord_list, angles, has_reply=True)
-
+        return self._mesg(
+            ProtocolCode.SOLVE_INV_KINEMATICS,
+            coord_list,
+            angles,
+            has_reply=True,
+        )

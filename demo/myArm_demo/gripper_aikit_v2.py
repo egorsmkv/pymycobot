@@ -2,7 +2,7 @@ import time
 from pymycobot.myarm import MyArm
 
 
-mc = MyArm('/dev/ttyAMA0')
+mc = MyArm("/dev/ttyAMA0")
 
 
 init_angles = [
@@ -45,7 +45,6 @@ def move():
 
     # mc.send_angles([0.0, -47.63, 0.17, -77.43, 0.08, -55.72, 0.0], 50)
     mc.send_angles([-2.02, 41.74, 0.43, -86.13, -0.17, -46.05, 0.0], 50)
-    
 
     time.sleep(3)
 
@@ -71,6 +70,6 @@ def move():
     time.sleep(4)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     gripper_off()
     move()

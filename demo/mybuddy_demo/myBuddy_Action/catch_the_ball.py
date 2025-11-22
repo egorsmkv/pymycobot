@@ -7,7 +7,7 @@ from threading import Lock, Thread
 import cv2 as cv
 
 # Establish serial connection
-mc = MyBuddy('/dev/ttyACM0', 115200)
+mc = MyBuddy("/dev/ttyACM0", 115200)
 
 
 # Release the arms and record the points passed
@@ -32,7 +32,14 @@ def write():
     time.sleep(1.5)
     mc.power_on()
     # The file here uses the saved txt file
-    data = list(filter(None, open(os.path.join(os.getcwd(), 'catch_the_ball.txt')).read().splitlines()))
+    data = list(
+        filter(
+            None,
+            open(os.path.join(os.getcwd(), "catch_the_ball.txt"))
+            .read()
+            .splitlines(),
+        )
+    )
     # infinite loop
     while True:
         for angles in data:
@@ -55,11 +62,11 @@ def smile():
         ret, frame = cap.read()
         if frame is not None:
             cv.imshow(out_win, frame)
-        if cv.waitKey(1) & 0xFF == ord('q') or ret == False:
+        if cv.waitKey(1) & 0xFF == ord("q") or ret == False:
             cap = cv.VideoCapture("/home/ubuntu/emo/look_happy.mp4")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # run with multithreading
     t1 = threading.Thread(target=write)
     t2 = threading.Thread(target=smile)

@@ -50,6 +50,7 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
         # Other
             wait() *
     """
+
     _write = write
     _read = read
 
@@ -84,7 +85,8 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
                 has_reply: Whether there is a return value to accept.
         """
         real_command, has_reply, _async = super(
-            MyPalletizerSocket, self)._mesg(genre, *args, **kwargs)
+            MyPalletizerSocket, self
+        )._mesg(genre, *args, **kwargs)
         # [254,...,255]
         if not has_reply:
             with self.lock:
@@ -97,13 +99,18 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
 
     def _res(self, real_command, has_reply, genre):
         self._write(self._flatten(real_command), "socket")
-        data = self._read(genre, method='socket')
+        data = self._read(genre, method="socket")
         if genre == ProtocolCode.SET_SSID_PWD:
             return None
         res = self._process_received(data, genre)
         if res is None:
             return -1
-        if res is not None and isinstance(res, list) and len(res) == 1 and genre in [ProtocolCode.SET_BASIC_OUTPUT]:
+        if (
+            res is not None
+            and isinstance(res, list)
+            and len(res) == 1
+            and genre in [ProtocolCode.SET_BASIC_OUTPUT]
+        ):
             return res[0]
         if genre in [
             ProtocolCode.ROBOT_VERSION,
@@ -129,7 +136,7 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
             ProtocolCode.GetHTSGripperTorque,
             ProtocolCode.GetGripperProtectCurrent,
             ProtocolCode.InitGripper,
-            ProtocolCode.SET_FOUR_PIECES_ZERO
+            ProtocolCode.SET_FOUR_PIECES_ZERO,
         ]:
             return self._process_single(res)
         elif genre in [ProtocolCode.GET_ANGLES]:
@@ -146,10 +153,16 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
                 return res
         elif genre in [ProtocolCode.GET_SERVO_VOLTAGES]:
             return [self._int2coord(angle) for angle in res]
-        elif genre in [ProtocolCode.GET_JOINT_MAX_ANGLE, ProtocolCode.GET_JOINT_MIN_ANGLE]:
+        elif genre in [
+            ProtocolCode.GET_JOINT_MAX_ANGLE,
+            ProtocolCode.GET_JOINT_MIN_ANGLE,
+        ]:
             return self._int2coord(res[0])
-        elif genre in [ProtocolCode.GET_BASIC_VERSION, ProtocolCode.SOFTWARE_VERSION,
-                       ProtocolCode.GET_ATOM_VERSION]:
+        elif genre in [
+            ProtocolCode.GET_BASIC_VERSION,
+            ProtocolCode.SOFTWARE_VERSION,
+            ProtocolCode.GET_ATOM_VERSION,
+        ]:
             return self._int2coord(self._process_single(res))
         elif genre == ProtocolCode.GET_ANGLES_COORDS:
             r = []
@@ -171,7 +184,9 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
         Args:
             flag: 0/1
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, flag=flag)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, flag=flag
+        )
         return self._mesg(ProtocolCode.SET_FREE_MODE, flag)
 
     def is_free_mode(self):
@@ -200,8 +215,9 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
             speed (int): 0 ~ 100
         """
         # calibration_parameters(len6=radians, speed=speed)
-        degrees = [self._angle2int(radian * (180 / math.pi))
-                   for radian in radians]
+        degrees = [
+            self._angle2int(radian * (180 / math.pi)) for radian in radians
+        ]
         return self._mesg(ProtocolCode.SEND_ANGLES, degrees, speed)
 
     def send_angle(self, id, degree, speed):
@@ -212,8 +228,15 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
             angle : angle value(float).
             speed : (int) 1 ~ 100
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, id=id, angle=degree, speed=speed)
-        return self._mesg(ProtocolCode.SEND_ANGLE, id, [self._angle2int(degree)], speed)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__,
+            id=id,
+            angle=degree,
+            speed=speed,
+        )
+        return self._mesg(
+            ProtocolCode.SEND_ANGLE, id, [self._angle2int(degree)], speed
+        )
 
     def send_angles(self, angles, speed):
         """Send the angles of all joints to robot arm.
@@ -222,7 +245,9 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
             angles: a list of angle values(List[float]). len 4.
             speed : (int) 1 ~ 100
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, angles=angles, speed=speed)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, angles=angles, speed=speed
+        )
         angles = [self._angle2int(angle) for angle in angles]
         return self._mesg(ProtocolCode.SEND_ANGLES, angles, speed)
 
@@ -242,7 +267,9 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
             coord(float) : coord value, mm
             speed(int) : 1 ~ 100
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, id=id, coord=coord, speed=speed)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, id=id, coord=coord, speed=speed
+        )
         value = self._coord2int(coord) if id <= 3 else self._angle2int(coord)
         return self._mesg(ProtocolCode.SEND_COORD, id, [value], speed)
 
@@ -253,7 +280,9 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
             coords: a list of coords value(List[float]). [x, y, z, θ]
             speed : (int) 1 ~ 100
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, coords=coords, speed=speed)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, coords=coords, speed=speed
+        )
         coord_list = []
         for idx in range(3):
             coord_list.append(self._coord2int(coords[idx]))
@@ -274,19 +303,25 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
             -1 - Error
         """
         if id == 1:
-            self.calibration_parameters(class_name=self.__class__.__name__, coords=data)
+            self.calibration_parameters(
+                class_name=self.__class__.__name__, coords=data
+            )
             data_list = []
             for idx in range(3):
                 data_list.append(self._coord2int(data[idx]))
             for idx in range(3, 4):
                 data_list.append(self._angle2int(data[idx]))
         elif id == 0:
-            self.calibration_parameters(class_name=self.__class__.__name__, angles=data)
+            self.calibration_parameters(
+                class_name=self.__class__.__name__, angles=data
+            )
             data_list = [self._angle2int(i) for i in data]
         else:
             raise Exception("id is not right, please input 0 or 1")
 
-        return self._mesg(ProtocolCode.IS_IN_POSITION, data_list, id, has_reply=True)
+        return self._mesg(
+            ProtocolCode.IS_IN_POSITION, data_list, id, has_reply=True
+        )
 
     def sync_send_angles(self, degrees, speed, timeout=15):
         t = time.time()
@@ -315,7 +350,11 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
             direction: 0 - decrease, 1 - increase
             speed: int (0 - 100)
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, id=joint_id, direction=direction)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__,
+            id=joint_id,
+            direction=direction,
+        )
         return self._mesg(ProtocolCode.JOG_ANGLE, joint_id, direction, speed)
 
     def jog_absolute(self, joint_id, angle, speed):
@@ -326,8 +365,18 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
             angle: -180 ~ 180
             speed: int (1 - 100)
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, id=joint_id, angle=angle, speed=speed)
-        return self._mesg(ProtocolCode.JOG_ABSOLUTE, joint_id, [self._angle2int(angle)], speed)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__,
+            id=joint_id,
+            angle=angle,
+            speed=speed,
+        )
+        return self._mesg(
+            ProtocolCode.JOG_ABSOLUTE,
+            joint_id,
+            [self._angle2int(angle)],
+            speed,
+        )
 
     def jog_increment(self, joint_id, increment, speed):
         """step mode
@@ -337,8 +386,15 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
             increment:
             speed: int (0 - 100)
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, id=joint_id, speed=speed)
-        return self._mesg(ProtocolCode.JOG_INCREMENT, joint_id, [self._angle2int(increment)], speed)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, id=joint_id, speed=speed
+        )
+        return self._mesg(
+            ProtocolCode.JOG_INCREMENT,
+            joint_id,
+            [self._angle2int(increment)],
+            speed,
+        )
 
     def jog_stop(self):
         """Stop jog moving"""
@@ -352,8 +408,12 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
             encoder: The value of the set encoder.
             speed : 1 - 100
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, encode_id=joint_id, encoder=encoder,
-                                    speed=speed)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__,
+            encode_id=joint_id,
+            encoder=encoder,
+            speed=speed,
+        )
         return self._mesg(ProtocolCode.SET_ENCODER, joint_id, [encoder], speed)
 
     def get_encoder(self, joint_id):
@@ -362,7 +422,9 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
         Args:
             joint_id: (int) 1 - 4
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, encode_id=joint_id)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, encode_id=joint_id
+        )
         return self._mesg(ProtocolCode.GET_ENCODER, joint_id, has_reply=True)
 
     def set_encoders(self, encoders, sp):
@@ -386,7 +448,9 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
         Set speed
         :param speed: 0-100
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, speed=speed)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, speed=speed
+        )
         return self._mesg(ProtocolCode.SET_SPEED, speed)
 
     def get_feed_override(self):
@@ -416,8 +480,12 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
         Return:
             angle value(float)
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, id=joint_id)
-        return self._mesg(ProtocolCode.GET_JOINT_MIN_ANGLE, joint_id, has_reply=True)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, id=joint_id
+        )
+        return self._mesg(
+            ProtocolCode.GET_JOINT_MIN_ANGLE, joint_id, has_reply=True
+        )
 
     def get_joint_max_angle(self, joint_id):
         """Gets the maximum movement angle of the specified joint
@@ -427,8 +495,12 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
         Return:
             angle value(float)
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, id=joint_id)
-        return self._mesg(ProtocolCode.GET_JOINT_MAX_ANGLE, joint_id, has_reply=True)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, id=joint_id
+        )
+        return self._mesg(
+            ProtocolCode.GET_JOINT_MAX_ANGLE, joint_id, has_reply=True
+        )
 
     def set_joint_min(self, id, angle):
         """Set the joint minimum angle
@@ -437,7 +509,9 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
             id: int 0 - 3
             angle: 0 ~ 180
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, id=id, angle=angle)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, id=id, angle=angle
+        )
         return self._mesg(ProtocolCode.SET_JOINT_MIN, id, angle)
 
     def set_joint_max(self, id, angle):
@@ -447,7 +521,9 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
             id: int 0 - 3
             angle: 0 ~ 180
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, id=id, angle=angle)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, id=id, angle=angle
+        )
         return self._mesg(ProtocolCode.SET_JOINT_MAX, id, angle)
 
     # Servo control
@@ -461,8 +537,12 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
             1 - enable
             -1 - error
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, id=servo_id)
-        return self._mesg(ProtocolCode.IS_SERVO_ENABLE, servo_id, has_reply=True)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, id=servo_id
+        )
+        return self._mesg(
+            ProtocolCode.IS_SERVO_ENABLE, servo_id, has_reply=True
+        )
 
     def set_servo_data(self, servo_id, data_id, value, mode=None):
         """Set the data parameters of the specified address of the steering gear
@@ -474,14 +554,26 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
             mode: 0 - indicates that value is one byte(default), 1 - 1 represents a value of two bytes.
         """
         if mode is None:
-            self.calibration_parameters(class_name=self.__class__.__name__, id=servo_id, address=data_id,
-                                        value=value)
-            return self._mesg(ProtocolCode.SET_SERVO_DATA, servo_id, data_id, value)
+            self.calibration_parameters(
+                class_name=self.__class__.__name__,
+                id=servo_id,
+                address=data_id,
+                value=value,
+            )
+            return self._mesg(
+                ProtocolCode.SET_SERVO_DATA, servo_id, data_id, value
+            )
         else:
-            self.calibration_parameters(class_name=self.__class__.__name__, id=servo_id, address=data_id,
-                                        value=value,
-                                        mode=mode)
-            return self._mesg(ProtocolCode.SET_SERVO_DATA, servo_id, data_id, [value], mode)
+            self.calibration_parameters(
+                class_name=self.__class__.__name__,
+                id=servo_id,
+                address=data_id,
+                value=value,
+                mode=mode,
+            )
+            return self._mesg(
+                ProtocolCode.SET_SERVO_DATA, servo_id, data_id, [value], mode
+            )
 
     def get_servo_data(self, servo_id, data_id, mode=None):
         """Read the data parameter of the specified address of the steering gear.
@@ -495,11 +587,22 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
             values 0 - 4096
         """
         if mode is not None:
-            self.calibration_parameters(class_name=self.__class__.__name__, id=servo_id, address=data_id, mode=mode)
-            return self._mesg(
-                ProtocolCode.GET_SERVO_DATA, servo_id, data_id, mode, has_reply=True
+            self.calibration_parameters(
+                class_name=self.__class__.__name__,
+                id=servo_id,
+                address=data_id,
+                mode=mode,
             )
-        self.calibration_parameters(class_name=self.__class__.__name__, id=servo_id, address=data_id)
+            return self._mesg(
+                ProtocolCode.GET_SERVO_DATA,
+                servo_id,
+                data_id,
+                mode,
+                has_reply=True,
+            )
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, id=servo_id, address=data_id
+        )
         return self._mesg(
             ProtocolCode.GET_SERVO_DATA, servo_id, data_id, has_reply=True
         )
@@ -511,7 +614,9 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
         Args:
             servo_id: Serial number of articulated steering gear. Joint id 1 - 4
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, id=servo_id)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, id=servo_id
+        )
         return self._mesg(ProtocolCode.SET_SERVO_CALIBRATION, servo_id)
 
     def release_servo(self, servo_id, mode=None):
@@ -522,11 +627,15 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
             mode: Default damping, set to 1, cancel damping
         """
         if mode is None:
-            self.calibration_parameters(class_name=self.__class__.__name__, id=servo_id)
+            self.calibration_parameters(
+                class_name=self.__class__.__name__, id=servo_id
+            )
             return self._mesg(ProtocolCode.RELEASE_SERVO, servo_id)
 
         else:
-            self.calibration_parameters(class_name=self.__class__.__name__, id=servo_id)
+            self.calibration_parameters(
+                class_name=self.__class__.__name__, id=servo_id
+            )
             return self._mesg(ProtocolCode.RELEASE_SERVO, servo_id, mode)
 
     def focus_servo(self, servo_id):
@@ -535,7 +644,9 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
         Args:
             servo_id: int Joint id 1 - 4
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, id=servo_id)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, id=servo_id
+        )
         return self._mesg(ProtocolCode.FOCUS_SERVO, servo_id)
 
     # Basic for raspberry pi.
@@ -565,7 +676,9 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
             pin_no   (int): pin number.
             pin_mode (int): 0 - input, 1 - output, 2 - input_pullup
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, pin_mode=pin_mode)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, pin_mode=pin_mode
+        )
         return self._mesg(ProtocolCode.SET_PIN_MODE, pin_no, pin_mode)
 
     def get_gripper_value(self, gripper_type=None):
@@ -583,8 +696,12 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
         if gripper_type is None:
             return self._mesg(ProtocolCode.GET_GRIPPER_VALUE, has_reply=True)
         else:
-            self.calibration_parameters(class_name=self.__class__.__name__, gripper_type=gripper_type)
-            return self._mesg(ProtocolCode.GET_GRIPPER_VALUE, gripper_type, has_reply=True)
+            self.calibration_parameters(
+                class_name=self.__class__.__name__, gripper_type=gripper_type
+            )
+            return self._mesg(
+                ProtocolCode.GET_GRIPPER_VALUE, gripper_type, has_reply=True
+            )
 
     def is_gripper_moving(self):
         """Judge whether the gripper is moving or not

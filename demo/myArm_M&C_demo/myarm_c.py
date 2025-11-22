@@ -10,9 +10,9 @@ import utils
 
 
 class Config:
-    host = "0.0.0.0"            # The host address to listen on
-    port = 8001                 # The port to listen on
-    maximum_connections = 5     # The maximum number of connections allowed
+    host = "0.0.0.0"  # The host address to listen on
+    port = 8001  # The port to listen on
+    maximum_connections = 5  # The maximum number of connections allowed
 
 
 def setup_robotic_connect(comport: str) -> T.Optional[MyArmC]:
@@ -92,7 +92,11 @@ def main():
         print(" # (Warn) No serial ports found. exit")
         return
 
-    serial_comport = utils.select("# (Info) Please select a serial port to connect robotic arm:", serial_ports, 1)
+    serial_comport = utils.select(
+        "# (Info) Please select a serial port to connect robotic arm:",
+        serial_ports,
+        1,
+    )
 
     print(f" # (Info) Selected {serial_comport} to connect robotic arm")
     robotic_api = setup_robotic_connect(serial_comport)
@@ -100,12 +104,14 @@ def main():
         print(" # (Error) Failed to connect robotic arm. exit")
         return
 
-    print(" # (Info) Start listening for changes in the angle of the robotic arm")
+    print(
+        " # (Info) Start listening for changes in the angle of the robotic arm"
+    )
     print(" # (Info) Press 【Ctrl+C】 to exit")
     transport_server = SocketTransportServer(
         host=Config.host,
         port=Config.port,
-        listen_size=Config.maximum_connections
+        listen_size=Config.maximum_connections,
     )
     transport_server.start()
     while True:
@@ -116,10 +122,12 @@ def main():
 
             print(f" # (Info) Current angle: {angles}")
             if max(angles) > 200 or min(angles) < -200:
-                print(" # (Warn) There is no communication between the joints, please check the connection")
+                print(
+                    " # (Warn) There is no communication between the joints, please check the connection"
+                )
                 continue
 
-            transport_server.sendall(f"\n{angles}".encode('utf-8'))
+            transport_server.sendall(f"\n{angles}".encode("utf-8"))
         except KeyboardInterrupt:
             print(" # (Info) Exit")
             break

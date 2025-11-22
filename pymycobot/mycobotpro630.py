@@ -29,7 +29,10 @@ def is_debian_os():
         py_version = check_python_version()
         if py_version == 3:
             result = subprocess.run(
-                ["lsb_release", "-a"], capture_output=True, text=True, check=True
+                ["lsb_release", "-a"],
+                capture_output=True,
+                text=True,
+                check=True,
             )
 
             # 解析输出，获取 Distributor ID 的信息
@@ -56,7 +59,11 @@ def is_debian_os():
     return None
 
 
-if platform.system() == "Linux" and platform.machine() == "aarch64" and is_debian_os():
+if (
+    platform.system() == "Linux"
+    and platform.machine() == "aarch64"
+    and is_debian_os()
+):
     from enum import Enum
     import crc
     import linuxcnc as elerob
@@ -179,10 +186,18 @@ class Phoenix:
         self.g = hal.component("halgpio", "halgpio")
 
         for i in range(MAX_PINS):
-            self.g.newpin("digital-in-" + str(i).zfill(2), hal.HAL_BIT, hal.HAL_IN)
-            self.g.newpin("digital-out-" + str(i).zfill(2), hal.HAL_BIT, hal.HAL_OUT)
-            self.g.newpin("analog-in-" + str(i).zfill(2), hal.HAL_FLOAT, hal.HAL_IN)
-            self.g.newpin("analog-out-" + str(i).zfill(2), hal.HAL_FLOAT, hal.HAL_OUT)
+            self.g.newpin(
+                "digital-in-" + str(i).zfill(2), hal.HAL_BIT, hal.HAL_IN
+            )
+            self.g.newpin(
+                "digital-out-" + str(i).zfill(2), hal.HAL_BIT, hal.HAL_OUT
+            )
+            self.g.newpin(
+                "analog-in-" + str(i).zfill(2), hal.HAL_FLOAT, hal.HAL_IN
+            )
+            self.g.newpin(
+                "analog-out-" + str(i).zfill(2), hal.HAL_FLOAT, hal.HAL_OUT
+            )
 
         # 0 .. MAX_JOINTS: joint status word
         # MAX_JOINTS .. MAX_JOINTS * 2: joint error mask
@@ -217,7 +232,9 @@ class Phoenix:
 
         self.hal_serial.newpin("0.sensor_torq_open", hal.HAL_U32, hal.HAL_OUT)
         self.hal_serial.newpin("0.sensor_error_pkgs", hal.HAL_U32, hal.HAL_OUT)
-        self.hal_serial.newpin("0.sensor_recv_timeout", hal.HAL_U32, hal.HAL_OUT)
+        self.hal_serial.newpin(
+            "0.sensor_recv_timeout", hal.HAL_U32, hal.HAL_OUT
+        )
         self.hal_serial.newpin("0.motion_flexible", hal.HAL_U32, hal.HAL_OUT)
 
         self.hal_serial.ready()
@@ -253,7 +270,9 @@ class Phoenix:
             data (list[int]): message bytes, e.g. [0xFE, 0x01]
             can_id (hexadecimal, optional): CAN ID. Defaults to 0x007.
         """
-        msg = can.Message(arbitration_id=can_id, data=data, is_extended_id=False)
+        msg = can.Message(
+            arbitration_id=can_id, data=data, is_extended_id=False
+        )
         self._init_can()
         try:
             self.bus.send(msg, timeout)
@@ -435,7 +454,9 @@ class Phoenix:
             brake_active_retry_count = 0
             while (not brake_active_ok) and (brake_active_retry_count <= 20):
                 self._state_on()
-                brake_active_ok = not self.get_digital_in(DI.BRAKE_ACTIVATION_RUNNING)
+                brake_active_ok = not self.get_digital_in(
+                    DI.BRAKE_ACTIVATION_RUNNING
+                )
                 time.sleep(1)
                 brake_active_retry_count += 1
             if not brake_active_ok:
@@ -564,7 +585,9 @@ class Phoenix:
             return False
         self._set_robot_move_state(RobotMoveState.MOVE_AXIS_STATE, 0, 0)
         return self.run_gcode(
-            "G01F" + str(speed * MAX_LINEAR_SPEED / 100) + self.coords_to_gcode(coords)
+            "G01F"
+            + str(speed * MAX_LINEAR_SPEED / 100)
+            + self.coords_to_gcode(coords)
         )
 
     def get_coord(self, axis):
@@ -835,7 +858,9 @@ class Phoenix:
         Returns:
             bool: True if servo is enabled, False otherwise
         """
-        return bool(self.get_digital_in(DI(DI.J1_SERVO_ENABLED.value + joint.value)))
+        return bool(
+            self.get_digital_in(DI(DI.J1_SERVO_ENABLED.value + joint.value))
+        )
 
     def is_all_servos_enabled(self):
         """Checks if all servos are enabled
@@ -964,7 +989,9 @@ class Phoenix:
             joint (Joint): joint Joint.J1 ~ Joint.J6
             release (bool): True to release, False to enable brake. Defaults to True.
         """
-        self.set_digital_out(DO(joint.value + DO.J1_BRAKE_RELEASE.value), release)
+        self.set_digital_out(
+            DO(joint.value + DO.J1_BRAKE_RELEASE.value), release
+        )
 
     def is_mdi_mode(self):
         """Checks if robot is in MDI mode.
@@ -1061,7 +1088,9 @@ class Phoenix:
         Returns:
             bool: True if joint communication is OK, False otherwise
         """
-        return bool(self.get_digital_in(DI(DI.J1_COMMUNICATION.value + joint.value)))
+        return bool(
+            self.get_digital_in(DI(DI.J1_COMMUNICATION.value + joint.value))
+        )
 
     def get_joint_current(self, joint):
         """Returns specified joint's current.
@@ -1072,7 +1101,9 @@ class Phoenix:
         Returns:
             float: current
         """
-        return self.get_analog_in(AI(AI.J1_WINDING_A_CURRENT.value + joint.value))
+        return self.get_analog_in(
+            AI(AI.J1_WINDING_A_CURRENT.value + joint.value)
+        )
 
     def get_joint_error_mask(self, joint):
         """Returns specified joint's error mask
@@ -1230,7 +1261,9 @@ class Phoenix:
         """
         if not self._check_speed(speed):
             return False
-        self._set_robot_move_state(RobotMoveState.JOG_JOINT_STATE, joint, direction)
+        self._set_robot_move_state(
+            RobotMoveState.JOG_JOINT_STATE, joint, direction
+        )
         self.command_id += 1
         return self._jog_continuous(
             JogMode.JOG_JOINT, joint, direction, speed, self.command_id
@@ -1250,13 +1283,17 @@ class Phoenix:
         """
         if not self._check_speed(speed):
             return False
-        self._set_robot_move_state(RobotMoveState.JOG_AXIS_STATE, axis, direction)
+        self._set_robot_move_state(
+            RobotMoveState.JOG_AXIS_STATE, axis, direction
+        )
         self.command_id += 1
         return self._jog_continuous(
             JogMode.JOG_TELEOP, axis, direction, speed, self.command_id
         )
 
-    def _jog_continuous(self, jog_mode, joint_or_axis, direction, speed, jog_id):
+    def _jog_continuous(
+        self, jog_mode, joint_or_axis, direction, speed, jog_id
+    ):
         """Starts axis or joint jog.
 
         Args:
@@ -1289,7 +1326,9 @@ class Phoenix:
         if (jog_mode == JogMode.JOG_TELEOP) and (joint_or_axis.value < 0):
             return False
         if jog_id != self.command_id:
-            print("_jog_continuous cancelled: some delay: jog_id != command_id")
+            print(
+                "_jog_continuous cancelled: some delay: jog_id != command_id"
+            )
             return False
         self.c.jog(
             elerob.JOG_CONTINUOUS,
@@ -1481,7 +1520,10 @@ class Phoenix:
             bool: True if program is not running or finished, False otherwise.
         """
         self.s.poll()
-        return self.s.exec_state <= elerob.EXEC_DONE and not self.is_program_running()
+        return (
+            self.s.exec_state <= elerob.EXEC_DONE
+            and not self.is_program_running()
+        )
 
     # def start_3d_mouse(self, enable):
     #     """Starts movement my space nav mouse.
@@ -1511,15 +1553,23 @@ class Phoenix:
         elif new_robot_state == RobotMoveState.JOG_AXIS_STATE:
             self.command_id += 1
             self._jog_continuous(
-                JogMode.JOG_TELEOP, joint_or_axis, direction, 1, self.command_id
+                JogMode.JOG_TELEOP,
+                joint_or_axis,
+                direction,
+                1,
+                self.command_id,
             )
             time.sleep(0.1)
         elif new_robot_state == RobotMoveState.MOVE_AXIS_STATE:
             self.run_gcode("G92.2")
-            self.run_gcode("G01F2000" + self.coords_to_gcode(self.get_coords()))
+            self.run_gcode(
+                "G01F2000" + self.coords_to_gcode(self.get_coords())
+            )
         elif new_robot_state == RobotMoveState.MOVE_JOINT_STATE:
             self.run_gcode("G92.2")
-            self.run_gcode("G38.3F1000" + self.angles_to_gcode(self.get_angles()))
+            self.run_gcode(
+                "G38.3F1000" + self.angles_to_gcode(self.get_angles())
+            )
         elif new_robot_state == RobotMoveState.RUN_PROGRAM_STATE:
             self.run_gcode("G92.2")
         self.robot_state = new_robot_state
@@ -2187,7 +2237,9 @@ class Phoenix:
             torque_limit (float): torque limit value
         """
         if joint.value < MAX_JOINTS:
-            self.set_analog_out(AO(AO.J1_TORQUE.value + joint.value), torque_limit)
+            self.set_analog_out(
+                AO(AO.J1_TORQUE.value + joint.value), torque_limit
+            )
 
     def set_axis_torque_limit(self, axis, value):
         """Sets cartesian axis torque limit.
@@ -2355,11 +2407,21 @@ class Phoenix:
         """
         return (
             self.float_equal(coords_1[Axis.X.value], coords_2[Axis.X.value])
-            and self.float_equal(coords_1[Axis.Y.value], coords_2[Axis.Y.value])
-            and self.float_equal(coords_1[Axis.Z.value], coords_2[Axis.Z.value])
-            and self.float_equal(coords_1[Axis.RX.value], coords_2[Axis.RX.value])
-            and self.float_equal(coords_1[Axis.RY.value], coords_2[Axis.RY.value])
-            and self.float_equal(coords_1[Axis.RZ.value], coords_2[Axis.RZ.value])
+            and self.float_equal(
+                coords_1[Axis.Y.value], coords_2[Axis.Y.value]
+            )
+            and self.float_equal(
+                coords_1[Axis.Z.value], coords_2[Axis.Z.value]
+            )
+            and self.float_equal(
+                coords_1[Axis.RX.value], coords_2[Axis.RX.value]
+            )
+            and self.float_equal(
+                coords_1[Axis.RY.value], coords_2[Axis.RY.value]
+            )
+            and self.float_equal(
+                coords_1[Axis.RZ.value], coords_2[Axis.RZ.value]
+            )
         )
 
     def angles_equal(self, angles_1, angles_2):
@@ -2373,12 +2435,24 @@ class Phoenix:
             bool: True if angles are equal, False otherwise.
         """
         return (
-            self.float_equal(angles_1[Joint.J1.value], angles_2[Joint.J1.value])
-            and self.float_equal(angles_1[Joint.J2.value], angles_2[Joint.J2.value])
-            and self.float_equal(angles_1[Joint.J3.value], angles_2[Joint.J3.value])
-            and self.float_equal(angles_1[Joint.J4.value], angles_2[Joint.J4.value])
-            and self.float_equal(angles_1[Joint.J5.value], angles_2[Joint.J5.value])
-            and self.float_equal(angles_1[Joint.J6.value], angles_2[Joint.J6.value])
+            self.float_equal(
+                angles_1[Joint.J1.value], angles_2[Joint.J1.value]
+            )
+            and self.float_equal(
+                angles_1[Joint.J2.value], angles_2[Joint.J2.value]
+            )
+            and self.float_equal(
+                angles_1[Joint.J3.value], angles_2[Joint.J3.value]
+            )
+            and self.float_equal(
+                angles_1[Joint.J4.value], angles_2[Joint.J4.value]
+            )
+            and self.float_equal(
+                angles_1[Joint.J5.value], angles_2[Joint.J5.value]
+            )
+            and self.float_equal(
+                angles_1[Joint.J6.value], angles_2[Joint.J6.value]
+            )
         )
 
     def tool_get_firmware_version(self):
@@ -2507,7 +2581,9 @@ class Phoenix:
         if angle < 0 or angle > 100:
             return False
         command = [254, 254, 8, 14, 6, 0, 11, 0, angle]
-        crc16_value = crc.Calculator(crc.Crc16.MODBUS.value).checksum(bytes(command))
+        crc16_value = crc.Calculator(crc.Crc16.MODBUS.value).checksum(
+            bytes(command)
+        )
         command.extend([(crc16_value >> 8), (crc16_value & 0xFF)])
         self.tool_serial_write_data(command)
         ret = self.tool_serial_read_data(11)
@@ -2523,7 +2599,9 @@ class Phoenix:
             int: current angle
         """
         command = [254, 254, 8, 14, 3, 0, 12, 0, 0]
-        crc16_value = crc.Calculator(crc.Crc16.MODBUS.value).checksum(bytes(command))
+        crc16_value = crc.Calculator(crc.Crc16.MODBUS.value).checksum(
+            bytes(command)
+        )
         command.extend([(crc16_value >> 8), (crc16_value & 0xFF)])
         self.tool_serial_write_data(command)
         ret = self.tool_serial_read_data(11)
@@ -2570,7 +2648,9 @@ class Phoenix:
             (torque_value >> 8),
             (torque_value & 0xFF),
         ]
-        crc16_value = crc.Calculator(crc.Crc16.MODBUS.value).checksum(bytes(command))
+        crc16_value = crc.Calculator(crc.Crc16.MODBUS.value).checksum(
+            bytes(command)
+        )
         command.extend([(crc16_value >> 8), (crc16_value & 0xFF)])
         self.tool_serial_write_data(command)
         ret = self.tool_serial_read_data(11)
@@ -2583,7 +2663,9 @@ class Phoenix:
             int: current torque value
         """
         command = [254, 254, 8, 14, 3, 0, 28, 0, 0]
-        crc16_value = crc.Calculator(crc.Crc16.MODBUS.value).checksum(bytes(command))
+        crc16_value = crc.Calculator(crc.Crc16.MODBUS.value).checksum(
+            bytes(command)
+        )
         command.extend([(crc16_value >> 8), (crc16_value & 0xFF)])
         self.tool_serial_write_data(command)
         ret = self.tool_serial_read_data(11)
@@ -2635,7 +2717,11 @@ class Phoenix:
         if parameter is int:
             parameter_bytes = parameter.to_bytes(2, "big")
         else:
-            parameter_bytes = [id, command_bytes[0], command_bytes[1]] + parameter
+            parameter_bytes = [
+                id,
+                command_bytes[0],
+                command_bytes[1],
+            ] + parameter
         messages_number = math.ceil(len(parameter_bytes) / 5)
         for i, sequence in enumerate(range(messages_number, 0, -1)):
             msg_len = 2 + 5
@@ -2665,7 +2751,9 @@ class Phoenix:
                 parameter_bytes[1],
             ]
         )
-        msg = self._receive_can([0x06, 0xD9, id, command_bytes[0], command_bytes[1]])
+        msg = self._receive_can(
+            [0x06, 0xD9, id, command_bytes[0], command_bytes[1]]
+        )
         if msg is Message:
             ret_value = int.from_bytes([msg.data[5], msg.data[6]], "big")
             return ret_value
@@ -2714,7 +2802,9 @@ class Phoenix:
         if data_to_look_for[0] > 7:
             data_to_look_for[0] = 7
         msg = self._receive_can(
-            msg_data=data_to_look_for, destroy_can=False, messages_num=messages_num
+            msg_data=data_to_look_for,
+            destroy_can=False,
+            messages_num=messages_num,
         )
         if messages_num == 1:
             data.extend(msg.data[3:])
@@ -2738,7 +2828,11 @@ class Phoenix:
         for i in range(0, len(bytes), CHUNK_SIZE):
             chunk = bytes[i : i + CHUNK_SIZE]
             # print("num_chunks = " + str(num_chunks) + ", i = " + str(i))
-            msg_bytes = [0x2 + len(chunk), 0xB5, num_chunks - int(i / CHUNK_SIZE)]
+            msg_bytes = [
+                0x2 + len(chunk),
+                0xB5,
+                num_chunks - int(i / CHUNK_SIZE),
+            ]
             msg_bytes.extend(list(chunk))
             # print("msg_bytes = " + str(list(msg_bytes)))
             self._send_can(msg_bytes)
@@ -2799,10 +2893,12 @@ class Phoenix:
             servo_id (Joint): one of Joint enum's values
         """
         self._send_can(
-            [0x23, 0xFE, 0x60, 0x01, 0x00, 0x00, 0x00, 0x00], 0x600 + servo_id.value + 1
+            [0x23, 0xFE, 0x60, 0x01, 0x00, 0x00, 0x00, 0x00],
+            0x600 + servo_id.value + 1,
         )
         self._send_can(
-            [0x23, 0xFE, 0x60, 0x01, 0x00, 0x00, 0x10, 0x00], 0x600 + servo_id.value + 1
+            [0x23, 0xFE, 0x60, 0x01, 0x00, 0x00, 0x10, 0x00],
+            0x600 + servo_id.value + 1,
         )
 
     def _servo_set_output(self, servo_id, state):

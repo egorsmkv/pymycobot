@@ -36,5 +36,6 @@ convention = "google"
 dev = [
     "flake8>=7.3.0",
     "pytest>=9.0.1",
+    "ruff>=0.14.6",
 ]
 

@@ -6,7 +6,6 @@ from pymycobot.myarm_api import MyArmAPI
 
 
 class MyArmC(MyArmAPI):
-
     def __init__(self, port, baudrate=1000000, timeout=0.1, debug=False):
         super(MyArmC, self).__init__(port, baudrate, timeout, debug)
 
@@ -21,10 +20,11 @@ class MyArmC(MyArmAPI):
             list[int]: 0/1, 1: press, 0: no press
         """
         if not isinstance(mode, int):
-            raise TypeError('mode must be int')
+            raise TypeError("mode must be int")
 
         if mode not in [1, 2, 3, 254]:
-            raise ValueError('mode must be 1, 2, 3 or 254')
+            raise ValueError("mode must be 1, 2, 3 or 254")
 
-        return self._mesg(ProtocolCode.GET_ATOM_PRESS_STATUS, mode, has_reply=True)
-
+        return self._mesg(
+            ProtocolCode.GET_ATOM_PRESS_STATUS, mode, has_reply=True
+        )

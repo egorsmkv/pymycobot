@@ -15,7 +15,9 @@ class AGVProCompositeKit(object):
 
     joystick = InputJoystick(raw_mapping=False)
 
-    def __init__(self, agv_pro_driver: AGVDriveAPI, arm_controller: BaseControllerApi):
+    def __init__(
+        self, agv_pro_driver: AGVDriveAPI, arm_controller: BaseControllerApi
+    ):
         self.arm_controller = arm_controller
         self.agv_pro = agv_pro_driver
 
@@ -112,7 +114,9 @@ class AGVProCompositeKit(object):
             print(f" # Stop panning.")
             self.agv_pro.stop()
 
-    @joystick.register(hotkey=Hotkey.STARTUP, value_filter=lambda value: value == 0)
+    @joystick.register(
+        hotkey=Hotkey.STARTUP, value_filter=lambda value: value == 0
+    )
     def STARTUP(self, _):
         hs = self.agvHorizontalSpeed.reset()
         vs = self.agvVerticalSpeed.reset()
@@ -121,7 +125,9 @@ class AGVProCompositeKit(object):
         print(f" # Speed reset {hs = :.2f} {vs = :.2f} {rs = :.2f}")
 
         if self.agv_pro.is_power_on() is False:
-            print(f" # Abnormal power-off of AGVPRO has been detected, and it is trying to power on...")
+            print(
+                f" # Abnormal power-off of AGVPRO has been detected, and it is trying to power on..."
+            )
             self.agv_pro.power_on()
             time.sleep(1)
             self.agv_pro.open_strip_light_diy_mode()
@@ -230,7 +236,3 @@ class AGVProCompositeKit(object):
 
     def mainloop(self):
         self.joystick.run_with_loop()
-
-
-
-

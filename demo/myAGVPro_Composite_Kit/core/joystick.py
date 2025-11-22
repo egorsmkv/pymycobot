@@ -43,6 +43,7 @@ HotkeyT = T.Union[Hotkey, int]
 
 class InputJoystick(object):
     """InputJoystick"""
+
     hotkey_map = {
         "Key::BTN_TL": Hotkey.L1,
         "Absolute::ABS_BRAKE": Hotkey.L2,
@@ -62,10 +63,15 @@ class InputJoystick(object):
         "Absolute::ABS_X": Hotkey.LEFT_X_AXIS,
         "Absolute::ABS_Y": Hotkey.LEFT_Y_AXIS,
         "Absolute::ABS_Z": Hotkey.RIGHT_X_AXIS,
-        "Absolute::ABS_RZ": Hotkey.RIGHT_Y_AXIS
+        "Absolute::ABS_RZ": Hotkey.RIGHT_Y_AXIS,
     }
 
-    def __init__(self, device: T.Optional[GamePad] = None, ignore_types: T.List[str] = None, raw_mapping: bool = True):
+    def __init__(
+        self,
+        device: T.Optional[GamePad] = None,
+        ignore_types: T.List[str] = None,
+        raw_mapping: bool = True,
+    ):
         self._device = device
         self._raw_mapping = raw_mapping
         self._ignore_types = ignore_types or ["Sync", "Misc"]
@@ -93,7 +99,9 @@ class InputJoystick(object):
         self._logger.debug(f"Bind {hotkey} -> {callback.__name__}")
         self._bindings[hotkey] = callback
 
-    def register(self, hotkey: HotkeyT, value_filter: T.Callable[[int], bool] = None):
+    def register(
+        self, hotkey: HotkeyT, value_filter: T.Callable[[int], bool] = None
+    ):
         def wrapper(callback: BindingCallbackT):
             self.binding(hotkey, callback)
 
@@ -125,7 +133,10 @@ class InputJoystick(object):
             self._logger.debug(f"Unbind {hotkey} -> {value}")
             return
 
-        if hotkey in self._value_filter_table.keys() and not self._value_filter_table[hotkey](value):
+        if (
+            hotkey in self._value_filter_table.keys()
+            and not self._value_filter_table[hotkey](value)
+        ):
             self._logger.debug(f"Filter {hotkey} -> {value}")
             return
 
@@ -164,9 +175,13 @@ class InputJoystick(object):
             except Exception as e:
                 self._logger.error(e)
 
-    def run_with_thread(self, loop_caller: T.Callable[[], bool] = None, delay: float = 0.01) -> None:
+    def run_with_thread(
+        self, loop_caller: T.Callable[[], bool] = None, delay: float = 0.01
+    ) -> None:
         hotkey_queue = queue.Queue()
-        thread = threading.Thread(target=self._thread_loop, args=(hotkey_queue,))
+        thread = threading.Thread(
+            target=self._thread_loop, args=(hotkey_queue,)
+        )
         thread.start()
         while loop_caller() if loop_caller is not None else True:
             for hotkey, value in self.read():
@@ -176,7 +191,9 @@ class InputJoystick(object):
         thread.join()
 
     @staticmethod
-    def get_gamepad(index: int = 0, _filter: T.Callable[[GamePad], bool] = None) -> T.Optional[GamePad]:
+    def get_gamepad(
+        index: int = 0, _filter: T.Callable[[GamePad], bool] = None
+    ) -> T.Optional[GamePad]:
         device_manager = DeviceManager()
         gamepads = device_manager.gamepads
         if _filter is not None:
@@ -187,16 +204,30 @@ class InputJoystick(object):
         return gamepads[index]
 
     @classmethod
-    def create_by_index(cls, index: int, ignore_types: T.List[str] = None, raw_mapping: bool = True) -> "InputJoystick":
+    def create_by_index(
+        cls,
+        index: int,
+        ignore_types: T.List[str] = None,
+        raw_mapping: bool = True,
+    ) -> "InputJoystick":
         ignore_types = ignore_types or []
         joystick = cls.get_gamepad(index=index)
         if joystick is None:
             raise FileNotFoundError("No joystick found")
-        return cls(joystick, ignore_types=ignore_types, raw_mapping=raw_mapping)
+        return cls(
+            joystick, ignore_types=ignore_types, raw_mapping=raw_mapping
+        )
 
     @classmethod
-    def create_by_name(cls, name: str, ignore_types: T.List[str] = None, raw_mapping: bool = True) -> "InputJoystick":
+    def create_by_name(
+        cls,
+        name: str,
+        ignore_types: T.List[str] = None,
+        raw_mapping: bool = True,
+    ) -> "InputJoystick":
         joystick = cls.get_gamepad(_filter=lambda j: j.name == name)
         if joystick is not None:
-            return cls(joystick, ignore_types=ignore_types, raw_mapping=raw_mapping)
+            return cls(
+                joystick, ignore_types=ignore_types, raw_mapping=raw_mapping
+            )
         raise FileNotFoundError(f"No joystick named {name}")

@@ -14,10 +14,14 @@
 
 # import library
 import time
-from pymycobot.mycobot280 import MyCobot280  # import mycobot library,if don't have, first 'pip install pymycobot'
+from pymycobot.mycobot280 import (
+    MyCobot280,
+)  # import mycobot library,if don't have, first 'pip install pymycobot'
 
 # use PC and M5 control
-mc = MyCobot280('COM14', 115200)  # WINDOWS use ，need check port number when you PC
+mc = MyCobot280(
+    "COM14", 115200
+)  # WINDOWS use ，need check port number when you PC
 # mc = MyCobot('/dev/ttyUSB0',115200)           # VM linux use
 time.sleep(0.5)
 
@@ -47,46 +51,62 @@ def process_gcode(file_path):
     # The last valid coordinate, using the rx, ry, rz values
     # in the current coordinates of the robot arm as the starting attitude
     last_coords = [0.0, 0.0, 0.0, get_coords[3], get_coords[4], get_coords[5]]
-    with open(file_path, 'r') as file:
+    with open(file_path, "r") as file:
         # Line-by-line processing instructions
         for line in file:
             command = line.strip()  # Remove newline characters and other whitespace characters at the end of the line
-            if command.startswith("G0") or command.startswith("G1"):  # Move command
+            if command.startswith("G0") or command.startswith(
+                "G1"
+            ):  # Move command
                 coords = last_coords[:]  # Copy the previous valid coordinates
                 command_parts = command.split()
                 for part in command_parts[1:]:
                     if part.startswith("X") or part.startswith("x"):
-                        coords[0] = float(part[1:])  # Extract and transform X coordinate data
+                        coords[0] = float(
+                            part[1:]
+                        )  # Extract and transform X coordinate data
                     elif part.startswith("Y") or part.startswith("y"):
-                        coords[1] = float(part[1:])  # Extract and transform Y coordinate data
+                        coords[1] = float(
+                            part[1:]
+                        )  # Extract and transform Y coordinate data
                     elif part.startswith("Z") or part.startswith("z"):
-                        coords[2] = float(part[1:])  # Extract and transform Z coordinate data
-                if coords[0] == 0.0 and coords[1] == 0.0:  # If XY data is missing, use the last valid XY coordinates
+                        coords[2] = float(
+                            part[1:]
+                        )  # Extract and transform Z coordinate data
+                if (
+                    coords[0] == 0.0 and coords[1] == 0.0
+                ):  # If XY data is missing, use the last valid XY coordinates
                     coords[0] = last_coords[0]
                     coords[1] = last_coords[1]
-                if coords[2] == 0.0:  # If Z data is missing, use the last valid Z coordinate
+                if (
+                    coords[2] == 0.0
+                ):  # If Z data is missing, use the last valid Z coordinate
                     coords[2] = last_coords[2]
                 last_coords = coords
                 data_coords.append(coords)  # Add coordinates to list and save
     return data_coords
 
 
-type = int(input('Please input 1-4（1-square 2-triangle 3-five point star 4-quit）:'))
+type = int(
+    input("Please input 1-4（1-square 2-triangle 3-five point star 4-quit）:")
+)
 if type == 1:
     # Pass in the gcode file path and obtain the coordinate data
     # File path can be customized
-    coords_data = process_gcode('square.nc')
+    coords_data = process_gcode("square.nc")
     # Send coordinates to the robot arm one by one
     for i in coords_data:
         mc.send_coords(i, draw_speed, 1)  # Send coordinates to the robot arm
-        time.sleep(3.5)  # Wait 3.5 seconds for the robot arm movement to complete
+        time.sleep(
+            3.5
+        )  # Wait 3.5 seconds for the robot arm movement to complete
 elif type == 2:
-    coords_data = process_gcode('triangle.nc')
+    coords_data = process_gcode("triangle.nc")
     for i in coords_data:
         mc.send_coords(i, draw_speed, 1)
         time.sleep(3.5)
 elif type == 3:
-    coords_data = process_gcode('five_point_star.nc')
+    coords_data = process_gcode("five_point_star.nc")
     for i in coords_data:
         mc.send_coords(i, draw_speed, 1)
         time.sleep(3.5)

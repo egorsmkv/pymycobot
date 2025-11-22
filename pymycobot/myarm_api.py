@@ -29,7 +29,9 @@ class MyArmMCProcessor(DataProcessor):
             debug    : whether show debug info
         """
         super(MyArmMCProcessor, self).__init__(debug=debug)
-        self.calibration_parameters = functools.partial(calibration_parameters, class_name=self.__class__.__name__)
+        self.calibration_parameters = functools.partial(
+            calibration_parameters, class_name=self.__class__.__name__
+        )
         self._serial_port = setup_serial_connect(port, baudrate, timeout)
         self.lock = threading.Lock()
 
@@ -42,7 +44,11 @@ class MyArmMCProcessor(DataProcessor):
         :param command: the command to check
         :return: True if the command is valid, False otherwise
         """
-        return len(command) >= 5 and command[-1] == ProtocolCode.FOOTER and command[2] == len(command) - 3
+        return (
+            len(command) >= 5
+            and command[-1] == ProtocolCode.FOOTER
+            and command[2] == len(command) - 3
+        )
 
     def _read_command_buffer(self, timeout=0.1):
         commands = b""
@@ -52,7 +58,11 @@ class MyArmMCProcessor(DataProcessor):
         while time.perf_counter() - stime < timeout:
             current_frame = self._serial_port.read(1)
 
-            if current_frame == b"\xfe" and previous_frame == b"\xfe" and is_record is False:
+            if (
+                current_frame == b"\xfe"
+                and previous_frame == b"\xfe"
+                and is_record is False
+            ):
                 is_record = True
                 commands = b"\xfe\xfe"
                 continue
@@ -69,9 +79,15 @@ class MyArmMCProcessor(DataProcessor):
     def _read(self, genre):
         if genre == ProtocolCode.GET_ROBOT_ERROR_STATUS:
             timeout = 90
-        elif genre == ProtocolCode.SET_SSID_PWD or genre == ProtocolCode.GET_SSID_PWD:
+        elif (
+            genre == ProtocolCode.SET_SSID_PWD
+            or genre == ProtocolCode.GET_SSID_PWD
+        ):
             timeout = 0.05
-        elif genre in [ProtocolCode.INIT_ELECTRIC_GRIPPER, ProtocolCode.SET_GRIPPER_MODE]:
+        elif genre in [
+            ProtocolCode.INIT_ELECTRIC_GRIPPER,
+            ProtocolCode.SET_GRIPPER_MODE,
+        ]:
             timeout = 0.3
         elif genre in [ProtocolCode.SET_GRIPPER_CALIBRATION]:
             timeout = 0.4
@@ -81,11 +97,15 @@ class MyArmMCProcessor(DataProcessor):
             timeout = 0.1
 
         command_buffer = self._read_command_buffer(timeout=timeout)
-        self.log.debug(f"_read : {' '.join(map(lambda x: f'{x:02x}', command_buffer))}")
+        self.log.debug(
+            f"_read : {' '.join(map(lambda x: f'{x:02x}', command_buffer))}"
+        )
         return command_buffer
 
     def _write(self, command):
-        self.log.debug(f"_write: {' '.join(map(lambda x: f'{x:02x}', command))}")
+        self.log.debug(
+            f"_write: {' '.join(map(lambda x: f'{x:02x}', command))}"
+        )
         if not self._serial_port.is_open:
             self._serial_port.open()
         self._serial_port.write(command)
@@ -101,7 +121,9 @@ class MyArmMCProcessor(DataProcessor):
             **kwargs: support `has_reply`
                 has_reply: Whether there is a return value to accept.
         """
-        real_command, has_reply, _async = super(MyArmMCProcessor, self)._mesg(genre, *args, **kwargs)
+        real_command, has_reply, _async = super(MyArmMCProcessor, self)._mesg(
+            genre, *args, **kwargs
+        )
         with self.lock:
             self._write(self._flatten(real_command))
 
@@ -132,7 +154,7 @@ class MyArmMCProcessor(DataProcessor):
                 ProtocolCode.POWER_ON,
                 ProtocolCode.GET_MASTER_PIN_STATUS,
                 ProtocolCode.GET_ATOM_PIN_STATUS,
-                ProtocolCode.GET_SERVO_D
+                ProtocolCode.GET_SERVO_D,
             ]
 
             if genre in return_single_genres:
@@ -141,10 +163,14 @@ class MyArmMCProcessor(DataProcessor):
                     result = self._int2angle(result)
                 return result
             if genre in (ProtocolCode.GET_ATOM_PRESS_STATUS,):
-                if self.__class__.__name__ == 'MyArmM':
+                if self.__class__.__name__ == "MyArmM":
                     return res[0]
                 return res
-            elif genre in [ProtocolCode.GET_ANGLES, ProtocolCode.GET_JOINT_MAX_ANGLE, ProtocolCode.GET_JOINT_MIN_ANGLE]:
+            elif genre in [
+                ProtocolCode.GET_ANGLES,
+                ProtocolCode.GET_JOINT_MAX_ANGLE,
+                ProtocolCode.GET_JOINT_MIN_ANGLE,
+            ]:
                 return [self._int2angle(angle) for angle in res]
             elif genre == ProtocolCode.GET_JOINTS_COORD:
                 r = []
@@ -164,24 +190,28 @@ class MyArmMCProcessor(DataProcessor):
                         continue
 
                     reverse_bins = reversed(bin(item)[2:])
-                    rank = [i for i, e in enumerate(reverse_bins) if e != '0']
+                    rank = [i for i, e in enumerate(reverse_bins) if e != "0"]
                     result.append(rank)
                 return result
-            elif genre in (ProtocolCode.GET_ROBOT_FIRMWARE_VERSION, ProtocolCode.GET_ROBOT_TOOL_FIRMWARE_VERSION):
+            elif genre in (
+                ProtocolCode.GET_ROBOT_FIRMWARE_VERSION,
+                ProtocolCode.GET_ROBOT_TOOL_FIRMWARE_VERSION,
+            ):
                 return self._int2coord(res[0])
             else:
                 return res
 
 
 class MyArmAPI(MyArmMCProcessor):
-
     def get_robot_modified_version(self):
         """Get the bot correction version number
 
         Returns:
                 version (int): the bot correction version number
         """
-        return self._mesg(ProtocolCode.GET_ROBOT_MODIFIED_VERSION, has_reply=True)
+        return self._mesg(
+            ProtocolCode.GET_ROBOT_MODIFIED_VERSION, has_reply=True
+        )
 
     def get_robot_firmware_version(self):
         """Obtaining the Robot Firmware Version (Major and Minor Versions)
@@ -189,15 +219,21 @@ class MyArmAPI(MyArmMCProcessor):
         Returns:
                 version (int): the robot firmware
         """
-        return self._mesg(ProtocolCode.GET_ROBOT_FIRMWARE_VERSION, has_reply=True)
+        return self._mesg(
+            ProtocolCode.GET_ROBOT_FIRMWARE_VERSION, has_reply=True
+        )
 
     def get_robot_tool_modified_version(self):
         """Get the remediation version of the bot tool"""
-        return self._mesg(ProtocolCode.GET_ROBOT_ATOM_MODIFIED_VERSION, has_reply=True)
+        return self._mesg(
+            ProtocolCode.GET_ROBOT_ATOM_MODIFIED_VERSION, has_reply=True
+        )
 
     def get_robot_tool_firmware_version(self):
         """Get the Robot Tool Firmware Version (End Atom)"""
-        return self._mesg(ProtocolCode.GET_ROBOT_TOOL_FIRMWARE_VERSION, has_reply=True)
+        return self._mesg(
+            ProtocolCode.GET_ROBOT_TOOL_FIRMWARE_VERSION, has_reply=True
+        )
 
     def set_robot_err_check_state(self, status):
         """Set Error Detection Status You can turn off error detection, but do not turn it off unless necessary
@@ -211,7 +247,9 @@ class MyArmAPI(MyArmMCProcessor):
 
     def get_robot_err_check_state(self):
         """Read error detection status"""
-        return self._mesg(ProtocolCode.GET_ROBOT_ERROR_CHECK_STATE, has_reply=True)
+        return self._mesg(
+            ProtocolCode.GET_ROBOT_ERROR_CHECK_STATE, has_reply=True
+        )
 
     def get_robot_error_status(self):
         """Get the bot error status
@@ -220,7 +258,9 @@ class MyArmAPI(MyArmMCProcessor):
             No error: [0,0,0,0,0,0,0,0]
             assuming that error 1 and 3 are reported in section 1, it should return: [[1,3],0,0,0,0,0,0,0]
         """
-        return self._mesg(ProtocolCode.GET_ROBOT_ERROR_STATUS, has_reply=True, timeout=90)
+        return self._mesg(
+            ProtocolCode.GET_ROBOT_ERROR_STATUS, has_reply=True, timeout=90
+        )
 
     def get_recv_queue_max_len(self):
         """The total length of the read command queue, the default length is 100"""
@@ -250,7 +290,9 @@ class MyArmAPI(MyArmMCProcessor):
             angle (int)
         """
         self.calibration_parameters(joint_id=joint_id)
-        return self._mesg(ProtocolCode.COBOTX_GET_ANGLE, joint_id, has_reply=True)
+        return self._mesg(
+            ProtocolCode.COBOTX_GET_ANGLE, joint_id, has_reply=True
+        )
 
     def get_joints_angle(self):
         """Obtain the current angle of all joints, if one of the angles is 200��,
@@ -290,7 +332,7 @@ class MyArmAPI(MyArmMCProcessor):
         return self._mesg(ProtocolCode.GET_ENCODER, servo_id, has_reply=True)
 
     def get_servos_encoder_drag(self):
-        """ Reads the current encoder value and operating speed of all servo motors
+        """Reads the current encoder value and operating speed of all servo motors
         Returns:
             encoders (list[int * 8]): 0-4095
             speeds (list[int * 8]): 0-4095
@@ -373,7 +415,9 @@ class MyArmAPI(MyArmMCProcessor):
             servo_id (int): 0-254
         """
         self.calibration_parameters(servo_id=servo_id)
-        return self._mesg(ProtocolCode.GET_SERVO_D, servo_id, has_reply=True, timeout=0.1)
+        return self._mesg(
+            ProtocolCode.GET_SERVO_D, servo_id, has_reply=True, timeout=0.1
+        )
 
     def set_servo_i(self, servo_id, data):
         """Set the proportional factor of the position ring I of the specified servo motor
@@ -389,7 +433,9 @@ class MyArmAPI(MyArmMCProcessor):
     def get_servo_i(self, servo_id):
         """Reads the position loop I scale factor of the specified servo motor"""
         self.calibration_parameters(servo_id=servo_id)
-        return self._mesg(ProtocolCode.GET_ERROR_DETECT_MODE, servo_id, has_reply=True)
+        return self._mesg(
+            ProtocolCode.GET_ERROR_DETECT_MODE, servo_id, has_reply=True
+        )
 
     def set_servo_cw(self, servo_id, data):
         """Sets the clockwise insensitivity zone of the encoder for the specified servo motor
@@ -412,7 +458,9 @@ class MyArmAPI(MyArmMCProcessor):
             servo_id (int): 0 - 254
         """
         self.calibration_parameters(servo_id=servo_id)
-        return self._mesg(ProtocolCode.GET_SERVO_MOTOR_CLOCKWISE, servo_id, has_reply=True)
+        return self._mesg(
+            ProtocolCode.GET_SERVO_MOTOR_CLOCKWISE, servo_id, has_reply=True
+        )
 
     def set_servo_cww(self, servo_id, data):
         """Sets the counterclockwise insensitive zone of the encoder for the specified servo motor
@@ -426,7 +474,9 @@ class MyArmAPI(MyArmMCProcessor):
             assert 0 <= data <= 16, "data must be between 0 and 16"
         else:
             assert 0 <= data <= 32, "data must be between 0 and 32"
-        return self._mesg(ProtocolCode.SET_SERVO_MOTOR_COUNTER_CLOCKWISE, servo_id, data)
+        return self._mesg(
+            ProtocolCode.SET_SERVO_MOTOR_COUNTER_CLOCKWISE, servo_id, data
+        )
 
     def get_servo_cww(self, servo_id):
         """Reads the counterclockwise insensitive area of the encoder of the specified servo motor
@@ -435,7 +485,11 @@ class MyArmAPI(MyArmMCProcessor):
             servo_id (int): 0 - 254
         """
         self.calibration_parameters(servo_id=servo_id)
-        return self._mesg(ProtocolCode.GET_SERVO_MOTOR_COUNTER_CLOCKWISE, servo_id, has_reply=True)
+        return self._mesg(
+            ProtocolCode.GET_SERVO_MOTOR_COUNTER_CLOCKWISE,
+            servo_id,
+            has_reply=True,
+        )
 
     def set_servo_system_data(self, servo_id, addr, data, mode):
         """Set the system parameters for the specified servo motor
@@ -447,13 +501,15 @@ class MyArmAPI(MyArmMCProcessor):
             mode (int): 1 - data 1byte. 2 - data 2byte
         """
         if mode not in (1, 2):
-            raise ValueError('mode must be 1 or 2')
+            raise ValueError("mode must be 1 or 2")
 
         if data not in range(0, 4097):
-            raise ValueError('data must be between 0 and 4096')
+            raise ValueError("data must be between 0 and 4096")
 
         self.calibration_parameters(servo_id=servo_id, servo_addr=addr)
-        self._mesg(ProtocolCode.SET_SERVO_MOTOR_CONFIG, servo_id, addr, [data], mode)
+        self._mesg(
+            ProtocolCode.SET_SERVO_MOTOR_CONFIG, servo_id, addr, [data], mode
+        )
 
     def get_servo_system_data(self, servo_id, addr, mode):
         """Read the system parameters of the specified servo motor
@@ -464,9 +520,15 @@ class MyArmAPI(MyArmMCProcessor):
             mode (int): 1 - data 1byte. 2 - data 2byte
         """
         if mode not in (1, 2):
-            raise ValueError('mode must be 1 or 2')
+            raise ValueError("mode must be 1 or 2")
         self.calibration_parameters(servo_id=servo_id)
-        return self._mesg(ProtocolCode.GET_SERVO_MOTOR_CONFIG, servo_id, addr, mode, has_reply=True)
+        return self._mesg(
+            ProtocolCode.GET_SERVO_MOTOR_CONFIG,
+            servo_id,
+            addr,
+            mode,
+            has_reply=True,
+        )
 
     def set_master_out_io_state(self, pin_number, status=1):
         """Set the host I/O pin status
@@ -477,7 +539,7 @@ class MyArmAPI(MyArmMCProcessor):
 
         """
         if status not in (0, 1):
-            raise ValueError('status must be 0 or 1')
+            raise ValueError("status must be 0 or 1")
         self.calibration_parameters(pin_number=pin_number)
         self._mesg(ProtocolCode.SET_MASTER_PIN_STATUS, pin_number, status)
 
@@ -491,7 +553,9 @@ class MyArmAPI(MyArmMCProcessor):
                 0 or 1. 1: high 0: low
         """
         self.calibration_parameters(pin_number=pin_number)
-        return self._mesg(ProtocolCode.GET_MASTER_PIN_STATUS, pin_number, has_reply=True)
+        return self._mesg(
+            ProtocolCode.GET_MASTER_PIN_STATUS, pin_number, has_reply=True
+        )
 
     def set_tool_out_io_state(self, io_number, status=1):
         """Set the Atom pin status
@@ -519,7 +583,9 @@ class MyArmAPI(MyArmMCProcessor):
         if pin not in (1, 2):
             raise ValueError("pin must be 1 or 2")
 
-        return self._mesg(ProtocolCode.GET_ATOM_PIN_STATUS, pin, has_reply=True)
+        return self._mesg(
+            ProtocolCode.GET_ATOM_PIN_STATUS, pin, has_reply=True
+        )
 
     def set_tool_led_color(self, r, g, b):
         """Set the Atom LED color

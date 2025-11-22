@@ -25,10 +25,19 @@ class AGVDriveAPI(object):
     def __init__(self, comport: str, debug: bool = False):
         self._agv_pro = pymycobot.MyAGVPro(comport, debug=debug)
 
-    def set_strip_light_color(self, locations: T.List[int], color: T.Tuple[int, int, int], brightness: int = 255):
+    def set_strip_light_color(
+        self,
+        locations: T.List[int],
+        color: T.Tuple[int, int, int],
+        brightness: int = 255,
+    ):
         for location in locations:
-            print(f" # Set strip light color {location} to {color} with brightness {brightness}")
-            self._agv_pro.set_led_color(location, color=color, brightness=brightness)
+            print(
+                f" # Set strip light color {location} to {color} with brightness {brightness}"
+            )
+            self._agv_pro.set_led_color(
+                location, color=color, brightness=brightness
+            )
 
     def open_strip_light_diy_mode(self):
         self._agv_pro.set_led_mode(1)
@@ -82,7 +91,7 @@ class AGVDriveAPI(object):
             right_bumper_strip=report_message[3][3] == 1,
             error_motor=report_message[4],
             power_voltage=report_message[5],
-            motor_enable=report_message[6] == 1
+            motor_enable=report_message[6] == 1,
         )
 
     def get_emergency_stop_state(self) -> bool:

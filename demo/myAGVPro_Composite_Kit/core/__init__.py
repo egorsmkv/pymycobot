@@ -34,11 +34,10 @@ def get_local_host() -> str:
 
 def find_esp32_drive():
     paths = []
-    for i in os.listdir('/dev'):
+    for i in os.listdir("/dev"):
         if not i.startswith("ttyACM"):
             continue
-        paths.append(os.path.join('/dev', i))
+        paths.append(os.path.join("/dev", i))
 
     paths.sort(key=lambda p: int(p[-1]))
     return paths
-

@@ -2,7 +2,7 @@ from pymycobot.ultraArmP340 import ultraArmP340
 import time
 import serial
 import serial.tools.list_ports
-#输入以上代码导入工程所需要的包
+# 输入以上代码导入工程所需要的包
 
 # ultraArmP340 类初始化需要两个参数：
 #   第一个是串口字符串， 如：
@@ -18,8 +18,8 @@ import serial.tools.list_ports
 #
 
 plist = [
-        str(x).split(" - ")[0].strip() for x in serial.tools.list_ports.comports()
-    ]
+    str(x).split(" - ")[0].strip() for x in serial.tools.list_ports.comports()
+]
 
 # 初始化一个ultraArmP340对象
 # 下面为 windows版本创建对象代码
@@ -29,10 +29,10 @@ ua = ultraArmP340(plist[0], 115200)
 ua.go_zero()
 time.sleep(0.5)
 
-# 开启吸泵    
+# 开启吸泵
 ua.set_gpio_state(0)
 
-#等待2 秒
+# 等待2 秒
 time.sleep(3)
 
 

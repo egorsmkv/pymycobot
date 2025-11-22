@@ -7,7 +7,12 @@ import threading
 import time
 import enum
 
-from .myagvapi import CommunicationProtocol, Utils, setup_serial_connect, setup_logging
+from .myagvapi import (
+    CommunicationProtocol,
+    Utils,
+    setup_serial_connect,
+    setup_logging,
+)
 
 LOCAL_LANGUAGE_CODE, _ = locale.getdefaultlocale()
 
@@ -66,14 +71,12 @@ PLAINTEXT_REPLY_PROTOCOL_CODE = (
     ProtocolCode.GET_WIFI_ACCOUNT,
     ProtocolCode.GET_WIFI_IP_PORT,
     ProtocolCode.GET_BLUETOOTH_UUID,
-    ProtocolCode.GET_BLUETOOTH_ADDRESS
+    ProtocolCode.GET_BLUETOOTH_ADDRESS,
 )
 
 
 class MyAGVProCommandProtocolApi(CommunicationProtocol):
-    genre_timeout_table = {
-        ProtocolCode.POWER_ON: 2.1
-    }
+    genre_timeout_table = {ProtocolCode.POWER_ON: 2.1}
     language_prompt_tips = {
         "en_US": {
             ProtocolCode.POWER_ON: {
@@ -81,7 +84,7 @@ class MyAGVProCommandProtocolApi(CommunicationProtocol):
                 2: "[Power-on Tips]: Emergency stop triggered",
                 3: "[Power-on Tips]: The battery is too low",
                 4: "[Power-on Tips]: CAN initialization is abnormal",
-                5: "[Power-on Tips]: Motor initialization exception"
+                5: "[Power-on Tips]: Motor initialization exception",
             }
         },
         "zh_CN": {
@@ -90,9 +93,9 @@ class MyAGVProCommandProtocolApi(CommunicationProtocol):
                 2: "[上电提示]: 紧急触发",
                 3: "[上电提示]: 电量过低",
                 4: "[上电提示]: CAN初始化异常",
-                5: "[上电提示]: 电机初始化异常"
+                5: "[上电提示]: 电机初始化异常",
             }
-        }
+        },
     }
 
     def __init__(self, debug=False, save_serial_log=False):
@@ -101,7 +104,9 @@ class MyAGVProCommandProtocolApi(CommunicationProtocol):
         self._data_buffer = []
         self._serial_filename = "serial.log"
         self._communication_mode = 0
-        self.log = setup_logging(name=f"{__name__}.{self.__class__.__name__}", debug=debug)
+        self.log = setup_logging(
+            name=f"{__name__}.{self.__class__.__name__}", debug=debug
+        )
 
     def _save_buffer_data(self, data, to_local=False):
         if self._save_serial_log is False:
@@ -110,12 +115,17 @@ class MyAGVProCommandProtocolApi(CommunicationProtocol):
         self._data_buffer.append(data)
 
         if to_local is True:
-            self._save_file(self._serial_filename, " ".join(map(str, self._data_buffer)) + "\n")
+            self._save_file(
+                self._serial_filename,
+                " ".join(map(str, self._data_buffer)) + "\n",
+            )
             self._data_buffer.clear()
 
     def _prompt(self, genre, code):
         default_prompt_tips = self.language_prompt_tips.get("en_US")
-        code_prompt_tips = self.language_prompt_tips.get(LOCAL_LANGUAGE_CODE, default_prompt_tips)
+        code_prompt_tips = self.language_prompt_tips.get(
+            LOCAL_LANGUAGE_CODE, default_prompt_tips
+        )
         prompt_tips = code_prompt_tips.get(genre, None)
         if prompt_tips is None:
             return
@@ -138,13 +148,19 @@ class MyAGVProCommandProtocolApi(CommunicationProtocol):
     def _match_protocol_data(self, genre, timeout=0.1):
         is_save_mac_addr = False
         for _ in range(5):
-            if ProtocolCode.SET_COMMUNICATION_MODE.equal(genre) and self._communication_mode == 2:
+            if (
+                ProtocolCode.SET_COMMUNICATION_MODE.equal(genre)
+                and self._communication_mode == 2
+            ):
                 data = self._read_plaintext_data(timeout=timeout)
                 if len(data) == 0:
                     continue
 
                 if is_save_mac_addr is False:
-                    mac_addr = self._parsing_data(ProtocolCode.GET_BLUETOOTH_ADDRESS, data.decode('utf-8'))
+                    mac_addr = self._parsing_data(
+                        ProtocolCode.GET_BLUETOOTH_ADDRESS,
+                        data.decode("utf-8"),
+                    )
                     info = f"MyAGVPro Bluetooth MAC Address: {mac_addr}"
                     self._save_file("AGVPro_BLUETOOTH_MAC_ADDR", info)
                     is_save_mac_addr = True
@@ -161,7 +177,9 @@ class MyAGVProCommandProtocolApi(CommunicationProtocol):
             else:
                 reply_data = self._read_protocol_data(timeout=timeout)
 
-                if reply_data and not genre.equal(reply_data[3]):  # check genre
+                if reply_data and not genre.equal(
+                    reply_data[3]
+                ):  # check genre
                     continue
 
             if len(reply_data) == 0:
@@ -175,17 +193,17 @@ class MyAGVProCommandProtocolApi(CommunicationProtocol):
 
     def _read_plaintext_data(self, timeout=0.1):
         reply_data = self._read_command_buffer(
-            start_flag_caller=lambda: b'AGVPro:',
-            end_flag_caller=lambda cmds: b'\r\n',
-            timeout=timeout
+            start_flag_caller=lambda: b"AGVPro:",
+            end_flag_caller=lambda cmds: b"\r\n",
+            timeout=timeout,
         )
         return reply_data
 
     def _read_protocol_data(self, timeout=0.1):
         reply_data = self._read_command_buffer(
-            start_flag_caller=lambda: b'\xfe\xfe',
+            start_flag_caller=lambda: b"\xfe\xfe",
             end_flag_caller=lambda cmds: Utils.crc16_check_bytes(cmds[:-2]),
-            timeout=timeout
+            timeout=timeout,
         )
         return reply_data
 
@@ -195,21 +213,23 @@ class MyAGVProCommandProtocolApi(CommunicationProtocol):
             timeout = self.genre_timeout_table.get(genre, 0.1)
             if not ProtocolCode.GET_AUTO_REPORT_MESSAGE.equal(genre):
                 real_command = self._combination(genre, args)
-                self.log.info(f"write: {' '.join(f'{x:02x}' for x in real_command)}")
+                self.log.info(
+                    f"write: {' '.join(f'{x:02x}' for x in real_command)}"
+                )
                 self.write(real_command)
 
             reply_data = self._match_protocol_data(genre, timeout)
             decode_respond = self._instruction_decoding(genre, reply_data)
             data = self._parsing_data(genre, decode_respond)
             self._prompt(genre, data)
-            self._save_buffer_data(b'', to_local=True)
+            self._save_buffer_data(b"", to_local=True)
             return data
 
     @classmethod
     def _filter(cls, data, target):
         for index in range(len(data) - 1, -1, -1):
             if data[index] != target:
-                return data[:index + 1]
+                return data[: index + 1]
         return data
 
     @classmethod
@@ -217,20 +237,20 @@ class MyAGVProCommandProtocolApi(CommunicationProtocol):
         if not reply_data:
             return None
 
-        respond_body = reply_data[4: -2]
+        respond_body = reply_data[4:-2]
         if genre in PLAINTEXT_REPLY_PROTOCOL_CODE:
             respond_body = reply_data.decode("utf-8")
 
         if genre in (
-                ProtocolCode.GET_MOTOR_TEMPERATURE,
-                ProtocolCode.GET_MOTOR_SPEEDS,
-                ProtocolCode.GET_MOTOR_TORQUES,
-                ProtocolCode.GET_MOTOR_STATUS,
-                ProtocolCode.GET_MOTOR_LOSS_COUNT
+            ProtocolCode.GET_MOTOR_TEMPERATURE,
+            ProtocolCode.GET_MOTOR_SPEEDS,
+            ProtocolCode.GET_MOTOR_TORQUES,
+            ProtocolCode.GET_MOTOR_STATUS,
+            ProtocolCode.GET_MOTOR_LOSS_COUNT,
         ):
             respond = []
             for i in range(0, len(respond_body), 2):
-                data = Utils.decode_int16(respond_body[i:i + 2])
+                data = Utils.decode_int16(respond_body[i : i + 2])
                 respond.append(data)
             return respond
         return respond_body
@@ -246,28 +266,34 @@ class MyAGVProCommandProtocolApi(CommunicationProtocol):
         if ProtocolCode.GET_MOTOR_TEMPERATURE.equal(genre):
             return list(data / 10 for data in reply_data)
 
-        if genre in (ProtocolCode.GET_MOTOR_SPEEDS, ProtocolCode.GET_MOTOR_TORQUES):
+        if genre in (
+            ProtocolCode.GET_MOTOR_SPEEDS,
+            ProtocolCode.GET_MOTOR_TORQUES,
+        ):
             return list(data / 100 for data in reply_data)
 
         if ProtocolCode.GET_MOTOR_LOSS_COUNT.equal(genre):
             return list(reply_data)
 
         if ProtocolCode.GET_WIFI_ACCOUNT.equal(genre):
-            data = re.findall(r'AGVPro:WIFI:S:(.*);P:(.*);', reply_data)
+            data = re.findall(r"AGVPro:WIFI:S:(.*);P:(.*);", reply_data)
             return data[0] if len(data) == 1 else None
 
         if ProtocolCode.GET_WIFI_IP_PORT.equal(genre):
-            data = re.findall(r'AGVPro:WIFI:IP:(.*);PORT:(.*);', reply_data)
+            data = re.findall(r"AGVPro:WIFI:IP:(.*);PORT:(.*);", reply_data)
             if len(data) == 0:
                 return None
             return data[0][0], int(data[0][1])
 
         if ProtocolCode.GET_BLUETOOTH_UUID.equal(genre):
-            data = re.findall(r'AGVPro:BLE::Name:(.*);Service_UUID:(.*);CHAR_UUID:(.*);', reply_data)
+            data = re.findall(
+                r"AGVPro:BLE::Name:(.*);Service_UUID:(.*);CHAR_UUID:(.*);",
+                reply_data,
+            )
             return data[0] if len(data) == 1 else None
 
         if ProtocolCode.GET_BLUETOOTH_ADDRESS.equal(genre):
-            data = re.findall(r'AGVPro:BLE:MAC:(.*);\r\n', reply_data)
+            data = re.findall(r"AGVPro:BLE:MAC:(.*);\r\n", reply_data)
             return data[0] if len(data) == 1 else None
 
         if ProtocolCode.GET_MOTOR_STATUS.equal(genre):
@@ -312,7 +338,7 @@ class MyAGVProCommandProtocolApi(CommunicationProtocol):
                     respond.append(data)
 
                 elif index > 7 and index % 2 == 0:
-                    piece = reply_data[index - 1:index + 1]
+                    piece = reply_data[index - 1 : index + 1]
                     int16 = Utils.decode_int16(piece)
                     respond.append(round(int16 / 100, 2))
 
@@ -333,7 +359,7 @@ class MyAGVProCommandProtocolApi(CommunicationProtocol):
         command_args = Utils.process_data_command(params)
         while len(command_args) < 8:
             command_args.append(0x00)
-        command = bytearray([0xfe, 0xfe, 0x0b, genre.value])
+        command = bytearray([0xFE, 0xFE, 0x0B, genre.value])
         command.extend(command_args)
         crc16_check_code = Utils.crc16_check(command)
 
@@ -351,7 +377,9 @@ class MyAGVProCommandProtocolApi(CommunicationProtocol):
 
             self._save_buffer_data(data)
 
-    def _read_command_buffer(self, start_flag_caller, end_flag_caller, timeout=1.0):
+    def _read_command_buffer(
+        self, start_flag_caller, end_flag_caller, timeout=1.0
+    ):
         channel_buffer = b""
         real_command = b""
         is_record = False
@@ -378,7 +406,6 @@ class MyAGVProCommandProtocolApi(CommunicationProtocol):
 
 
 class MyAGVProCommandApi(MyAGVProCommandProtocolApi):
-
     def get_system_version(self):
         """Obtain the major firmware version number
 
@@ -449,8 +476,10 @@ class MyAGVProCommandApi(MyAGVProCommandProtocolApi):
         """
         return self._merge(ProtocolCode.GET_POWER_STATE)
 
-    def _basic_move(self, vertical_speed=0.0, horizontal_speed=0.0, rotate_speed=0.0):
-        """ Basic moving control
+    def _basic_move(
+        self, vertical_speed=0.0, horizontal_speed=0.0, rotate_speed=0.0
+    ):
+        """Basic moving control
 
         Args:
             vertical_speed: +-0.01 ~ +-1.50m/s
@@ -465,8 +494,8 @@ class MyAGVProCommandApi(MyAGVProCommandProtocolApi):
             [
                 int(vertical_speed * 100),
                 int(horizontal_speed * 100),
-                int(rotate_speed * 100)
-            ]
+                int(rotate_speed * 100),
+            ],
         )
 
     def move_forward(self, speed):
@@ -482,8 +511,12 @@ class MyAGVProCommandApi(MyAGVProCommandProtocolApi):
             raise ValueError("Speed must be between 0.01 and 1.50")
 
         if self.get_significant_bit(speed) > 2:
-            raise ValueError(f"speed must be a number with 2 significant bits, but got {speed}")
-        return self._merge(ProtocolCode.AGV_MOTION_CONTROL, [int(speed * 100 * 1), 0x00])
+            raise ValueError(
+                f"speed must be a number with 2 significant bits, but got {speed}"
+            )
+        return self._merge(
+            ProtocolCode.AGV_MOTION_CONTROL, [int(speed * 100 * 1), 0x00]
+        )
 
     def move_backward(self, speed):
         """Pan the robot backward
@@ -498,9 +531,13 @@ class MyAGVProCommandApi(MyAGVProCommandProtocolApi):
             raise ValueError("Speed must be between 0.01 and 1.50")
 
         if self.get_significant_bit(speed) > 2:
-            raise ValueError(f"speed must be a number with 2 significant bits, but got {speed}")
+            raise ValueError(
+                f"speed must be a number with 2 significant bits, but got {speed}"
+            )
 
-        return self._merge(ProtocolCode.AGV_MOTION_CONTROL, [int(speed * 100 * -1)])
+        return self._merge(
+            ProtocolCode.AGV_MOTION_CONTROL, [int(speed * 100 * -1)]
+        )
 
     def move_left_lateral(self, speed):
         """Pan the robot left
@@ -515,8 +552,12 @@ class MyAGVProCommandApi(MyAGVProCommandProtocolApi):
             raise ValueError("Speed must be between 0.01 and 1.00")
 
         if self.get_significant_bit(speed) > 2:
-            raise ValueError(f"speed must be a number with 2 significant bits, but got {speed}")
-        return self._merge(ProtocolCode.AGV_MOTION_CONTROL, [0x00, int(speed * 100 * -1)])
+            raise ValueError(
+                f"speed must be a number with 2 significant bits, but got {speed}"
+            )
+        return self._merge(
+            ProtocolCode.AGV_MOTION_CONTROL, [0x00, int(speed * 100 * -1)]
+        )
 
     def move_right_lateral(self, speed):
         """Pan the robot right
@@ -531,8 +572,12 @@ class MyAGVProCommandApi(MyAGVProCommandProtocolApi):
             raise ValueError("Speed must be between 0.01 and 1.00")
 
         if self.get_significant_bit(speed) > 2:
-            raise ValueError(f"speed must be a number with 2 significant bits, but got {speed}")
-        return self._merge(ProtocolCode.AGV_MOTION_CONTROL, [0x00, int(speed * 100 * 1)])
+            raise ValueError(
+                f"speed must be a number with 2 significant bits, but got {speed}"
+            )
+        return self._merge(
+            ProtocolCode.AGV_MOTION_CONTROL, [0x00, int(speed * 100 * 1)]
+        )
 
     def turn_left(self, speed):
         """Rotate to the left
@@ -544,8 +589,13 @@ class MyAGVProCommandApi(MyAGVProCommandProtocolApi):
             int: 1: Success, 0: Failed
         """
         if self.get_significant_bit(speed) > 2:
-            raise ValueError(f"speed must be a number with 2 significant bits, but got {speed}")
-        return self._merge(ProtocolCode.AGV_MOTION_CONTROL, [0x00, 0x00, int(speed * 100 * -1), 0x00])
+            raise ValueError(
+                f"speed must be a number with 2 significant bits, but got {speed}"
+            )
+        return self._merge(
+            ProtocolCode.AGV_MOTION_CONTROL,
+            [0x00, 0x00, int(speed * 100 * -1), 0x00],
+        )
 
     def turn_right(self, speed):
         """Rotate to the right
@@ -557,8 +607,12 @@ class MyAGVProCommandApi(MyAGVProCommandProtocolApi):
             int: 1: Success, 0: Failed
         """
         if self.get_significant_bit(speed) > 2:
-            raise ValueError(f"speed must be a number with 2 significant bits, but got {speed}")
-        return self._merge(ProtocolCode.AGV_MOTION_CONTROL, [0x00, 0x00, int(speed * 100 * 1)])
+            raise ValueError(
+                f"speed must be a number with 2 significant bits, but got {speed}"
+            )
+        return self._merge(
+            ProtocolCode.AGV_MOTION_CONTROL, [0x00, 0x00, int(speed * 100 * 1)]
+        )
 
     def stop(self):
         """Stop moving
@@ -738,7 +792,9 @@ class MyAGVProCommandApi(MyAGVProCommandProtocolApi):
         if any(map(lambda c: not 0 <= c <= 255, color)):
             raise ValueError("Color must be between 0 and 255")
 
-        return self._merge(ProtocolCode.SET_LED_COLOR, position, brightness, *color)
+        return self._merge(
+            ProtocolCode.SET_LED_COLOR, position, brightness, *color
+        )
 
     def set_led_mode(self, mode):
         """Set the LED mode
@@ -849,11 +905,19 @@ class MyAGVProCommandApi(MyAGVProCommandProtocolApi):
 
 
 class MyAGVPro(MyAGVProCommandApi):
-
-    def __init__(self, port, baudrate=1000000, timeout=0.1, debug=False, save_serial_log=False):
+    def __init__(
+        self,
+        port,
+        baudrate=1000000,
+        timeout=0.1,
+        debug=False,
+        save_serial_log=False,
+    ):
         super().__init__(debug=debug, save_serial_log=save_serial_log)
-        self._serial = setup_serial_connect(port=port, baudrate=baudrate, timeout=timeout)
-        self._serial_filename = 'agvpro_serial_serial.log'
+        self._serial = setup_serial_connect(
+            port=port, baudrate=baudrate, timeout=timeout
+        )
+        self._serial_filename = "agvpro_serial_serial.log"
 
     def write(self, command):
         return self._serial.write(command)

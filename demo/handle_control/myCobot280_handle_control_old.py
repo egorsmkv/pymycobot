@@ -16,6 +16,7 @@ if "linux" in platform.platform().lower():
     GPIO.setup(20, GPIO.OUT)
     GPIO.setup(21, GPIO.OUT)
 
+
 class JoyStickKey(Enum):
     StartKey = 7
     SelectKey = 6
@@ -42,6 +43,7 @@ class JoyStickContinous(Enum):
     RightXAxis = 3
     RightYAxis = 4
     R2 = 5
+
 
 joystick_key_map = {
     0: JoyStickKey.RBottomKey,
@@ -74,18 +76,22 @@ joystick_continous_map = {
 mc = MyCobot280("/dev/ttyAMA0", "1000000")
 mc.set_fresh_mode(1)
 
+
 # Turn on the integrated pump
 def Integrated_pump_on():
-    mc.set_digital_output(33,0)
+    mc.set_digital_output(33, 0)
+
 
 # Turn off the integrated pump
 def Integrated_pump_off():
-    mc.set_digital_output(33,1)
+    mc.set_digital_output(33, 1)
+
 
 # 开启吸泵
 def pump_on():
     # 打开电磁阀
     GPIO.output(20, 0)
+
 
 # 停止吸泵
 def pump_off():
@@ -97,6 +103,7 @@ def pump_off():
     time.sleep(1)
     GPIO.output(21, 1)
     time.sleep(0.05)
+
 
 context = {"running": True}
 arm_speed = 50
@@ -120,6 +127,7 @@ global_states = {
     },
 }
 
+
 def get_init_key_hold_timestamp():
     return {
         JoyStickKey.L1: -1,
@@ -128,7 +136,9 @@ def get_init_key_hold_timestamp():
         JoyStickContinous.R2: -1,
     }
 
+
 key_hold_timestamp = get_init_key_hold_timestamp()
+
 
 def get_joystick():
     pygame.init()
@@ -143,7 +153,9 @@ def get_joystick():
     return joystick
 
 
-def dispatch_key_action(key: T.Union[JoyStickKey, JoyStickContinous], value: float):
+def dispatch_key_action(
+    key: T.Union[JoyStickKey, JoyStickContinous], value: float
+):
     global mc, arm_angle_table, global_states
     # print(f"key : {key} value : {value}")
 
@@ -233,15 +245,17 @@ def dispatch_key_action(key: T.Union[JoyStickKey, JoyStickContinous], value: flo
 
     # 工具
     if key == JoyStickKey.RLeftKey:
-        pump_on()   #V2.0 pump
-        Integrated_pump_on()    #Integrated pump
+        pump_on()  # V2.0 pump
+        Integrated_pump_on()  # Integrated pump
         time.sleep(0.05)
     elif key == JoyStickKey.RTopKey:
-        pump_off()   #V2.0 pump
-        Integrated_pump_off()    #Integrated pump
+        pump_off()  # V2.0 pump
+        Integrated_pump_off()  # Integrated pump
         time.sleep(0.05)
     elif key == JoyStickKey.RBottomKey:
-        global_states["gripper_val"] = min(100, global_states["gripper_val"] + 5)
+        global_states["gripper_val"] = min(
+            100, global_states["gripper_val"] + 5
+        )
         mc.set_gripper_value(global_states["gripper_val"], 50)
         time.sleep(0.5)
     elif key == JoyStickKey.RRightKey:
@@ -328,7 +342,10 @@ def retreive_joystick_input(joystick, context):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 context["running"] = False
-            elif event.type == pygame.JOYBUTTONDOWN or event.type == pygame.JOYBUTTONUP:
+            elif (
+                event.type == pygame.JOYBUTTONDOWN
+                or event.type == pygame.JOYBUTTONUP
+            ):
                 n = joystick.get_numbuttons()
                 for key_id in range(n):
                     button_status = joystick.get_button(key_id)
@@ -343,7 +360,8 @@ def retreive_joystick_input(joystick, context):
 
                     if (
                         joystick_continous_map[key_id] == JoyStickContinous.L2
-                        or joystick_continous_map[key_id] == JoyStickContinous.R2
+                        or joystick_continous_map[key_id]
+                        == JoyStickContinous.R2
                     ):
                         axis = math.ceil(axis)
                         if int(axis) == -1:

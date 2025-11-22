@@ -5,9 +5,9 @@ from pymycobot.mybuddy import MyBuddy
 import threading
 from threading import Lock, Thread
 import cv2 as cv
-# Establish serial connection
-mc = MyBuddy('/dev/ttyACM0', 115200)
 
+# Establish serial connection
+mc = MyBuddy("/dev/ttyACM0", 115200)
 
 
 # Release the arms and record the points passed
@@ -31,7 +31,14 @@ def read():
 def write():
     time.sleep(1.5)
     # The file here uses the saved txt file
-    data = list(filter(None, open(os.path.join(os.getcwd(), 'ChewingGum.txt')).read().splitlines()))
+    data = list(
+        filter(
+            None,
+            open(os.path.join(os.getcwd(), "ChewingGum.txt"))
+            .read()
+            .splitlines(),
+        )
+    )
     for angles in data:
         data = eval(angles)[0]
         data[4] -= 280
@@ -43,7 +50,14 @@ def write():
     mc.set_gripper_state(2, 1)
     time.sleep(1.5)
     # The file here uses the saved txt file
-    data = list(filter(None, open(os.path.join(os.getcwd(), 'ChewingGum_2.txt')).read().splitlines()))
+    data = list(
+        filter(
+            None,
+            open(os.path.join(os.getcwd(), "ChewingGum_2.txt"))
+            .read()
+            .splitlines(),
+        )
+    )
     for angles in data:
         data = eval(angles)[0]
         data[4] -= 280
@@ -55,7 +69,14 @@ def write():
     mc.set_gripper_state(2, 0)
     time.sleep(1.5)
     # The file here uses the saved txt file
-    data = list(filter(None, open(os.path.join(os.getcwd(), 'ChewingGum_3.txt')).read().splitlines()))
+    data = list(
+        filter(
+            None,
+            open(os.path.join(os.getcwd(), "ChewingGum_3.txt"))
+            .read()
+            .splitlines(),
+        )
+    )
     for angles in data:
         data = eval(angles)[0]
         data[4] -= 280
@@ -78,11 +99,11 @@ def smile():
         if frame is not None:
             print(1)
             cv.imshow(out_win, frame)
-        if cv.waitKey(1) & 0xFF == ord('q') or ret == False:
+        if cv.waitKey(1) & 0xFF == ord("q") or ret == False:
             cap = cv.VideoCapture("/home/ubuntu/emo/look_happy.mp4")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # run with multithreading
     t1 = threading.Thread(target=write)
     t2 = threading.Thread(target=smile)

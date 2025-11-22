@@ -21,7 +21,9 @@ class MycobotTest(object):
 
         self.win = tkinter.Tk()
         self.win.title("树莓派版 myArm 测试工具")
-        self.win.geometry("918x511+10+10")  # 290 160为窗口大小，+10 +10 定义窗口弹出时的默认展示位置
+        self.win.geometry(
+            "918x511+10+10"
+        )  # 290 160为窗口大小，+10 +10 定义窗口弹出时的默认展示位置
 
         self.port_label = tkinter.Label(self.win, text="选择串口：")
         self.port_label.grid(row=0)
@@ -43,7 +45,9 @@ class MycobotTest(object):
         # Connect
         self.connect_label = tkinter.Label(self.win, text="连接机器：")
         self.connect_label.grid(row=2)
-        self.connect = tkinter.Button(self.win, text="连接", command=self.connect_mycobot)
+        self.connect = tkinter.Button(
+            self.win, text="连接", command=self.connect_mycobot
+        )
         self.disconnect = tkinter.Button(
             self.win, text="断开", command=self.disconnect_mycobot
         )
@@ -146,9 +150,7 @@ class MycobotTest(object):
                 \r=================================================
                 {}
                 \r=================================================
-            """.format(
-                e
-            )
+            """.format(e)
             self.write_log_to_Text(err_log)
 
     def disconnect_mycobot(self):
@@ -191,7 +193,7 @@ class MycobotTest(object):
         #     if not self.mycobot._read(1):
         #         res.append(idx)
         #     time.sleep(0.1)
-        for i in range(1,8):
+        for i in range(1, 8):
             r = self.mycobot.is_servo_enable(i)
             if r != 1:
                 res.append(i)
@@ -242,7 +244,9 @@ class MycobotTest(object):
     def start_aging_test(self):
         if not self.has_mycobot():
             return
-        self.write_log_to_Text("循环老化测试需要持续30分钟，30分钟以后会自动停下")
+        self.write_log_to_Text(
+            "循环老化测试需要持续30分钟，30分钟以后会自动停下"
+        )
         self.aging_stop = False
         self.aging = threading.Thread(target=self._aging_test, daemon=True)
         self.aging.start()
@@ -264,7 +268,7 @@ class MycobotTest(object):
     def rectify_mycobot(self):
         if not self.has_mycobot():
             return
-        for i in range(1,8):
+        for i in range(1, 8):
             self.mycobot.focus_servo(i)
             time.sleep(0.1)
         self.write_log_to_Text("使能所有电机完成.")
@@ -289,7 +293,9 @@ class MycobotTest(object):
         #     return
         start = time.time()
         self.stop_test = False
-        while True and time.time() - start < 60*30 and self.stop_test == False:
+        while (
+            True and time.time() - start < 60 * 30 and self.stop_test == False
+        ):
             self.mycobot.set_color(255, 0, 0)
             self.mycobot.wait(5).send_angles([0, 0, 0, 0, 0, 0, 0], 95)
             self.mycobot.wait(3).send_angles([-160, 0, 0, 0, 0, 0, 0], 95)
@@ -375,8 +381,6 @@ class MycobotTest(object):
 
         #     def aging_test():
         #         # fast
-                
-
 
         #     if __name__ == '__main__':
         #         while True and time.time() - start < 60*30:
@@ -439,7 +443,8 @@ class MycobotTest(object):
 
     def get_serial_port_list(self):
         plist = [
-            str(x).split(" - ")[0].strip() for x in serial.tools.list_ports.comports()
+            str(x).split(" - ")[0].strip()
+            for x in serial.tools.list_ports.comports()
         ]
         print(plist)
         self.port_list["value"] = plist
@@ -447,7 +452,9 @@ class MycobotTest(object):
 
     def get_current_time(self):
         """Get current time with format."""
-        current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
+        current_time = time.strftime(
+            "%Y-%m-%d %H:%M:%S", time.localtime(time.time())
+        )
         return current_time
 
     def write_log_to_Text(self, logmsg: str):

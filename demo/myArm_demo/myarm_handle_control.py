@@ -25,25 +25,25 @@ def control():
                 command[0] += 2
                 if command[0] > 285:
                     command[0] = 280
-                print('x + coords---->:', command[0])
+                print("x + coords---->:", command[0])
                 mc.send_coord(1, command[0], speed)
             elif action == 2:
                 command[0] -= 2
                 if command[0] < -285:
                     command[0] = -280
-                print('x - coords---->:', command[0])
+                print("x - coords---->:", command[0])
                 mc.send_coord(1, command[0], speed)
             elif action == 3:
                 command[1] += 2
                 if command[1] > 285:
                     command[1] = 280
-                print('y + coords---->:', command[1])
+                print("y + coords---->:", command[1])
                 mc.send_coord(2, command[1], speed)
             elif action == 4:
                 command[1] -= 2
                 if command[1] < -285:
                     command[1] = -280
-                print('y - coords---->:', command[1])
+                print("y - coords---->:", command[1])
                 mc.send_coord(2, command[1], speed)
             elif action == 5:
                 command[2] += 2
@@ -87,13 +87,13 @@ def control():
                 command[2] += 2
                 if command[2] > 450:
                     command[2] = 445
-                print('z + coords---->:', command[2])
+                print("z + coords---->:", command[2])
                 mc.send_coord(3, command[2], speed)
             elif action == 9:
                 command[2] -= 2
                 if command[2] < -120:
                     command[2] = -118
-                print('z - coords---->:', command[2])
+                print("z - coords---->:", command[2])
                 mc.send_coord(3, command[2], speed)
             elif action == 10:
                 gripper_value = 95
@@ -158,7 +158,7 @@ def control():
                     mc.send_angles([-30, 0, 0, -90, 0, -90, 0], 30)
                     time.sleep(3)
                     command = zero.copy()
-                    print('command', command)
+                    print("command", command)
                     action = 0
             else:
                 pass
@@ -231,15 +231,16 @@ def main():
                 done = True
             # 按键按下或弹起事件
             elif (
-                    event_.type == pygame.JOYBUTTONDOWN or event_.type == pygame.JOYBUTTONUP
+                event_.type == pygame.JOYBUTTONDOWN
+                or event_.type == pygame.JOYBUTTONUP
             ):
                 buttons = joystick.get_numbuttons()
                 # print('total:', buttons)
                 # 获取所有按键状态信息
                 for i in range(buttons):
                     button = joystick.get_button(i)
-                    print('i value:', i)
-                    print('button---------->', button)
+                    print("i value:", i)
+                    print("button---------->", button)
 
                     if i == 7:
                         if button == 1:
@@ -294,7 +295,7 @@ def main():
                                 start_time = 0
                                 action = 0
                     print("button " + str(i) + ": " + str(button))
-                    print('action--->', action)
+                    print("action--->", action)
             # 轴转动事件
             elif event_.type == pygame.JOYAXISMOTION:
                 axes = joystick.get_numaxes()
@@ -302,7 +303,7 @@ def main():
                 # while True:
                 for i in range(axes):
                     axis = joystick.get_axis(i)
-                    print('i value: {}  axis value: {}'.format(i, axis))
+                    print("i value: {}  axis value: {}".format(i, axis))
                     # res[i] = axis
                     if i == 1:
                         if axis < -3.0517578125e-05:
@@ -372,7 +373,7 @@ def main():
                 # for i in range(hats):
                 hat = joystick.get_hat(0)
                 # print("hat " + str(i) +": " + str(hat))
-                print('hat:', str(hat))
+                print("hat:", str(hat))
                 if hat == (0, 1):
                     action = 12
                 elif hat == (0, -1):

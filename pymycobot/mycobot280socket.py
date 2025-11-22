@@ -88,6 +88,7 @@ class MyCobot280Socket(CommandGenerator):
             close()
             wait() *
     """
+
     _write = write
     _read = read
 
@@ -122,8 +123,9 @@ class MyCobot280Socket(CommandGenerator):
             **kwargs: support `has_reply`
                 has_reply: Whether there is a return value to accept.
         """
-        real_command, has_reply, _async = super(
-            MyCobot280Socket, self)._mesg(genre, *args, **kwargs)
+        real_command, has_reply, _async = super(MyCobot280Socket, self)._mesg(
+            genre, *args, **kwargs
+        )
         # [254,...,255]
         if _async:
             with self.lock:
@@ -135,15 +137,18 @@ class MyCobot280Socket(CommandGenerator):
             return result
 
     def _res(self, real_command, has_reply, genre):
-        if genre == ProtocolCode.SET_SSID_PWD or genre == ProtocolCode.GET_SSID_PWD:
+        if (
+            genre == ProtocolCode.SET_SSID_PWD
+            or genre == ProtocolCode.GET_SSID_PWD
+        ):
             self._write(self._flatten(real_command), "socket")
-            data = self._read(genre, method='socket')
+            data = self._read(genre, method="socket")
         else:
             try_count = 0
             while try_count < 3:
                 self._write(self._flatten(real_command), "socket")
-                data = self._read(genre, method='socket')
-                if data is not None and data != b'':
+                data = self._read(genre, method="socket")
+                if data is not None and data != b"":
                     break
                 try_count += 1
             else:
@@ -155,11 +160,19 @@ class MyCobot280Socket(CommandGenerator):
         res = self._process_received(data, genre)
         if res is None:
             return -1
-        elif res is not None and isinstance(res, list) and len(res) == 1 and genre not in [
-            ProtocolCode.GET_BASIC_VERSION,
-            ProtocolCode.GET_JOINT_MIN_ANGLE,
-            ProtocolCode.GET_JOINT_MAX_ANGLE,
-            ProtocolCode.SOFTWARE_VERSION, ProtocolCode.SET_BASIC_OUTPUT]:
+        elif (
+            res is not None
+            and isinstance(res, list)
+            and len(res) == 1
+            and genre
+            not in [
+                ProtocolCode.GET_BASIC_VERSION,
+                ProtocolCode.GET_JOINT_MIN_ANGLE,
+                ProtocolCode.GET_JOINT_MAX_ANGLE,
+                ProtocolCode.SOFTWARE_VERSION,
+                ProtocolCode.SET_BASIC_OUTPUT,
+            ]
+        ):
             return res[0]
         if genre in [
             ProtocolCode.ROBOT_VERSION,
@@ -191,13 +204,21 @@ class MyCobot280Socket(CommandGenerator):
             ProtocolCode.GetHTSGripperTorque,
             ProtocolCode.GetGripperProtectCurrent,
             ProtocolCode.InitGripper,
-            ProtocolCode.SET_FOUR_PIECES_ZERO
+            ProtocolCode.SET_FOUR_PIECES_ZERO,
         ]:
             return self._process_single(res)
-        elif genre in [ProtocolCode.GET_ANGLES, ProtocolCode.SOLVE_INV_KINEMATICS, ProtocolCode.GET_ANGLES_PLAN]:
+        elif genre in [
+            ProtocolCode.GET_ANGLES,
+            ProtocolCode.SOLVE_INV_KINEMATICS,
+            ProtocolCode.GET_ANGLES_PLAN,
+        ]:
             return [self._int2angle(angle) for angle in res]
-        elif genre in [ProtocolCode.GET_COORDS, ProtocolCode.GET_TOOL_REFERENCE, ProtocolCode.GET_WORLD_REFERENCE,
-                       ProtocolCode.GET_COORDS_PLAN]:
+        elif genre in [
+            ProtocolCode.GET_COORDS,
+            ProtocolCode.GET_TOOL_REFERENCE,
+            ProtocolCode.GET_WORLD_REFERENCE,
+            ProtocolCode.GET_COORDS_PLAN,
+        ]:
             if res:
                 r = []
                 for idx in range(3):
@@ -209,17 +230,27 @@ class MyCobot280Socket(CommandGenerator):
                 return res
         elif genre in [ProtocolCode.GET_SERVO_VOLTAGES]:
             return [self._int2coord(angle) for angle in res]
-        elif genre in [ProtocolCode.GET_JOINT_MAX_ANGLE, ProtocolCode.GET_JOINT_MIN_ANGLE]:
+        elif genre in [
+            ProtocolCode.GET_JOINT_MAX_ANGLE,
+            ProtocolCode.GET_JOINT_MIN_ANGLE,
+        ]:
             return self._int2coord(res[0])
-        elif genre in [ProtocolCode.GET_BASIC_VERSION, ProtocolCode.SOFTWARE_VERSION,
-                       ProtocolCode.GET_ATOM_VERSION]:
+        elif genre in [
+            ProtocolCode.GET_BASIC_VERSION,
+            ProtocolCode.SOFTWARE_VERSION,
+            ProtocolCode.GET_ATOM_VERSION,
+        ]:
             return self._int2coord(self._process_single(res))
         elif genre in [ProtocolCode.GET_REBOOT_COUNT]:
             return self._process_high_low_bytes(res)
         elif genre in [ProtocolCode.SET_BASIC_OUTPUT]:
             return 1
-        elif genre in [ProtocolCode.DRAG_CLEAR_RECORD_DATA, ProtocolCode.DRAG_GET_RECORD_LEN,
-                       ProtocolCode.DRAG_START_RECORD, ProtocolCode.DRAG_END_RECORD]:
+        elif genre in [
+            ProtocolCode.DRAG_CLEAR_RECORD_DATA,
+            ProtocolCode.DRAG_GET_RECORD_LEN,
+            ProtocolCode.DRAG_START_RECORD,
+            ProtocolCode.DRAG_END_RECORD,
+        ]:
             return self._parse_bytes_to_int(res)
         elif genre in [ProtocolCode.DRAG_GET_RECORD_DATA]:
             return self._split_joint_and_speed(res)
@@ -260,7 +291,9 @@ class MyCobot280Socket(CommandGenerator):
         Args:
             flag: 0/1
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, flag=flag)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, flag=flag
+        )
         return self._mesg(ProtocolCode.SET_FREE_MODE, flag)
 
     def is_free_mode(self):
@@ -279,7 +312,9 @@ class MyCobot280Socket(CommandGenerator):
                 1 - Always execute the latest command first.
                 0 - Execute instructions sequentially in the form of a queue.
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, mode=mode)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, mode=mode
+        )
         return self._mesg(ProtocolCode.SET_FRESH_MODE, mode)
 
     def get_fresh_mode(self):
@@ -316,9 +351,12 @@ class MyCobot280Socket(CommandGenerator):
             speed: (int )0 ~ 100
         """
         calibration_parameters(len6=radians, speed=speed)
-        degrees = [self._angle2int(radian * (180 / math.pi))
-                   for radian in radians]
-        return self._mesg(ProtocolCode.SEND_ANGLES, degrees, speed, _async=_async)
+        degrees = [
+            self._angle2int(radian * (180 / math.pi)) for radian in radians
+        ]
+        return self._mesg(
+            ProtocolCode.SEND_ANGLES, degrees, speed, _async=_async
+        )
 
     def sync_send_angles(self, degrees, speed, timeout=15):
         """Send the angle in synchronous state and return when the target point is reached
@@ -385,21 +423,43 @@ class MyCobot280Socket(CommandGenerator):
             direction (int): 1 - forward rotation, 0 - reverse rotation
             speed (int): 1 ~ 100
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, end_direction=end_direction, direction=direction, speed=speed)
-        return self._mesg(ProtocolCode.JOG_ABSOLUTE, end_direction, direction, speed, _async=_async)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__,
+            end_direction=end_direction,
+            direction=direction,
+            speed=speed,
+        )
+        return self._mesg(
+            ProtocolCode.JOG_ABSOLUTE,
+            end_direction,
+            direction,
+            speed,
+            _async=_async,
+        )
 
     def jog_increment_angle(self, joint_id, increment, speed, _async=False):
-        """ angle step mode
+        """angle step mode
 
         Args:
             joint_id: int 1-6.
             increment: Angle increment value
             speed: int (0 - 100)
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, id=joint_id, increment_angle=increment, speed=speed)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__,
+            id=joint_id,
+            increment_angle=increment,
+            speed=speed,
+        )
         scaled_increment = self._angle2int(increment)
         scaled_increment = max(min(scaled_increment, 32767), -32768)
-        return self._mesg(ProtocolCode.JOG_INCREMENT, joint_id, [scaled_increment], speed, _async=_async)
+        return self._mesg(
+            ProtocolCode.JOG_INCREMENT,
+            joint_id,
+            [scaled_increment],
+            speed,
+            _async=_async,
+        )
 
     def jog_increment_coord(self, id, increment, speed, _async=False):
         """coord step mode
@@ -409,13 +469,20 @@ class MyCobot280Socket(CommandGenerator):
             increment: Coord increment value
             speed: int (1 - 100)
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, id=id, increment_coord=increment, speed=speed)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__,
+            id=id,
+            increment_coord=increment,
+            speed=speed,
+        )
         if id <= 3:
             value = self._coord2int(increment)
         else:
             scaled_increment = self._angle2int(increment)
             value = max(min(scaled_increment, 32767), -32768)
-        return self._mesg(ProtocolCode.JOG_INCREMENT_COORD, id, [value], speed, _async=_async)
+        return self._mesg(
+            ProtocolCode.JOG_INCREMENT_COORD, id, [value], speed, _async=_async
+        )
 
     def set_HTS_gripper_torque(self, torque):
         """Set new adaptive gripper torque
@@ -427,8 +494,12 @@ class MyCobot280Socket(CommandGenerator):
             0: Set failed
             1: Set successful
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, torque=torque)
-        return self._mesg(ProtocolCode.SetHTSGripperTorque, [torque], has_reply=True)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, torque=torque
+        )
+        return self._mesg(
+            ProtocolCode.SetHTSGripperTorque, [torque], has_reply=True
+        )
 
     def get_HTS_gripper_torque(self):
         """Get gripper torque
@@ -444,7 +515,9 @@ class MyCobot280Socket(CommandGenerator):
         Returns:
             int: 1 ~ 500
         """
-        return self._mesg(ProtocolCode.GetGripperProtectCurrent, has_reply=True)
+        return self._mesg(
+            ProtocolCode.GetGripperProtectCurrent, has_reply=True
+        )
 
     def init_gripper(self):
         """Initialize gripper
@@ -460,7 +533,9 @@ class MyCobot280Socket(CommandGenerator):
         Args:
             current (int): 1 ~ 500
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, current=current)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, current=current
+        )
 
         return self._mesg(ProtocolCode.SetGripperProtectCurrent, [current])
 
@@ -472,7 +547,9 @@ class MyCobot280Socket(CommandGenerator):
             pin_no   (int): pin number.
             pin_mode (int): 0 - input, 1 - output, 2 - input_pullup
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, pin_mode=pin_mode)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, pin_mode=pin_mode
+        )
         return self._mesg(ProtocolCode.SET_PIN_MODE, pin_no, pin_mode)
 
     def get_gripper_value(self, gripper_type=None):
@@ -490,8 +567,12 @@ class MyCobot280Socket(CommandGenerator):
         if gripper_type is None:
             return self._mesg(ProtocolCode.GET_GRIPPER_VALUE, has_reply=True)
         else:
-            self.calibration_parameters(class_name=self.__class__.__name__, gripper_type=gripper_type)
-            return self._mesg(ProtocolCode.GET_GRIPPER_VALUE, gripper_type, has_reply=True)
+            self.calibration_parameters(
+                class_name=self.__class__.__name__, gripper_type=gripper_type
+            )
+            return self._mesg(
+                ProtocolCode.GET_GRIPPER_VALUE, gripper_type, has_reply=True
+            )
 
     def is_gripper_moving(self):
         """Judge whether the gripper is moving or not
@@ -504,14 +585,16 @@ class MyCobot280Socket(CommandGenerator):
         return self._mesg(ProtocolCode.IS_GRIPPER_MOVING, has_reply=True)
 
     def set_pwm_output(self, channel, frequency, pin_val):
-        """ PWM control
+        """PWM control
 
         Args:
             channel (int): IO number.
             frequency (int): clock frequency
             pin_val (int): Duty cycle 0 ~ 256; 128 means 50%
         """
-        return self._mesg(ProtocolCode.SET_PWM_OUTPUT, channel, [frequency], pin_val)
+        return self._mesg(
+            ProtocolCode.SET_PWM_OUTPUT, channel, [frequency], pin_val
+        )
 
     # communication mode
     def set_transponder_mode(self, mode):
@@ -520,16 +603,19 @@ class MyCobot280Socket(CommandGenerator):
         Args:
             mode: 0 - Turn off transparent transmission，1 - Open transparent transmission
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, mode=mode)
-        return self._mesg(ProtocolCode.SET_COMMUNICATE_MODE, mode, has_reply=True)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, mode=mode
+        )
+        return self._mesg(
+            ProtocolCode.SET_COMMUNICATE_MODE, mode, has_reply=True
+        )
 
     def get_transponder_mode(self):
         return self._mesg(ProtocolCode.GET_COMMUNICATE_MODE, has_reply=True)
 
     # g9 servo
     def move_round(self):
-        """Drive the 9g steering gear clockwise for one revolution
-        """
+        """Drive the 9g steering gear clockwise for one revolution"""
         return self._mesg(ProtocolCode.move_round)
 
     def set_four_pieces_zero(self):
@@ -550,7 +636,9 @@ class MyCobot280Socket(CommandGenerator):
                 for gripper: Joint id 7
             angle: 0 ~ 180
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, id=id, angle=angle)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, id=id, angle=angle
+        )
         return self._mesg(ProtocolCode.SET_JOINT_MAX, id, angle)
 
     def set_joint_min(self, id, angle):
@@ -562,7 +650,9 @@ class MyCobot280Socket(CommandGenerator):
                 for gripper: Joint id 7
             angle: 0 ~ 180
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, id=id, angle=angle)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, id=id, angle=angle
+        )
         return self._mesg(ProtocolCode.SET_JOINT_MIN, id, angle)
 
     # servo state value
@@ -606,7 +696,9 @@ class MyCobot280Socket(CommandGenerator):
             coords: a list of coords value(List[float])
                     [x(mm), y, z, rx(angle), ry, rz]
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, coords=coords)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, coords=coords
+        )
         coord_list = []
         for idx in range(3):
             coord_list.append(self._coord2int(coords[idx]))
@@ -615,7 +707,7 @@ class MyCobot280Socket(CommandGenerator):
         return self._mesg(ProtocolCode.SET_TOOL_REFERENCE, coord_list)
 
     def get_tool_reference(self):
-        """Get tool coordinate system """
+        """Get tool coordinate system"""
         return self._mesg(ProtocolCode.GET_TOOL_REFERENCE, has_reply=True)
 
     def set_world_reference(self, coords):
@@ -625,7 +717,9 @@ class MyCobot280Socket(CommandGenerator):
             coords: a list of coords value(List[float])
                     [x(mm), y, z, rx(angle), ry, rz]\n
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, coords=coords)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, coords=coords
+        )
         coord_list = []
         for idx in range(3):
             coord_list.append(self._coord2int(coords[idx]))
@@ -643,7 +737,9 @@ class MyCobot280Socket(CommandGenerator):
         Args:
             rftype: 0 - base 1 - tool.
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, rftype=rftype)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, rftype=rftype
+        )
         return self._mesg(ProtocolCode.SET_REFERENCE_FRAME, rftype)
 
     def get_reference_frame(self):
@@ -660,7 +756,9 @@ class MyCobot280Socket(CommandGenerator):
         Args:
             move_type: 1 - movel, 0 - moveJ
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, move_type=move_type)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, move_type=move_type
+        )
         return self._mesg(ProtocolCode.SET_MOVEMENT_TYPE, move_type)
 
     def get_movement_type(self):
@@ -678,7 +776,9 @@ class MyCobot280Socket(CommandGenerator):
             end: int
                 0 - flange, 1 - tool
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, end=end)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, end=end
+        )
         return self._mesg(ProtocolCode.SET_END_TYPE, end)
 
     def get_end_type(self):
@@ -692,7 +792,7 @@ class MyCobot280Socket(CommandGenerator):
     def set_gpio_mode(self, mode):
         """Set pin coding method
         Args:
-            mode: (str) BCM or BOARD 
+            mode: (str) BCM or BOARD
         """
         self.calibration_parameters(gpiomode=mode)
         if mode == "BCM":
@@ -727,7 +827,7 @@ class MyCobot280Socket(CommandGenerator):
         return self._mesg(ProtocolCode.GET_GPIO_IN, pin_no, has_reply=True)
 
     def angles_to_coords(self, angles):
-        """ Convert angles to coordinates
+        """Convert angles to coordinates
 
         Args:
             angles : A float list of all angle.
@@ -739,7 +839,7 @@ class MyCobot280Socket(CommandGenerator):
         return self._mesg(ProtocolCode.GET_COORDS, angles, has_reply=True)
 
     def solve_inv_kinematics(self, target_coords, current_angles):
-        """ Convert target coordinates to angles
+        """Convert target coordinates to angles
 
         Args:
             target_coords: A float list of all coordinates.
@@ -754,7 +854,12 @@ class MyCobot280Socket(CommandGenerator):
             coord_list.append(self._coord2int(target_coords[idx]))
         for angle in target_coords[3:]:
             coord_list.append(self._angle2int(angle))
-        return self._mesg(ProtocolCode.SOLVE_INV_KINEMATICS, coord_list, angles, has_reply=True)
+        return self._mesg(
+            ProtocolCode.SOLVE_INV_KINEMATICS,
+            coord_list,
+            angles,
+            has_reply=True,
+        )
 
     def set_vision_mode(self, flag):
         """Set the visual tracking mode to limit the posture flipping of send_coords in refresh mode.
@@ -763,7 +868,9 @@ class MyCobot280Socket(CommandGenerator):
         Args:
             flag: 0/1; 0 - close; 1 - open
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, flag=flag)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, flag=flag
+        )
         return self._mesg(ProtocolCode.SET_VISION_MODE, flag)
 
     def is_torque_gripper(self):
@@ -790,8 +897,13 @@ class MyCobot280Socket(CommandGenerator):
                 1: Force control
                 0: Non-force control
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, flag=flag, gripper_speed=speed, _type_1=_type_1,
-                                    is_torque=is_torque)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__,
+            flag=flag,
+            gripper_speed=speed,
+            _type_1=_type_1,
+            is_torque=is_torque,
+        )
         args = [flag, speed]
         if _type_1 is not None:
             args.append(_type_1)
@@ -799,7 +911,9 @@ class MyCobot280Socket(CommandGenerator):
             args.append(is_torque)
         return self._mesg(ProtocolCode.SET_GRIPPER_STATE, *args)
 
-    def set_gripper_value(self, gripper_value, speed, gripper_type=None, is_torque=None):
+    def set_gripper_value(
+        self, gripper_value, speed, gripper_type=None, is_torque=None
+    ):
         """Set gripper value
 
         Args:
@@ -813,14 +927,21 @@ class MyCobot280Socket(CommandGenerator):
                 1: Force control
                 0: Non-force control
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, gripper_value=gripper_value, gripper_speed=speed,
-                                    gripper_type=gripper_type, is_torque=is_torque)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__,
+            gripper_value=gripper_value,
+            gripper_speed=speed,
+            gripper_type=gripper_type,
+            is_torque=is_torque,
+        )
         args = [gripper_value, speed]
         if gripper_type is not None:
             args.append(gripper_type)
         if is_torque is not None:
             args.append(is_torque)
-        return self._mesg(ProtocolCode.SET_GRIPPER_VALUE, *args, has_reply=True)
+        return self._mesg(
+            ProtocolCode.SET_GRIPPER_VALUE, *args, has_reply=True
+        )
 
     def drag_start_record(self):  # TODO need test 2024/11/15
         """Start track recording
@@ -883,11 +1004,15 @@ class MyCobot280Socket(CommandGenerator):
             pin_no: pin port number.
             pin_signal: 0 / 1
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, pin_no_basic=pin_no, pin_signal=pin_signal)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__,
+            pin_no_basic=pin_no,
+            pin_signal=pin_signal,
+        )
         return self._mesg(ProtocolCode.SET_BASIC_OUTPUT, pin_no, pin_signal)
 
     def get_angles_plan(self):
-        """ Get the angle plan of all joints.
+        """Get the angle plan of all joints.
 
         Return:
             list: A float list of all angle.

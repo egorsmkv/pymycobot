@@ -3,7 +3,7 @@ import time
 import RPi.GPIO as GPIO
 
 # 初始化一个MyCobot对象
-mc = MyArm('/dev/ttyAMA0')
+mc = MyArm("/dev/ttyAMA0")
 
 # 初始化
 GPIO.setmode(GPIO.BCM)

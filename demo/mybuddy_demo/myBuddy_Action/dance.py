@@ -7,7 +7,7 @@ from threading import Lock, Thread
 import cv2 as cv
 
 # Establish serial connection
-mc = MyBuddy('/dev/ttyACM0', 115200)
+mc = MyBuddy("/dev/ttyACM0", 115200)
 
 t = 1
 
@@ -68,11 +68,11 @@ def smile():
         ret, frame = cap.read()
         if frame is not None:
             cv.imshow(out_win, frame)
-        if cv.waitKey(1) & 0xFF == ord('q') or ret == False:
+        if cv.waitKey(1) & 0xFF == ord("q") or ret == False:
             cap = cv.VideoCapture("/home/ubuntu/emo/look_happy.mp4")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # run with multithreading
     t1 = threading.Thread(target=run())
     t2 = threading.Thread(target=smile)

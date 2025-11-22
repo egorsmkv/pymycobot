@@ -19,15 +19,17 @@ class GPIOProtocolCode:
 
 
 def to_string(data: bytes):
-    return ' '.join(map(lambda x: f'{x:02x}', data))
+    return " ".join(map(lambda x: f"{x:02x}", data))
 
 
 def get_local_host(name: str):
     host = None
     dgram_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
-        pack_res = struct.pack('256s', bytes(name, encoding="utf8"))
-        host = socket.inet_ntoa(fcntl.ioctl(dgram_socket.fileno(), 0x8915, pack_res)[20:24])
+        pack_res = struct.pack("256s", bytes(name, encoding="utf8"))
+        host = socket.inet_ntoa(
+            fcntl.ioctl(dgram_socket.fileno(), 0x8915, pack_res)[20:24]
+        )
     except Exception as e:
         print(e)
     finally:
@@ -75,12 +77,16 @@ class SocketTransport(object):
 
 class SerialTransport(object):
     def __init__(self, comport="/dev/ttyS1", baudrate=100_0000, timeout=None):
-        self.serial = serial.Serial(port=comport, baudrate=baudrate, timeout=timeout)
+        self.serial = serial.Serial(
+            port=comport, baudrate=baudrate, timeout=timeout
+        )
         self.log = logging.getLogger("serial")
         self.baudrate = baudrate
         self.comport = comport
         self.open()
-        self.log.info(f"start serial on [{self.comport}] with baudrate [{self.baudrate}]")
+        self.log.info(
+            f"start serial on [{self.comport}] with baudrate [{self.baudrate}]"
+        )
 
     def send(self, data):
         self.serial.write(data)
@@ -110,6 +116,7 @@ class MyCobot280RDKX5Server(object):
     4. Instruction parsing is done entirely by the client
     5. The server is responsible for setting the GPIO mode
     """
+
     def __init__(self, socket_transport, serial_transport, debug=True):
         self.debug = debug
         self.socket_transport = socket_transport
@@ -121,53 +128,89 @@ class MyCobot280RDKX5Server(object):
             self.log.info("tcp server started.")
             for conn, addr in self.socket_transport.accept():
                 self.log.info(f"{addr} accepted!")
-                for data in self.socket_transport.context(conn, buffer_size=1024):
-                    self.serial_transport.log.info(f"{addr} recv << {to_string(data)}")
+                for data in self.socket_transport.context(
+                    conn, buffer_size=1024
+                ):
+                    self.serial_transport.log.info(
+                        f"{addr} recv << {to_string(data)}"
+                    )
                     if data[3] == GPIOProtocolCode.SETUP_GPIO_MODE:
                         try:
                             mode = GPIO.BCM if data[4] == 0 else GPIO.BOARD
                             GPIO.setmode(mode)
                             self.log.debug(f"{addr} setup gpio mode => {mode}")
-                            serial_data = bytes([0xfe, 0xfe, 0x03, data[3], 0x01, 0xfa])
+                            serial_data = bytes(
+                                [0xFE, 0xFE, 0x03, data[3], 0x01, 0xFA]
+                            )
                         except Exception as e:
-                            self.log.error(f"{addr} setup gpio mode error: {e}")
-                            serial_data = bytes([0xfe, 0xfe, 0x03, data[3], 0xff, 0xfa])
+                            self.log.error(
+                                f"{addr} setup gpio mode error: {e}"
+                            )
+                            serial_data = bytes(
+                                [0xFE, 0xFE, 0x03, data[3], 0xFF, 0xFA]
+                            )
 
                     elif data[3] == GPIOProtocolCode.SETUP_GPIO_STATE:
                         try:
                             mode = GPIO.OUT if data[5] == 1 else GPIO.IN
                             level = GPIO.HIGH if data[6] == 1 else GPIO.LOW
-                            self.log.debug(f"{addr} setup gpio state, mode => {mode}, level => {level}")
+                            self.log.debug(
+                                f"{addr} setup gpio state, mode => {mode}, level => {level}"
+                            )
                             GPIO.setup(data[4], mode, initial=level)
-                            serial_data = bytes([0xfe, 0xfe, 0x03, data[3], 0x01, 0xfa])
+                            serial_data = bytes(
+                                [0xFE, 0xFE, 0x03, data[3], 0x01, 0xFA]
+                            )
                         except Exception as e:
-                            self.log.error(f"{addr} setup gpio state error: {e}")
-                            serial_data = bytes([0xfe, 0xfe, 0x03, data[3], 0xff, 0xfa])
+                            self.log.error(
+                                f"{addr} setup gpio state error: {e}"
+                            )
+                            serial_data = bytes(
+                                [0xFE, 0xFE, 0x03, data[3], 0xFF, 0xFA]
+                            )
 
                     elif data[3] == GPIOProtocolCode.SET_GPIO_OUTPUT:
                         try:
                             level = GPIO.HIGH if data[5] == 1 else GPIO.LOW
-                            self.log.debug(f"{addr} set gpio output, level => {level}")
+                            self.log.debug(
+                                f"{addr} set gpio output, level => {level}"
+                            )
                             GPIO.output(data[4], level)
-                            serial_data = bytes([0xfe, 0xfe, 0x03, data[3], 0x01, 0xfa])
+                            serial_data = bytes(
+                                [0xFE, 0xFE, 0x03, data[3], 0x01, 0xFA]
+                            )
                         except Exception as e:
-                            self.log.error(f"{addr} set gpio output error: {e}")
-                            serial_data = bytes([0xfe, 0xfe, 0x03, data[3], 0xff, 0xfa])
+                            self.log.error(
+                                f"{addr} set gpio output error: {e}"
+                            )
+                            serial_data = bytes(
+                                [0xFE, 0xFE, 0x03, data[3], 0xFF, 0xFA]
+                            )
 
                     elif data[3] == GPIOProtocolCode.GET_GPIO_INPUT:
                         try:
-                            self.log.debug(f"{addr} get gpio input, channel => {data[4]}")
+                            self.log.debug(
+                                f"{addr} get gpio input, channel => {data[4]}"
+                            )
                             level = GPIO.input(data[4])
-                            self.log.debug(f"{addr} get gpio input, level => {level}")
-                            serial_data = bytes([0xfe, 0xfe, 0x03, data[3], level, 0xfa])
+                            self.log.debug(
+                                f"{addr} get gpio input, level => {level}"
+                            )
+                            serial_data = bytes(
+                                [0xFE, 0xFE, 0x03, data[3], level, 0xFA]
+                            )
                         except Exception as e:
                             self.log.error(f"{addr} get gpio input error: {e}")
-                            serial_data = bytes([0xfe, 0xfe, 0x03, data[3], 0xff, 0xfa])
+                            serial_data = bytes(
+                                [0xFE, 0xFE, 0x03, data[3], 0xFF, 0xFA]
+                            )
                     else:
                         self.serial_transport.send(data)
                         serial_data = self.serial_transport.recv()
 
-                    self.serial_transport.log.info(f"{addr} send >> {to_string(serial_data)}")
+                    self.serial_transport.log.info(
+                        f"{addr} send >> {to_string(serial_data)}"
+                    )
                     conn.send(serial_data)
                 else:
                     self.log.info(f"{addr} closed!")
@@ -184,19 +227,18 @@ def main(debug=False):
     logging.basicConfig(
         level=logging.DEBUG if debug else logging.INFO,
         format="%(asctime)s - [%(name)s] %(levelname)7s - %(message)s",
-        handlers=[
-            logging.StreamHandler(),
-            logging.FileHandler("server.log")
-        ]
+        handlers=[logging.StreamHandler(), logging.FileHandler("server.log")],
     )
 
     socket_transport = SocketTransport(host="0.0.0.0", port=30002)
 
-    serial_transport = SerialTransport(comport="/dev/ttyS1", baudrate=100_0000, timeout=0.1)
+    serial_transport = SerialTransport(
+        comport="/dev/ttyS1", baudrate=100_0000, timeout=0.1
+    )
 
     MyCobot280RDKX5Server(socket_transport, serial_transport).mainloop()
     GPIO.cleanup()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

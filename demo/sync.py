@@ -25,7 +25,7 @@ def test(mycobot):
     # See: https://github.com/elephantrobotics/pymycobot/issues/144
     mycobot.sync_send_angles([0, 0, 0, 0, 0, 0], 100)
     mycobot.sync_send_angles([100, 50, 0, 0, 70, 160], 100)
-    mycobot.sync_send_angles([-100,-50, 0, 0, -70,-160], 100)
+    mycobot.sync_send_angles([-100, -50, 0, 0, -70, -160], 100)
     mycobot.set_free_mode(1)
 
     print("=== check end ===\n")

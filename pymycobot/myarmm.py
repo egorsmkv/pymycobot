@@ -8,9 +8,8 @@ from pymycobot.myarm_api import MyArmAPI
 
 
 class MyArmM(MyArmAPI):
-
     def __init__(self, port, baudrate="1000000", timeout=0.1, debug=False):
-        super(MyArmM, self).__init__(port, baudrate, timeout,debug)
+        super(MyArmM, self).__init__(port, baudrate, timeout, debug)
 
     def set_joint_angle(self, joint_id, angle, speed):
         """Sets the individual joints to move to the target angle
@@ -20,8 +19,12 @@ class MyArmM(MyArmAPI):
             angle (int) : 0 - 254
             speed (int) : 1 - 100
         """
-        self.calibration_parameters(joint_id=joint_id, angle=angle, speed=speed)
-        self._mesg(ProtocolCode.SEND_ANGLE, joint_id, [self._angle2int(angle)], speed)
+        self.calibration_parameters(
+            joint_id=joint_id, angle=angle, speed=speed
+        )
+        self._mesg(
+            ProtocolCode.SEND_ANGLE, joint_id, [self._angle2int(angle)], speed
+        )
 
     def set_joints_angle(self, angles, speed):
         """Sets all joints to move to the target angle
@@ -56,7 +59,9 @@ class MyArmM(MyArmAPI):
             speed: (int) 1 - 100
 
         """
-        self.calibration_parameters(servo_id=servo_id, encoder=encoder, speed=speed)
+        self.calibration_parameters(
+            servo_id=servo_id, encoder=encoder, speed=speed
+        )
         self._mesg(ProtocolCode.SET_ENCODER, servo_id, [encoder], speed)
 
     def set_servos_encoder(self, positions, speed):
@@ -82,7 +87,9 @@ class MyArmM(MyArmAPI):
 
         for sid, speed in enumerate(speeds):
             if not -10000 < speed < 1000:
-                raise ValueError(f"servo {sid} speed must be between -10000 and 1000")
+                raise ValueError(
+                    f"servo {sid} speed must be between -10000 and 1000"
+                )
 
         self._mesg(ProtocolCode.SET_ENCODERS_DRAG, encoders, speeds)
 
@@ -106,7 +113,9 @@ class MyArmM(MyArmAPI):
             0 or 1. 1: high 0: low
 
         """
-        return self._mesg(ProtocolCode.GET_AUXILIARY_PIN_STATUS, io_number, has_reply=True)
+        return self._mesg(
+            ProtocolCode.GET_AUXILIARY_PIN_STATUS, io_number, has_reply=True
+        )
 
     def get_robot_power_status(self):
         """Get the robot power status

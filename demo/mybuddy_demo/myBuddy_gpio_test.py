@@ -1,26 +1,27 @@
-#import library
+# import library
 import time
 import os
 import sys
 import serial
 import serial.tools.list_ports
 import platform
+
 sys.path.append(os.getcwd())
 from pymycobot.mybuddy import MyBuddy
 
-#define type
+# define type
 port: str
 mc: MyBuddy
 DEBUG = False
 
 # auto select system port
-if platform.system() == 'Windows':
-    port = 'COM21'
+if platform.system() == "Windows":
+    port = "COM21"
     baud = 115200
-elif platform.system() == 'Linux':
-    port = '/dev/ttyACM0'
+elif platform.system() == "Linux":
+    port = "/dev/ttyACM0"
     baud = 115200
-    
+
 
 # Connect Robot
 mc = MyBuddy(port, baud, debug=DEBUG)
@@ -29,11 +30,11 @@ time.sleep(1)
 # Test IO output
 pin_no = 15
 mc.set_gpio_init_mode(0)
-mc.set_gpio_setup(pin_no,1)
+mc.set_gpio_setup(pin_no, 1)
 
-mc.set_gpio_output(pin_no,1)
+mc.set_gpio_output(pin_no, 1)
 time.sleep(2)
-mc.set_gpio_output(pin_no,0)
+mc.set_gpio_output(pin_no, 0)
 time.sleep(2)
 mc.set_gpio_clearup(pin_no)
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import sys
+
 sys.path.append(os.getcwd())
 import tkinter
 from tkinter import ttk
@@ -13,17 +14,22 @@ from pymycobot.mycobot320 import MyCobot320
 
 LOG_NUM = 0
 
-multiple_angle = [[90, -90, 90, 90, 90, 90],
-        [-90, 90, -90, -90, -90, -90],
-        [-171.38, 70.57, 41.66, -24.87, -82.88, 6.76],
-        [0.43, -92.72, 92.9, 87.71, 89.56, -0.17],]
+multiple_angle = [
+    [90, -90, 90, 90, 90, 90],
+    [-90, 90, -90, -90, -90, -90],
+    [-171.38, 70.57, 41.66, -24.87, -82.88, 6.76],
+    [0.43, -92.72, 92.9, 87.71, 89.56, -0.17],
+]
 
-multiple_angle_grip = [[79.1, -30.41, -96.85, 40, 88.85, 0],
-        [79.1, -60.41, -96.85, 80, 88.85, 0],
-        [79.1, -30.41, -96.85, 40, 88.85, 0],
-        [-27.59, -8.78, -127.26, 45.35, 88.85, 0],
-        [-27.59, -60, -90, 60.35, 88.85, 0],
-        [-27.59, -8.78, -127.26, 45.35, 88.85, 0]]
+multiple_angle_grip = [
+    [79.1, -30.41, -96.85, 40, 88.85, 0],
+    [79.1, -60.41, -96.85, 80, 88.85, 0],
+    [79.1, -30.41, -96.85, 40, 88.85, 0],
+    [-27.59, -8.78, -127.26, 45.35, 88.85, 0],
+    [-27.59, -60, -90, 60.35, 88.85, 0],
+    [-27.59, -8.78, -127.26, 45.35, 88.85, 0],
+]
+
 
 class MycobotTest(object):
     def __init__(self):
@@ -31,7 +37,9 @@ class MycobotTest(object):
 
         self.win = tkinter.Tk()
         self.win.title("树莓派版 Mycobot 测试工具")
-        self.win.geometry("918x480+10+10")  # 290 160为窗口大小，+10 +10 定义窗口弹出时的默认展示位置
+        self.win.geometry(
+            "918x480+10+10"
+        )  # 290 160为窗口大小，+10 +10 定义窗口弹出时的默认展示位置
 
         self.port_label = tkinter.Label(self.win, text="选择串口：")
         self.port_label.grid(row=0)
@@ -52,7 +60,9 @@ class MycobotTest(object):
         # Connect
         self.connect_label = tkinter.Label(self.win, text="连接mycobot：")
         self.connect_label.grid(row=2)
-        self.connect = tkinter.Button(self.win, text="连接", command=self.connect_mycobot)
+        self.connect = tkinter.Button(
+            self.win, text="连接", command=self.connect_mycobot
+        )
         self.disconnect = tkinter.Button(
             self.win, text="断开", command=self.disconnect_mycobot
         )
@@ -118,7 +128,7 @@ class MycobotTest(object):
         #     self.win, text="校准pid", command=self.rectify_mycobot
         # )
         # self.rectify_btn.grid(row=10, column=1)
-    
+
         # I/O
         self.test_IO_label = tkinter.Label(self.win, text="测试I/O：")
         self.test_IO_label.grid(row=11)
@@ -130,7 +140,6 @@ class MycobotTest(object):
         )
         self.test_basic_btn.grid(row=12)
         self.test_atom_btn.grid(row=12, column=1)
-
 
         # Log output.
         self.log_label = tkinter.Label(self.win, text="日志：")
@@ -170,7 +179,7 @@ class MycobotTest(object):
             # self.mycobot = MyCobot(PI_PORT, PI_BAUD)
             self.mycobot = MyCobot320(port, baud)
             time.sleep(0.5)
-            self.mycobot._write([255,255,3,22,1,250])
+            self.mycobot._write([255, 255, 3, 22, 1, 250])
             time.sleep(0.5)
             # self.mycobot = MyCobot("/dev/cu.usbserial-0213245D", 115200)
             self.write_log_to_Text("连接成功 !")
@@ -180,9 +189,7 @@ class MycobotTest(object):
                 \r=================================================
                 {}
                 \r=================================================
-            """.format(
-                e
-            )
+            """.format(e)
             self.write_log_to_Text(err_log)
 
     def disconnect_mycobot(self):
@@ -233,8 +240,8 @@ class MycobotTest(object):
         #         res.append(idx)
         #     time.sleep(0.1)
         res = []
-        for i in range(1,8):
-            _data = self.mycobot.get_servo_data(i , 5)
+        for i in range(1, 8):
+            _data = self.mycobot.get_servo_data(i, 5)
             time.sleep(0.02)
             # self.write_log_to_Text("connect servo error".format(_data))
             if _data != i:
@@ -262,8 +269,10 @@ class MycobotTest(object):
         time.sleep(0.1)
         self.mycobot.focus_servo(self.calibration_num)
         time.sleep(0.5)
-        pos=self.mycobot.get_angles()
-        self.write_log_to_Text("校准电机"+str(self.calibration_num) + "结束.")
+        pos = self.mycobot.get_angles()
+        self.write_log_to_Text(
+            "校准电机" + str(self.calibration_num) + "结束."
+        )
 
         if self.calibration_num == 6:
             self.write_log_to_Text("全部校准完成.")
@@ -315,8 +324,7 @@ class MycobotTest(object):
     #                 self.write_log_to_Text("Servo motor :" + str(i) + "  data_id : " + str(data_id[j]) + "   data: " + str(_data) + "  modify successfully ")
     #             else:
     #                 self.write_log_to_Text("Servo motor :"  + str(i) + "  data_id : " + str(data_id[j]) + "   data: " + str(_data) + "  modify error ")
-    
-    
+
     def test_basic(self):
         pin_no = [1, 2, 3, 4, 5, 6]
         for p in pin_no:
@@ -325,7 +333,9 @@ class MycobotTest(object):
             time.sleep(0.5)
         time.sleep(1)
         for p in pin_no:
-            self.write_log_to_Text("读取引脚 %s 为 : %s" % (p, self.mycobot.get_basic_input(p)))
+            self.write_log_to_Text(
+                "读取引脚 %s 为 : %s" % (p, self.mycobot.get_basic_input(p))
+            )
             time.sleep(0.5)
         time.sleep(1)
         for p in pin_no:
@@ -334,9 +344,11 @@ class MycobotTest(object):
             time.sleep(0.5)
         time.sleep(1)
         for p in pin_no:
-            self.write_log_to_Text("读取引脚 %s 为 : %s" % (p, self.mycobot.get_basic_input(p)))
+            self.write_log_to_Text(
+                "读取引脚 %s 为 : %s" % (p, self.mycobot.get_basic_input(p))
+            )
             time.sleep(0.5)
-    
+
     def test_atom(self):
         pin_in = [19, 22]
         pin_out = [23, 33]
@@ -346,7 +358,9 @@ class MycobotTest(object):
             time.sleep(0.5)
         time.sleep(1)
         for p in pin_in:
-            self.write_log_to_Text("读取引脚 %s 为 : %s" % (p, self.mycobot.get_digital_input(p)))
+            self.write_log_to_Text(
+                "读取引脚 %s 为 : %s" % (p, self.mycobot.get_digital_input(p))
+            )
             time.sleep(0.5)
         time.sleep(1)
         for p in pin_out:
@@ -355,10 +369,12 @@ class MycobotTest(object):
             time.sleep(0.5)
         time.sleep(1)
         for p in pin_in:
-            self.write_log_to_Text("读取引脚 %s 为 : %s" % (p, self.mycobot.get_digital_input(p)))
+            self.write_log_to_Text(
+                "读取引脚 %s 为 : %s" % (p, self.mycobot.get_digital_input(p))
+            )
             time.sleep(0.5)
         time.sleep(1)
-            
+
     # ============================================================
     # Utils method
     # ============================================================
@@ -370,15 +386,13 @@ class MycobotTest(object):
         return True
 
     def aging_test(self):
-
         while True:
-
             speed = [50, 100]
             joint = [1, 2, 3, 4, 5, 6]
             angle = [0, 168, 90, 130, 145, 165, 180]
-            coord = ['y', 'z', 'x']
+            coord = ["y", "z", "x"]
 
-            self.mycobot.set_color(0,0,255)
+            self.mycobot.set_color(0, 0, 255)
 
             self.mycobot.wait(1).send_angles([0, 0, 0, 0, 0, 0], speed[1])
 
@@ -398,11 +412,10 @@ class MycobotTest(object):
 
                         self.mycobot.wait(t).send_angle(j, angle[j], sp)
                         print(self.aging_stop)
-                        self.mycobot.wait(t).send_angle(j, angle[j]*(-1), sp)
+                        self.mycobot.wait(t).send_angle(j, angle[j] * (-1), sp)
                         print(self.aging_stop)
                         self.mycobot.wait(t).send_angle(j, angle[0], sp)
                         print(self.aging_stop)
-
 
             # 多关节运动
             for b in range(2):
@@ -421,7 +434,9 @@ class MycobotTest(object):
             self.mycobot.wait(5).send_angles([0, 0, 0, 0, 0, 0], speed[1])
 
             # 笛卡尔运动
-            self.mycobot.wait(5).send_angles([0, -25, -115, 45, -80, 0], speed[1])
+            self.mycobot.wait(5).send_angles(
+                [0, -25, -115, 45, -80, 0], speed[1]
+            )
             time.sleep(2)
 
             for c in range(2):
@@ -436,11 +451,11 @@ class MycobotTest(object):
                         t = 1
 
                     for cd in coord:
-                        if cd == 'x':
+                        if cd == "x":
                             i = 0
-                        elif cd == 'y':
+                        elif cd == "y":
                             i = 1
-                        elif cd == 'z':
+                        elif cd == "z":
                             i = 2
                         print(cd)
                         if self.aging_stop:
@@ -448,11 +463,11 @@ class MycobotTest(object):
 
                         data_list[i] = data_list[i] + 90
                         self.mycobot.wait(t).send_coords(data_list, sp, 1)
-                        print(t,data_list,sp)
+                        print(t, data_list, sp)
 
                         data_list[i] = data_list[i] - 140
                         self.mycobot.wait(t).send_coords(data_list, sp, 1)
-                        print(t,data_list,sp)
+                        print(t, data_list, sp)
 
             self.mycobot.wait(5).send_angles([0, 0, 0, 0, 0, 0], speed[1])
 
@@ -487,7 +502,8 @@ class MycobotTest(object):
 
     def get_serial_port_list(self):
         plist = [
-            str(x).split(" - ")[0].strip() for x in serial.tools.list_ports.comports()
+            str(x).split(" - ")[0].strip()
+            for x in serial.tools.list_ports.comports()
         ]
         print(plist)
         self.port_list["value"] = plist
@@ -495,7 +511,9 @@ class MycobotTest(object):
 
     def get_current_time(self):
         """Get current time with format."""
-        current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
+        current_time = time.strftime(
+            "%Y-%m-%d %H:%M:%S", time.localtime(time.time())
+        )
         return current_time
 
     def write_log_to_Text(self, logmsg: str):

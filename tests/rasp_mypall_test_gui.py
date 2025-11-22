@@ -21,7 +21,9 @@ class MycobotTest(object):
 
         self.win = tkinter.Tk()
         self.win.title("树莓派版 MyPalletizer 测试工具")
-        self.win.geometry("918x611+10+10")  # 290 160为窗口大小，+10 +10 定义窗口弹出时的默认展示位置
+        self.win.geometry(
+            "918x611+10+10"
+        )  # 290 160为窗口大小，+10 +10 定义窗口弹出时的默认展示位置
 
         self.port_label = tkinter.Label(self.win, text="选择串口：")
         self.port_label.grid(row=0)
@@ -43,7 +45,9 @@ class MycobotTest(object):
         # Connect
         self.connect_label = tkinter.Label(self.win, text="连接机器：")
         self.connect_label.grid(row=2)
-        self.connect = tkinter.Button(self.win, text="连接", command=self.connect_mycobot)
+        self.connect = tkinter.Button(
+            self.win, text="连接", command=self.connect_mycobot
+        )
         self.disconnect = tkinter.Button(
             self.win, text="断开", command=self.disconnect_mycobot
         )
@@ -103,8 +107,8 @@ class MycobotTest(object):
             self.win, text="使能所有电机", command=self.rectify_mycobot
         )
         self.rectify_btn.grid(row=10, column=1)
-        
-        self.set_data= tkinter.Button(
+
+        self.set_data = tkinter.Button(
             self.win, text="校准电机参数", command=self.set_servo_data
         )
         self.set_data.grid(row=11, column=0)
@@ -151,9 +155,7 @@ class MycobotTest(object):
                 \r=================================================
                 {}
                 \r=================================================
-            """.format(
-                e
-            )
+            """.format(e)
             self.write_log_to_Text(err_log)
 
     def disconnect_mycobot(self):
@@ -196,7 +198,7 @@ class MycobotTest(object):
         #     if not self.mycobot._read(1):
         #         res.append(idx)
         #     time.sleep(0.1)
-        for i in range(1,5):
+        for i in range(1, 5):
             r = self.mycobot.is_servo_enable(i)
             if r != 1:
                 res.append(i)
@@ -243,14 +245,14 @@ class MycobotTest(object):
         }
         self.mycobot.set_color(*color_dict[color])
         self.write_log_to_Text("发送颜色: {}.".format(color))
-        
+
     def set_servo_data(self):
         if not self.has_mycobot():
             return
         address = [21, 22, 23, 24, 26, 27]
-        joint_1 = [25,25,0,0,3,3]
-        joint_other = [32,8,0,0,1,1]
-        for i in range(1,5):
+        joint_1 = [25, 25, 0, 0, 3, 3]
+        joint_other = [32, 8, 0, 0, 1, 1]
+        for i in range(1, 5):
             if i == 1:
                 for j in range(len(address)):
                     self.mycobot.set_servo_data(i, address[j], joint_1[j])
@@ -276,7 +278,6 @@ class MycobotTest(object):
                         res += "失败{}".format(data)
                 time.sleep(0.1)
                 self.write_log_to_Text(res)
-        
 
     def start_aging_test(self):
         if not self.has_mycobot():
@@ -303,7 +304,7 @@ class MycobotTest(object):
     def rectify_mycobot(self):
         if not self.has_mycobot():
             return
-        for i in range(1,5):
+        for i in range(1, 5):
             self.mycobot.focus_servo(i)
             time.sleep(0.1)
         self.write_log_to_Text("使能所有电机完成.")
@@ -328,7 +329,9 @@ class MycobotTest(object):
         #     return
         start = time.time()
         self.stop_test = False
-        while True and time.time() - start < 60*30 and self.stop_test == False:
+        while (
+            True and time.time() - start < 60 * 30 and self.stop_test == False
+        ):
             self.mycobot.set_color(255, 0, 0)
             self.mycobot.wait(5).send_angles([0, 0, 0, 0], 95)
             self.mycobot.wait(3).send_angles([-160, 0, 0, 0], 95)
@@ -387,8 +390,6 @@ class MycobotTest(object):
 
         #     def aging_test():
         #         # fast
-                
-
 
         #     if __name__ == '__main__':
         #         while True and time.time() - start < 60*30:
@@ -453,7 +454,8 @@ class MycobotTest(object):
 
     def get_serial_port_list(self):
         plist = [
-            str(x).split(" - ")[0].strip() for x in serial.tools.list_ports.comports()
+            str(x).split(" - ")[0].strip()
+            for x in serial.tools.list_ports.comports()
         ]
         print(plist)
         self.port_list["value"] = plist
@@ -461,7 +463,9 @@ class MycobotTest(object):
 
     def get_current_time(self):
         """Get current time with format."""
-        current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
+        current_time = time.strftime(
+            "%Y-%m-%d %H:%M:%S", time.localtime(time.time())
+        )
         return current_time
 
     def write_log_to_Text(self, logmsg: str):

@@ -248,18 +248,18 @@ class ProtocolCode(object):
     SET_ROBOT_ERROR_CHECK_STATE = 6
     GET_ROBOT_ERROR_CHECK_STATE = 7
     GET_ROBOT_ERROR_STATUS = 0x15
-    GET_ATOM_PRESS_STATUS = 0x6b
-    GET_ATOM_LED_COLOR = 0x6a
+    GET_ATOM_PRESS_STATUS = 0x6B
+    GET_ATOM_LED_COLOR = 0x6A
     SET_ATOM_PIN_STATUS = 0x61
     GET_ATOM_PIN_STATUS = 0x62
     SET_MASTER_PIN_STATUS = 0x65
     GET_MASTER_PIN_STATUS = 0x66
-    SET_AUXILIARY_PIN_STATUS = 0xa0
-    GET_AUXILIARY_PIN_STATUS = 0xa1
+    SET_AUXILIARY_PIN_STATUS = 0xA0
+    GET_AUXILIARY_PIN_STATUS = 0xA1
     SET_SERVO_MOTOR_CLOCKWISE = 0x73
-    GET_SERVO_MOTOR_CLOCKWISE = 0Xea
+    GET_SERVO_MOTOR_CLOCKWISE = 0xEA
     SET_SERVO_MOTOR_COUNTER_CLOCKWISE = 0x74
-    GET_SERVO_MOTOR_COUNTER_CLOCKWISE = 0xeb
+    GET_SERVO_MOTOR_COUNTER_CLOCKWISE = 0xEB
     SET_SERVO_MOTOR_CONFIG = 0x52
     GET_SERVO_MOTOR_CONFIG = 0x53
     CLEAR_RECV_QUEUE = 0x19
@@ -280,10 +280,53 @@ class ProtocolCode(object):
 
 
 has_return = [
-    0x02, 0x03, 0x04, 0x09, 0x10, 0x11, 0x12, 0x13, 0x1c, 0x18, 0x19, 0x20, 0x23, 0x27, 0x29, 0x2A, 0x2B, 0x35, 0x4A,
-    0x4B, 0x4C, 0x4D,
-    0x50, 0x51, 0x56, 0x57, 0x59, 0x5A, 0x62, 0x82, 0x84, 0x86, 0x88, 0x8A, 0xA1, 0xA2, 0xB2, 0xB3,
-    0xB4, 0xB5, 0xB7, 0xD6, 0xe1, 0xe2, 0xe4, 0xC, 0x9C
+    0x02,
+    0x03,
+    0x04,
+    0x09,
+    0x10,
+    0x11,
+    0x12,
+    0x13,
+    0x1C,
+    0x18,
+    0x19,
+    0x20,
+    0x23,
+    0x27,
+    0x29,
+    0x2A,
+    0x2B,
+    0x35,
+    0x4A,
+    0x4B,
+    0x4C,
+    0x4D,
+    0x50,
+    0x51,
+    0x56,
+    0x57,
+    0x59,
+    0x5A,
+    0x62,
+    0x82,
+    0x84,
+    0x86,
+    0x88,
+    0x8A,
+    0xA1,
+    0xA2,
+    0xB2,
+    0xB3,
+    0xB4,
+    0xB5,
+    0xB7,
+    0xD6,
+    0xE1,
+    0xE2,
+    0xE4,
+    0xC,
+    0x9C,
 ]
 
 has_closed_loop = [
@@ -293,7 +336,7 @@ has_closed_loop = [
     ProtocolCode.SEND_COORDS,
     ProtocolCode.JOG_INCREMENT,
     ProtocolCode.JOG_INCREMENT_COORD,
-    ProtocolCode.COBOTX_SET_SOLUTION_ANGLES
+    ProtocolCode.COBOTX_SET_SOLUTION_ANGLES,
 ]
 
 
@@ -309,7 +352,8 @@ def get_logger(name):
     console.setFormatter(formatter)
 
     save = logging.handlers.RotatingFileHandler(
-        "server_pro630.log", maxBytes=10485760, backupCount=1)
+        "server_pro630.log", maxBytes=10485760, backupCount=1
+    )
     save.setFormatter(formatter)
 
     logger.addHandler(save)
@@ -318,9 +362,9 @@ def get_logger(name):
 
 
 class pro630Server(object):
-
-    def __init__(self, host, port, serial_num="/dev/ttyAMA0", baud=115200) -> None:
-
+    def __init__(
+        self, host, port, serial_num="/dev/ttyAMA0", baud=115200
+    ) -> None:
         self.logger = get_logger("AS")
         self.mc = None
         self.serial_num = serial_num
@@ -338,7 +382,7 @@ class pro630Server(object):
         GPIO.setup(self.power_control_1, GPIO.IN)
         GPIO.setup(self.power_control_2, GPIO.OUT)
         self.conn = None
-        check_mode = [0xfe, 0xfe, 0x3, 0xc, 0xc9, 0x50]
+        check_mode = [0xFE, 0xFE, 0x3, 0xC, 0xC9, 0x50]
         self.connected = True
         self.asynchronous = False
         self.mc.write(check_mode)
@@ -374,8 +418,11 @@ class pro630Server(object):
                         if self.mc.isOpen() == False:
                             self.mc.open()
                         else:
-                            self.logger.info("get command: {}".format(
-                                [hex(v) for v in command]))
+                            self.logger.info(
+                                "get command: {}".format(
+                                    [hex(v) for v in command]
+                                )
+                            )
                             # command = self.re_data_2(command)
                             # print(f"Type of command[3] is {type(command[3])} value = {command[3]}")
                             if command[3] == 16:
@@ -438,9 +485,15 @@ class pro630Server(object):
                                     # 关闭闭环
                                     self.asynchronous = True
                             if command[3] in has_return or (
-                                    command[3] in has_closed_loop and self.asynchronous is False):
+                                command[3] in has_closed_loop
+                                and self.asynchronous is False
+                            ):
                                 # res = self.read(command)
-                                self.read_thread = threading.Thread(target=self.read, args=(command,), daemon=True)
+                                self.read_thread = threading.Thread(
+                                    target=self.read,
+                                    args=(command,),
+                                    daemon=True,
+                                )
                                 self.read_thread.start()
                     except ConnectionResetError:
                         pass
@@ -469,7 +522,7 @@ class pro630Server(object):
 
     @classmethod
     def crc_check(cls, command):
-        crc = 0xffff
+        crc = 0xFFFF
         for index in range(len(command)):
             crc ^= command[index]
             for _ in range(8):
@@ -498,9 +551,19 @@ class pro630Server(object):
             wait_time = 8
         elif command[3] in [0x11, 0x13, 0x18, 0x56, 0x57, 0x29]:
             wait_time = 3
-        elif command[3] in [ProtocolCode.SEND_ANGLE, ProtocolCode.SEND_ANGLES, ProtocolCode.SEND_COORD,
-                            ProtocolCode.SEND_COORDS, ProtocolCode.JOG_INCREMENT, ProtocolCode.JOG_INCREMENT_COORD,
-                            ProtocolCode.COBOTX_SET_SOLUTION_ANGLES] and self.asynchronous == False:
+        elif (
+            command[3]
+            in [
+                ProtocolCode.SEND_ANGLE,
+                ProtocolCode.SEND_ANGLES,
+                ProtocolCode.SEND_COORD,
+                ProtocolCode.SEND_COORDS,
+                ProtocolCode.JOG_INCREMENT,
+                ProtocolCode.JOG_INCREMENT_COORD,
+                ProtocolCode.COBOTX_SET_SOLUTION_ANGLES,
+            ]
+            and self.asynchronous == False
+        ):
             wait_time = 300
         while True and time.time() - t < wait_time and self.connected:
             data = self.mc.read()
@@ -549,16 +612,18 @@ class pro630Server(object):
             else:
                 time.sleep(0.001)
         else:
-            datas = b''
+            datas = b""
         if self.conn is not None:
-            self.logger.info("return datas: {}".format([hex(v) for v in datas]))
+            self.logger.info(
+                "return datas: {}".format([hex(v) for v in datas])
+            )
 
             self.conn.sendall(datas)
-            datas = b''
+            datas = b""
         return datas
 
     def re_data_2(self, command):
-        r2 = re.compile(r'[[](.*?)[]]')
+        r2 = re.compile(r"[[](.*?)[]]")
         data_str = re.findall(r2, command)[0]
         data_list = data_str.split(",")
         data_list = [int(i) for i in data_list]
@@ -568,8 +633,13 @@ class pro630Server(object):
 if __name__ == "__main__":
     ifname = "wlan0"
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    HOST = socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8915, struct.pack(
-        '256s', bytes(ifname, encoding="utf8")))[20:24])
+    HOST = socket.inet_ntoa(
+        fcntl.ioctl(
+            s.fileno(),
+            0x8915,
+            struct.pack("256s", bytes(ifname, encoding="utf8")),
+        )[20:24]
+    )
     # HOST = "localhost"
     PORT = 9000
     print("ip: {} port: {}".format(HOST, PORT))

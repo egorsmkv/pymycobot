@@ -46,6 +46,7 @@ class MyCobotSocket(CommandGenerator):
         # Other
             wait() *
     """
+
     _write = write
     _read = read
 
@@ -79,8 +80,9 @@ class MyCobotSocket(CommandGenerator):
             **kwargs: support `has_reply`
                 has_reply: Whether there is a return value to accept.
         """
-        real_command, has_reply, _async = super(
-            MyCobotSocket, self)._mesg(genre, *args, **kwargs)
+        real_command, has_reply, _async = super(MyCobotSocket, self)._mesg(
+            genre, *args, **kwargs
+        )
         # [254,...,255]
         with self.lock:
             # data = self._write(self._flatten(real_command), "socket")
@@ -89,8 +91,8 @@ class MyCobotSocket(CommandGenerator):
             try_count = 0
             while try_count < 3:
                 self._write(self._flatten(real_command), "socket")
-                data = self._read(genre, method='socket')
-                if data is not None and data != b'':
+                data = self._read(genre, method="socket")
+                if data is not None and data != b"":
                     break
                 try_count += 1
             else:
@@ -130,12 +132,16 @@ class MyCobotSocket(CommandGenerator):
                 ProtocolCode.GetHTSGripperTorque,
                 ProtocolCode.GetGripperProtectCurrent,
                 ProtocolCode.InitGripper,
-                ProtocolCode.SET_FOUR_PIECES_ZERO
+                ProtocolCode.SET_FOUR_PIECES_ZERO,
             ]:
                 return self._process_single(res)
             elif genre in [ProtocolCode.GET_ANGLES]:
                 return [self._int2angle(angle) for angle in res]
-            elif genre in [ProtocolCode.GET_COORDS, ProtocolCode.GET_TOOL_REFERENCE, ProtocolCode.GET_WORLD_REFERENCE]:
+            elif genre in [
+                ProtocolCode.GET_COORDS,
+                ProtocolCode.GET_TOOL_REFERENCE,
+                ProtocolCode.GET_WORLD_REFERENCE,
+            ]:
                 if res:
                     r = []
                     for idx in range(3):
@@ -147,9 +153,16 @@ class MyCobotSocket(CommandGenerator):
                     return res
             elif genre in [ProtocolCode.GET_SERVO_VOLTAGES]:
                 return [self._int2coord(angle) for angle in res]
-            elif genre in [ProtocolCode.GET_JOINT_MAX_ANGLE, ProtocolCode.GET_JOINT_MIN_ANGLE]:
+            elif genre in [
+                ProtocolCode.GET_JOINT_MAX_ANGLE,
+                ProtocolCode.GET_JOINT_MIN_ANGLE,
+            ]:
                 return self._int2coord(res[0])
-            elif genre in [ProtocolCode.GET_BASIC_VERSION, ProtocolCode.SOFTWARE_VERSION, ProtocolCode.GET_ATOM_VERSION]:
+            elif genre in [
+                ProtocolCode.GET_BASIC_VERSION,
+                ProtocolCode.SOFTWARE_VERSION,
+                ProtocolCode.GET_ATOM_VERSION,
+            ]:
                 return self._int2coord(self._process_single(res))
             elif genre == ProtocolCode.GET_ANGLES_COORDS:
                 r = []
@@ -181,8 +194,9 @@ class MyCobotSocket(CommandGenerator):
             speed (int): 0 ~ 100
         """
         calibration_parameters(len6=radians, speed=speed)
-        degrees = [self._angle2int(radian * (180 / math.pi))
-                   for radian in radians]
+        degrees = [
+            self._angle2int(radian * (180 / math.pi)) for radian in radians
+        ]
         return self._mesg(ProtocolCode.SEND_ANGLES, degrees, speed)
 
     def sync_send_angles(self, degrees, speed, timeout=15):
@@ -248,13 +262,13 @@ class MyCobotSocket(CommandGenerator):
 
     def close(self):
         self.sock.close()
-        
+
     def open(self):
         # 关闭之后需要重新连接
         self.sock = self.connect_socket()
         # self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # print("====open=",self.sock)
         # self.sock.connect((self.SERVER_IP, self.SERVER_PORT))
-        
+
     def go_home(self):
-        self.sync_send_angles([0,0,0,0,0,0], 30)
+        self.sync_send_angles([0, 0, 0, 0, 0, 0], 30)

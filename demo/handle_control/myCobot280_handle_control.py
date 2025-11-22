@@ -23,7 +23,7 @@ if IS_LINUX:
 if IS_WINDOWS:
     mc = MyCobot280(get_port_list()[0], 115200)  # M5
 else:
-    mc = MyCobot280('/dev/ttyAMA0', 1000000)  # PI
+    mc = MyCobot280("/dev/ttyAMA0", 1000000)  # PI
 
 init_angles = [0, 0, -90, 0, 0, 0]
 go_home = [0, 0, 0, 0, 0, 0]
@@ -37,30 +37,30 @@ previous_state = [0, 0, 0, 0, 0, 0]
 
 if IS_WINDOWS:
     AXIS_MAP = {
-        'x': 1,
-        'y': 0,
-        'z': 3,
-        'rz': 2,
+        "x": 1,
+        "y": 0,
+        "z": 3,
+        "rz": 2,
     }
     RELEASE_AXIS = 4
     POWER_AXIS = 5
 else:
     AXIS_MAP = {
-        'x': 1,
-        'y': 0,
-        'z': 4,
-        'rz': 3,
+        "x": 1,
+        "y": 0,
+        "z": 4,
+        "rz": 3,
     }
     RELEASE_AXIS = 2
     POWER_AXIS = 5
 
 BUTTON_MAP = {
-    'gripper_open': 2,
-    'gripper_close': 3,
-    'pump_on': 0,
-    'pump_off': 1,
-    'to_init': 5,
-    'to_home': 4,
+    "gripper_open": 2,
+    "gripper_close": 3,
+    "pump_on": 0,
+    "pump_off": 1,
+    "to_init": 5,
+    "to_home": 4,
 }
 
 
@@ -117,21 +117,21 @@ def joy_handler():
         if abs(value) > 0.1:
             flag = True
             previous_state[axis] = value
-            if axis == AXIS_MAP['y'] and value == -1.00:
+            if axis == AXIS_MAP["y"] and value == -1.00:
                 mc.jog_coord(2, 1, 50)
-            elif axis == AXIS_MAP['y'] and value == 1.00:
+            elif axis == AXIS_MAP["y"] and value == 1.00:
                 mc.jog_coord(2, 0, 50)
-            if axis == AXIS_MAP['x'] and value == 1.00:
+            if axis == AXIS_MAP["x"] and value == 1.00:
                 mc.jog_coord(1, 0, 50)
-            elif axis == AXIS_MAP['x'] and value == -1.00:
+            elif axis == AXIS_MAP["x"] and value == -1.00:
                 mc.jog_coord(1, 1, 50)
-            if axis == AXIS_MAP['z'] and value == 1.00:
+            if axis == AXIS_MAP["z"] and value == 1.00:
                 mc.jog_coord(3, 1, 50)
-            elif axis == AXIS_MAP['z'] and value == -1.00:
+            elif axis == AXIS_MAP["z"] and value == -1.00:
                 mc.jog_coord(3, 0, 50)
-            if axis == AXIS_MAP['rz'] and value == 1.00:
+            if axis == AXIS_MAP["rz"] and value == 1.00:
                 mc.jog_coord(6, 1, 50)
-            elif axis == AXIS_MAP['rz'] and value == -1.00:
+            elif axis == AXIS_MAP["rz"] and value == -1.00:
                 mc.jog_coord(6, 0, 50)
             # Axis RELEASE_AXIS for servo release
             elif axis == RELEASE_AXIS and value == 1.00:
@@ -148,18 +148,18 @@ def joy_handler():
                 previous_state[axis] = 0
     # Joystick button pressed
     elif event.type == pygame.JOYBUTTONDOWN:
-        if joystick.get_button(BUTTON_MAP['gripper_open']):
+        if joystick.get_button(BUTTON_MAP["gripper_open"]):
             mc.set_gripper_state(0, 100)
-        elif joystick.get_button(BUTTON_MAP['gripper_close']):
+        elif joystick.get_button(BUTTON_MAP["gripper_close"]):
             mc.set_gripper_state(1, 100)
-        elif joystick.get_button(BUTTON_MAP['pump_on']):
+        elif joystick.get_button(BUTTON_MAP["pump_on"]):
             pump_on()
-        elif joystick.get_button(BUTTON_MAP['pump_off']):
+        elif joystick.get_button(BUTTON_MAP["pump_off"]):
             pump_off()
-        elif joystick.get_button(BUTTON_MAP['to_init']):
+        elif joystick.get_button(BUTTON_MAP["to_init"]):
             mc.send_angles(init_angles, 50)
             time.sleep(2)
-        elif joystick.get_button(BUTTON_MAP['to_home']):
+        elif joystick.get_button(BUTTON_MAP["to_home"]):
             mc.send_angles(go_home, 50)
             time.sleep(3)
     # D-Pad (HAT) movement

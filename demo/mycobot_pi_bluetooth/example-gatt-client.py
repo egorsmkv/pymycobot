@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
 import dbus
+
 try:
-  from gi.repository import GObject
+    from gi.repository import GObject
 except ImportError:
-  import gobject as GObject
+    import gobject as GObject
 import sys
 
 from dbus.mainloop.glib import DBusGMainLoop
@@ -12,17 +13,17 @@ from dbus.mainloop.glib import DBusGMainLoop
 bus = None
 mainloop = None
 
-BLUEZ_SERVICE_NAME = 'org.bluez'
-DBUS_OM_IFACE =      'org.freedesktop.DBus.ObjectManager'
-DBUS_PROP_IFACE =    'org.freedesktop.DBus.Properties'
+BLUEZ_SERVICE_NAME = "org.bluez"
+DBUS_OM_IFACE = "org.freedesktop.DBus.ObjectManager"
+DBUS_PROP_IFACE = "org.freedesktop.DBus.Properties"
 
-GATT_SERVICE_IFACE = 'org.bluez.GattService1'
-GATT_CHRC_IFACE =    'org.bluez.GattCharacteristic1'
+GATT_SERVICE_IFACE = "org.bluez.GattService1"
+GATT_CHRC_IFACE = "org.bluez.GattCharacteristic1"
 
-HR_SVC_UUID =        '0000180d-0000-1000-8000-00805f9b34fb'
-HR_MSRMT_UUID =      '00002a37-0000-1000-8000-00805f9b34fb'
-BODY_SNSR_LOC_UUID = '00002a38-0000-1000-8000-00805f9b34fb'
-HR_CTRL_PT_UUID =    '00002a39-0000-1000-8000-00805f9b34fb'
+HR_SVC_UUID = "0000180d-0000-1000-8000-00805f9b34fb"
+HR_MSRMT_UUID = "00002a37-0000-1000-8000-00805f9b34fb"
+BODY_SNSR_LOC_UUID = "00002a38-0000-1000-8000-00805f9b34fb"
+HR_CTRL_PT_UUID = "00002a39-0000-1000-8000-00805f9b34fb"
 
 # The objects that we interact with.
 hr_service = None
@@ -32,50 +33,50 @@ hr_ctrl_pt_chrc = None
 
 
 def generic_error_cb(error):
-    print('D-Bus call failed: ' + str(error))
+    print("D-Bus call failed: " + str(error))
     mainloop.quit()
 
 
 def body_sensor_val_to_str(val):
     if val == 0:
-        return 'Other'
+        return "Other"
     if val == 1:
-        return 'Chest'
+        return "Chest"
     if val == 2:
-        return 'Wrist'
+        return "Wrist"
     if val == 3:
-        return 'Finger'
+        return "Finger"
     if val == 4:
-        return 'Hand'
+        return "Hand"
     if val == 5:
-        return 'Ear Lobe'
+        return "Ear Lobe"
     if val == 6:
-        return 'Foot'
+        return "Foot"
 
-    return 'Reserved value'
+    return "Reserved value"
 
 
 def sensor_contact_val_to_str(val):
     if val == 0 or val == 1:
-        return 'not supported'
+        return "not supported"
     if val == 2:
-        return 'no contact detected'
+        return "no contact detected"
     if val == 3:
-        return 'contact detected'
+        return "contact detected"
 
-    return 'invalid value'
+    return "invalid value"
 
 
 def body_sensor_val_cb(value):
     if len(value) != 1:
-        print('Invalid body sensor location value: ' + repr(value))
+        print("Invalid body sensor location value: " + repr(value))
         return
 
-    print('Body sensor location value: ' + body_sensor_val_to_str(value[0]))
+    print("Body sensor location value: " + body_sensor_val_to_str(value[0]))
 
 
 def hr_msrmt_start_notify_cb():
-    print('HR Measurement notifications enabled')
+    print("HR Measurement notifications enabled")
 
 
 def hr_msrmt_changed_cb(iface, changed_props, invalidated_props):
@@ -85,11 +86,11 @@ def hr_msrmt_changed_cb(iface, changed_props, invalidated_props):
     if not len(changed_props):
         return
 
-    value = changed_props.get('Value', None)
+    value = changed_props.get("Value", None)
     if not value:
         return
 
-    print('New HR Measurement')
+    print("New HR Measurement")
 
     flags = value[0]
     value_format = flags & 0x01
@@ -103,38 +104,42 @@ def hr_msrmt_changed_cb(iface, changed_props, invalidated_props):
         hr_msrmt = value[1] | (value[2] << 8)
         next_ind = 3
 
-    print('\tHR: ' + str(int(hr_msrmt)))
-    print('\tSensor Contact status: ' +
-          sensor_contact_val_to_str(sc_status))
+    print("\tHR: " + str(int(hr_msrmt)))
+    print("\tSensor Contact status: " + sensor_contact_val_to_str(sc_status))
 
     if ee_status:
-        print('\tEnergy Expended: ' + str(int(value[next_ind])))
+        print("\tEnergy Expended: " + str(int(value[next_ind])))
 
 
 def start_client():
     # Read the Body Sensor Location value and print it asynchronously.
-    body_snsr_loc_chrc[0].ReadValue({}, reply_handler=body_sensor_val_cb,
-                                    error_handler=generic_error_cb,
-                                    dbus_interface=GATT_CHRC_IFACE)
+    body_snsr_loc_chrc[0].ReadValue(
+        {},
+        reply_handler=body_sensor_val_cb,
+        error_handler=generic_error_cb,
+        dbus_interface=GATT_CHRC_IFACE,
+    )
 
     # Listen to PropertiesChanged signals from the Heart Measurement
     # Characteristic.
     hr_msrmt_prop_iface = dbus.Interface(hr_msrmt_chrc[0], DBUS_PROP_IFACE)
-    hr_msrmt_prop_iface.connect_to_signal("PropertiesChanged",
-                                          hr_msrmt_changed_cb)
+    hr_msrmt_prop_iface.connect_to_signal(
+        "PropertiesChanged", hr_msrmt_changed_cb
+    )
 
     # Subscribe to Heart Rate Measurement notifications.
-    hr_msrmt_chrc[0].StartNotify(reply_handler=hr_msrmt_start_notify_cb,
-                                 error_handler=generic_error_cb,
-                                 dbus_interface=GATT_CHRC_IFACE)
+    hr_msrmt_chrc[0].StartNotify(
+        reply_handler=hr_msrmt_start_notify_cb,
+        error_handler=generic_error_cb,
+        dbus_interface=GATT_CHRC_IFACE,
+    )
 
 
 def process_chrc(chrc_path):
     chrc = bus.get_object(BLUEZ_SERVICE_NAME, chrc_path)
-    chrc_props = chrc.GetAll(GATT_CHRC_IFACE,
-                             dbus_interface=DBUS_PROP_IFACE)
+    chrc_props = chrc.GetAll(GATT_CHRC_IFACE, dbus_interface=DBUS_PROP_IFACE)
 
-    uuid = chrc_props['UUID']
+    uuid = chrc_props["UUID"]
 
     if uuid == HR_MSRMT_UUID:
         global hr_msrmt_chrc
@@ -146,22 +151,23 @@ def process_chrc(chrc_path):
         global hr_ctrl_pt_chrc
         hr_ctrl_pt_chrc = (chrc, chrc_props)
     else:
-        print('Unrecognized characteristic: ' + uuid)
+        print("Unrecognized characteristic: " + uuid)
 
     return True
 
 
 def process_hr_service(service_path, chrc_paths):
     service = bus.get_object(BLUEZ_SERVICE_NAME, service_path)
-    service_props = service.GetAll(GATT_SERVICE_IFACE,
-                                   dbus_interface=DBUS_PROP_IFACE)
+    service_props = service.GetAll(
+        GATT_SERVICE_IFACE, dbus_interface=DBUS_PROP_IFACE
+    )
 
-    uuid = service_props['UUID']
+    uuid = service_props["UUID"]
 
     if uuid != HR_SVC_UUID:
         return False
 
-    print('Heart Rate Service found: ' + service_path)
+    print("Heart Rate Service found: " + service_path)
 
     # Process the characteristics.
     for chrc_path in chrc_paths:
@@ -178,7 +184,7 @@ def interfaces_removed_cb(object_path, interfaces):
         return
 
     if object_path == hr_service[2]:
-        print('Service was removed')
+        print("Service was removed")
         mainloop.quit()
 
 
@@ -190,10 +196,10 @@ def main():
     global mainloop
     mainloop = GObject.MainLoop()
 
-    om = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, '/'), DBUS_OM_IFACE)
-    om.connect_to_signal('InterfacesRemoved', interfaces_removed_cb)
+    om = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, "/"), DBUS_OM_IFACE)
+    om.connect_to_signal("InterfacesRemoved", interfaces_removed_cb)
 
-    print('Getting objects...')
+    print("Getting objects...")
     objects = om.GetManagedObjects()
     chrcs = []
 
@@ -214,7 +220,7 @@ def main():
             break
 
     if not hr_service:
-        print('No Heart Rate Service found')
+        print("No Heart Rate Service found")
         sys.exit(1)
 
     start_client()
@@ -222,5 +228,5 @@ def main():
     mainloop.run()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

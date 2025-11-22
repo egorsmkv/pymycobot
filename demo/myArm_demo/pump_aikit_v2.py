@@ -2,7 +2,7 @@ import time
 from pymycobot.myarm import MyArm
 import RPi.GPIO as GPIO
 
-mc = MyArm('/dev/ttyAMA0')
+mc = MyArm("/dev/ttyAMA0")
 
 # 初始化
 GPIO.setmode(GPIO.BCM)
@@ -45,17 +45,17 @@ def move():
     """
     myarm使用吸泵模拟aikitV2套装抓取木块
     """
-    #mc.send_angles(init_angles[0], 50)
-    #time.sleep(3)
+    # mc.send_angles(init_angles[0], 50)
+    # time.sleep(3)
 
     mc.send_angles(init_angles[1], 50)
     time.sleep(3)
 
-    #mc.send_angles([0, 22, 0, -70, 0, -82, 0], 30)
+    # mc.send_angles([0, 22, 0, -70, 0, -82, 0], 30)
     mc.send_coords([176.3, -1.5, 201.3, -179.89, 3.6, 179.49], 30)
     time.sleep(3)
 
-    #mc.send_angles([-0.35, 37.79, -0.7, -90.43, -0.35, -45.96, -0.26], 30)
+    # mc.send_angles([-0.35, 37.79, -0.7, -90.43, -0.35, -45.96, -0.26], 30)
     mc.send_coords([177.8, -3.5, 114, -179.26, 5.79, 179.64], 30)
     time.sleep(2.5)
     pump_on()
@@ -78,6 +78,6 @@ def move():
     time.sleep(4)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pump_off()
     move()

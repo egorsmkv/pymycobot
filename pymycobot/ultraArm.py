@@ -7,7 +7,6 @@ import threading
 
 class ultraArm:
     def __init__(self, port, baudrate=115200, timeout=0.1, debug=False):
-
         """
         Args:
             port     : port string
@@ -51,11 +50,11 @@ class ultraArm:
                             time.sleep(2)
                             qs = self._get_queue_size()
                             if self.debug:
-                                print('respone_size1:', qs)
+                                print("respone_size1:", qs)
                             if qs < 40:
                                 time.sleep(1)
                                 qsize = self._get_queue_size()
-                                print('respone_size2:', qsize)
+                                print("respone_size2:", qsize)
                                 break
 
                         except Exception as e:
@@ -71,89 +70,105 @@ class ultraArm:
                 data = self._serial_port.read(self._serial_port.inWaiting())
                 data = str(data.decode())
                 if self.debug:
-                    print("\nreceived data:\n%s**********************\n" % data)
+                    print(
+                        "\nreceived data:\n%s**********************\n" % data
+                    )
                 if data.find("ERROR: COMMAND NOT RECOGNIZED") > -1:
                     flag = None
 
                 if flag == "angle":
-                    a = data[data.find("ANGLES"):]
+                    a = data[data.find("ANGLES") :]
                     astart = a.find("[")
                     aend = a.find("]")
                     if a != None and a != "":
                         try:
-                            all = list(map(float, a[astart + 1: aend].split(",")))
+                            all = list(
+                                map(float, a[astart + 1 : aend].split(","))
+                            )
                             return all
                         except Exception:
-                            print("received angles is not completed! Retry receive...")
+                            print(
+                                "received angles is not completed! Retry receive..."
+                            )
                             count += 1
                             continue
 
                 elif flag == "coord":
-                    c = data[data.find("COORDS"):]
+                    c = data[data.find("COORDS") :]
                     cstart = c.find("[")
                     cend = c.find("]")
                     if c != None and c != "":
                         try:
-                            all = list(map(float, c[cstart + 1: cend].split(",")))
+                            all = list(
+                                map(float, c[cstart + 1 : cend].split(","))
+                            )
                             return all
                         except Exception:
-                            print("received coords is not completed! Retry receive...")
+                            print(
+                                "received coords is not completed! Retry receive..."
+                            )
                             count += 1
                             continue
 
                 elif flag == "endstop":
-                    e = data[data.find("ENDSTOP"):]
+                    e = data[data.find("ENDSTOP") :]
                     eend = e.find("\n")
                     if e != None and e != "":
                         try:
                             all = e[:eend]
                             return all
                         except Exception:
-                            print("received coords is not completed! Retry receive...")
+                            print(
+                                "received coords is not completed! Retry receive..."
+                            )
                             count += 1
                             continue
 
                 elif flag == "size":
                     try:
-                        q = data[data.find("QUEUE SIZE"):]
+                        q = data[data.find("QUEUE SIZE") :]
                         qstart = q.find("[")
                         qend = q.find("]")
                         if q != None and q != "":
-                            qsize = int(q[qstart + 1: qend])
+                            qsize = int(q[qstart + 1 : qend])
                             return qsize
                     except Exception as e:
                         count += 1
                         continue
-                elif flag == 'isStop':
+                elif flag == "isStop":
                     if "Moving end" in data:
                         return 1
                     else:
                         return 0
-                elif flag == 'gripper':
+                elif flag == "gripper":
                     header = "GRIPPERANGLE["
                     read = data.find(header) + len(header)
                     # print(data[read:])
-                    end = data[read:].find(']')
-                    return data[read:read + end]
-                elif flag == 'system':
+                    end = data[read:].find("]")
+                    return data[read : read + end]
+                elif flag == "system":
                     header = "ReadSYS["
                     read = data.find(header) + len(header)
-                    end = data[read:].find(']')
-                    return int(data[read:read + end])
-                elif flag == 'system_version':
+                    end = data[read:].find("]")
+                    return int(data[read : read + end])
+                elif flag == "system_version":
                     start_idx = data.find("GetSystemVersion[")
                     if start_idx != -1:
-                        version_str = data[start_idx + len("GetSystemVersion["):]
-                        version_str = version_str.split(']')[0]
+                        version_str = data[
+                            start_idx + len("GetSystemVersion[") :
+                        ]
+                        version_str = version_str.split("]")[0]
                         version = float(version_str.strip())
                         return version
                     else:
                         return None
-                elif flag == 'modify_version':
+                elif flag == "modify_version":
                     start_idx = data.find("GetModifyVersion[")
                     if start_idx != -1:
-                        version_str = data[start_idx + len("GetModifyVersion["):]
-                        version_str = version_str.split(']')[0]
+                        version_str = data[
+                            start_idx + len("GetModifyVersion[") :
+                        ]
+                        version_str = version_str.split("]")[0]
                         version = int(version_str.strip())
                         return version
                     else:
@@ -203,7 +218,9 @@ class ultraArm:
             data = None
             while True:
                 if self._serial_port.inWaiting() > 0:
-                    data = self._serial_port.read(self._serial_port.inWaiting())
+                    data = self._serial_port.read(
+                        self._serial_port.inWaiting()
+                    )
                     if data != None:
                         data = str(data.decode())
                         if data.find("ok") > 0:
@@ -213,7 +230,9 @@ class ultraArm:
 
     def sleep(self, time):
         with self.lock:
-            command = ProtocolCode.SLEEP_TIME + " S" + str(time) + ProtocolCode.END
+            command = (
+                ProtocolCode.SLEEP_TIME + " S" + str(time) + ProtocolCode.END
+            )
             self._serial_port.write(command.encode())
             self._serial_port.flush()
             self._debug(command)
@@ -419,7 +438,14 @@ class ultraArm:
             speed: 0 - 1500
         """
         with self.lock:
-            command = ProtocolCode.GIRPPER_OPEN + "A" + str(state) + "F" + str(speed) + ProtocolCode.END
+            command = (
+                ProtocolCode.GIRPPER_OPEN
+                + "A"
+                + str(state)
+                + "F"
+                + str(speed)
+                + ProtocolCode.END
+            )
             self._serial_port.write(command.encode())
             self._serial_port.flush()
             self._debug(command)
@@ -524,7 +550,9 @@ class ultraArm:
             speed : (int) 0-200 mm/s
         """
         with self.lock:
-            degrees = [round(degree * (180 / math.pi), 2) for degree in degrees]
+            degrees = [
+                round(degree * (180 / math.pi), 2) for degree in degrees
+            ]
             self.set_angles(degrees, speed)
 
     def set_jog_angle(self, id=None, direction=None, speed=0):
@@ -556,7 +584,7 @@ class ultraArm:
         """Start jog movement with coord
 
         Args:
-            axis : 
+            axis :
             1 : x
             2 : y
             3 : z
@@ -642,11 +670,11 @@ class ultraArm:
     def close(self):
         with self.lock:
             self._serial_port.close()
-        
+
     def open(self):
         with self.lock:
             self._serial_port.open()
-        
+
     def is_moving_end(self):
         with self.lock:
             """Get the current state of all home switches."""
@@ -661,9 +689,7 @@ class ultraArm:
             pass
 
     def get_gripper_angle(self):
-        """
-        
-        """
+        """ """
         command = ProtocolCode.GET_GRIPPER_ANGLE + ProtocolCode.END
         self._serial_port.write(command.encode())
         self._serial_port.flush()
@@ -682,11 +708,22 @@ class ultraArm:
                 2 - setting value range is 0-65535, address 56 (setting position) can be used
         """
         if mode:
-            command = ProtocolCode.SET_SYSTEM_VALUE + " X{} ".format(id) + "Y{} ".format(address) + "Z{} ".format(
-                value) + "P{} ".format(mode) + ProtocolCode.END
+            command = (
+                ProtocolCode.SET_SYSTEM_VALUE
+                + " X{} ".format(id)
+                + "Y{} ".format(address)
+                + "Z{} ".format(value)
+                + "P{} ".format(mode)
+                + ProtocolCode.END
+            )
         else:
-            command = ProtocolCode.SET_SYSTEM_VALUE + " X{} ".format(id) + "Y{} ".format(address) + "Z{} ".format(
-                value) + ProtocolCode.END
+            command = (
+                ProtocolCode.SET_SYSTEM_VALUE
+                + " X{} ".format(id)
+                + "Y{} ".format(address)
+                + "Z{} ".format(value)
+                + ProtocolCode.END
+            )
         self._serial_port.write(command.encode())
         self._serial_port.flush()
         self._debug(command)
@@ -705,10 +742,20 @@ class ultraArm:
             _type_: _description_
         """
         if mode:
-            command = ProtocolCode.GET_SYSTEM_VALUE + " J{} ".format(id) + "S{} ".format(address) + "P{} ".format(
-                mode) + ProtocolCode.END
+            command = (
+                ProtocolCode.GET_SYSTEM_VALUE
+                + " J{} ".format(id)
+                + "S{} ".format(address)
+                + "P{} ".format(mode)
+                + ProtocolCode.END
+            )
         else:
-            command = ProtocolCode.GET_SYSTEM_VALUE + " J{} ".format(id) + "S{} ".format(address) + ProtocolCode.END
+            command = (
+                ProtocolCode.GET_SYSTEM_VALUE
+                + " J{} ".format(id)
+                + "S{} ".format(address)
+                + ProtocolCode.END
+            )
         self._serial_port.write(command.encode())
         self._serial_port.flush()
         self._debug(command)
@@ -725,7 +772,7 @@ class ultraArm:
         self._serial_port.write(command.encode())
         self._serial_port.flush()
         self._debug(command)
-        return self._request('system_version')
+        return self._request("system_version")
 
     def get_modify_version(self):
         """
@@ -738,4 +785,4 @@ class ultraArm:
         self._serial_port.write(command.encode())
         self._serial_port.flush()
         self._debug(command)
-        return self._request('modify_version')
+        return self._request("modify_version")

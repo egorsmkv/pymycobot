@@ -10,6 +10,7 @@ from .generate import CommandGenerator
 from .common import ProtocolCode, read, write
 from pymycobot.sms import sms_sts
 
+
 class MyPalletizedataException(Exception):
     pass
 
@@ -25,7 +26,10 @@ MAX_ANGLE = 170.0
 
 
 def calibration_parameters(**kwargs):
-    if kwargs.get("id", None) is not None and not MIN_ID <= kwargs["id"] <= MAX_ID:
+    if (
+        kwargs.get("id", None) is not None
+        and not MIN_ID <= kwargs["id"] <= MAX_ID
+    ):
         raise MyPalletizedataException(
             "The id not right, should be {0} ~ {1}, but received {2}.".format(
                 MIN_ID, MAX_ID, kwargs["id"]
@@ -46,9 +50,10 @@ def calibration_parameters(**kwargs):
         degrees = kwargs["degrees"]
         if not isinstance(degrees, list):
             raise MyPalletizedataException("`degrees` must be a list.")
-        if len(degrees) not in [3,4]:
+        if len(degrees) not in [3, 4]:
             raise MyPalletizedataException(
-                "The length of `degrees` must be 3 /  4.")
+                "The length of `degrees` must be 3 /  4."
+            )
         for idx, angle in enumerate(degrees):
             if not MIN_ANGLE <= angle <= MAX_ANGLE:
                 raise MyPalletizedataException(
@@ -62,10 +67,12 @@ def calibration_parameters(**kwargs):
         if not isinstance(coords, list):
             raise MyPalletizedataException("`coords` must be a list.")
         if len(coords) != 4:
-            raise MyPalletizedataException(
-                "The length of `coords` must be 4.")
+            raise MyPalletizedataException("The length of `coords` must be 4.")
 
-    if kwargs.get("speed", None) is not None and not 0 <= kwargs["speed"] <= 100:
+    if (
+        kwargs.get("speed", None) is not None
+        and not 0 <= kwargs["speed"] <= 100
+    ):
         raise MyPalletizedataException(
             "speed value not right, should be 0 ~ 100, the error speed is %s"
             % kwargs["speed"]
@@ -76,8 +83,8 @@ def calibration_parameters(**kwargs):
         for i, v in enumerate(kwargs["rgb"]):
             if not (0 <= v <= 255):
                 raise MyPalletizedataException(
-                    "The RGB value needs be 0 ~ 255, but the %s is %s" % (
-                        rgb_str[i], v)
+                    "The RGB value needs be 0 ~ 255, but the %s is %s"
+                    % (rgb_str[i], v)
                 )
 
 
@@ -156,7 +163,7 @@ class MyPalletizer(CommandGenerator, sms_sts):
                     ProtocolCode.GetHTSGripperTorque,
                     ProtocolCode.GetGripperProtectCurrent,
                     ProtocolCode.InitGripper,
-                    ProtocolCode.SET_FOUR_PIECES_ZERO
+                    ProtocolCode.SET_FOUR_PIECES_ZERO,
                 ]:
                     return self._process_single(res)
                 elif genre in [ProtocolCode.GET_ANGLES]:
@@ -166,7 +173,7 @@ class MyPalletizer(CommandGenerator, sms_sts):
                         r = []
                         for idx in range(3):
                             r.append(self._int2coord(res[idx]))
-                        if len(res)>3:
+                        if len(res) > 3:
                             r.append(self._int2angle(res[3]))
                         return r
                     else:
@@ -176,7 +183,11 @@ class MyPalletizer(CommandGenerator, sms_sts):
                     ProtocolCode.GET_JOINT_MAX_ANGLE,
                 ]:
                     return self._int2angle(res[0]) if res else 0
-                elif genre in [ProtocolCode.GET_BASIC_VERSION, ProtocolCode.SOFTWARE_VERSION, ProtocolCode.GET_ATOM_VERSION]:
+                elif genre in [
+                    ProtocolCode.GET_BASIC_VERSION,
+                    ProtocolCode.SOFTWARE_VERSION,
+                    ProtocolCode.GET_ATOM_VERSION,
+                ]:
                     return self._int2coord(self._process_single(res))
                 elif genre == ProtocolCode.GET_ANGLES_COORDS:
                     r = []
@@ -209,8 +220,9 @@ class MyPalletizer(CommandGenerator, sms_sts):
             speed (int): 0 ~ 100
         """
         # calibration_parameters(len6=radians, speed=speed)
-        degrees = [self._angle2int(radian * (180 / math.pi))
-                   for radian in radians]
+        degrees = [
+            self._angle2int(radian * (180 / math.pi)) for radian in radians
+        ]
         return self._mesg(ProtocolCode.SEND_ANGLES, degrees, speed)
 
     def sync_send_angles(self, degrees, speed, timeout=15):
@@ -255,21 +267,25 @@ class MyPalletizer(CommandGenerator, sms_sts):
     def wait(self, t):
         time.sleep(t)
         return self
-    
+
     def get_accie_data(self, value):
         """Get gyroscope data
-        
+
         Args:
-            value: 
+            value:
                 0 - Get data from a 3-axis gyroscope.\n
                 1 - Get data from a 2-axis gyroscope.
-            
+
         """
         data_list = [[25, 21], [26, 32]]
-        return self._mesg(ProtocolCode.GET_ACCEI_DATA, data_list[1] if value else data_list[0], has_reply=True)
-    
+        return self._mesg(
+            ProtocolCode.GET_ACCEI_DATA,
+            data_list[1] if value else data_list[0],
+            has_reply=True,
+        )
+
     def close(self):
         self._serial_port.close()
-        
+
     def open(self):
         self._serial_port.open()

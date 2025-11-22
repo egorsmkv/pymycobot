@@ -18,14 +18,16 @@ class MyBuddyCommandGenerator(CommandGenerator):
             **kwargs: support `has_reply`
                 has_reply: Whether there is a return value to accept.
         """
-        command_data = self._process_data_command(genre, self.__class__.__name__, args)
+        command_data = self._process_data_command(
+            genre, self.__class__.__name__, args
+        )
 
         if genre == 178:
             # 修改wifi端口
             command_data = self._encode_int16(command_data)
 
         LEN = len(command_data) + 1
-        check_digit = (sum(command_data[1:]) + genre) & 0xff
+        check_digit = (sum(command_data[1:]) + genre) & 0xFF
         # if check_digit >= 256:
         #     check_digit %= 256
         command = [
@@ -69,14 +71,13 @@ class MyBuddyCommandGenerator(CommandGenerator):
         return self._mesg(ProtocolCode.CLEAR_ERROR_INFO, ids, has_reply=True)
 
     def get_system_version(self):
-        """Get cobot version
-        """
+        """Get cobot version"""
         return self._mesg(ProtocolCode.SOFTWARE_VERSION, 0, has_reply=True)
 
     # Overall status
     def power_on(self, id=0):
         """Open communication with Atom.
-        
+
         Args:
             id: 0/1/2/3 (ALL/L/R/W)
         """
@@ -84,7 +85,7 @@ class MyBuddyCommandGenerator(CommandGenerator):
 
     def power_off(self, id=0):
         """Close communication with Atom.
-        
+
         Args:
             id: 0/1/2/3 (ALL/L/R/W)
         """
@@ -95,7 +96,7 @@ class MyBuddyCommandGenerator(CommandGenerator):
 
         Args:
             id: 0/1/2/3 (ALL/L/R/W)
-            
+
         Return:
             1 - power on
             0 - power off
@@ -105,7 +106,7 @@ class MyBuddyCommandGenerator(CommandGenerator):
 
     def release_all_servos(self, id=0):
         """Robot turns off torque output
-        
+
         Args:
             id: 0/1/2/3 (ALL/L/R/W)
         """
@@ -113,39 +114,41 @@ class MyBuddyCommandGenerator(CommandGenerator):
 
     def is_controller_connected(self, id=0):
         """Wether connected with Atom.
-        
+
         Args:
             id: 0/1/2/3 (ALL/L/R/W)
-            
+
         Return:
             1: Connected
             0: Disconnect
             -1 : Bad data
         """
-        return self._mesg(ProtocolCode.IS_CONTROLLER_CONNECTED, id, has_reply=True)
+        return self._mesg(
+            ProtocolCode.IS_CONTROLLER_CONNECTED, id, has_reply=True
+        )
 
-    def read_next_error(self, id = 0):
+    def read_next_error(self, id=0):
         """Robot Error Detection
-        
+
         Args:
             id: 0/1/2/3 (ALL/L/R/W)
         """
         self._mesg(ProtocolCode.READ_NEXT_ERROR, id, has_reply=True)
-        
+
     def set_fresh_mode(self, id, mode):
         """Set command refresh mode
-        
+
         Args:
             id: 1/2 (L/R).\n
             mode: int
                 1 - Always execute the latest command first.
-                0 - Execute instructions sequentially in the form of a queue. 
+                0 - Execute instructions sequentially in the form of a queue.
         """
         return self._mesg(ProtocolCode.SET_FRESH_MODE, id, mode)
-    
+
     def get_fresh_mode(self, id):
         """Get instruction refresh mode status
-        
+
         Args:
             id: 1/2 (L/R).
         """
@@ -166,7 +169,7 @@ class MyBuddyCommandGenerator(CommandGenerator):
         Args:
             id: 0/1/2/3 (ALL/L/R/W)
 
-        Return: 
+        Return:
             0 - No
             1 - Yes
         """
@@ -175,11 +178,11 @@ class MyBuddyCommandGenerator(CommandGenerator):
         )
 
     def get_angles(self, id):
-        """ Get the degree of all joints.
+        """Get the degree of all joints.
 
         Args:
             id: 1/2 (L/R)
-            
+
         Return:
             list: A float list of all degree.
         """
@@ -193,7 +196,7 @@ class MyBuddyCommandGenerator(CommandGenerator):
             joint: 1 ~ 6
             angle: int
             speed: 1 ~ 100
-        
+
         Return:
             None
         """
@@ -226,7 +229,7 @@ class MyBuddyCommandGenerator(CommandGenerator):
 
     def get_coords(self, id):
         """Get the coordinates of the robotic arm
-        
+
         Args:
             id: 1/2 (L/R).
         """
@@ -234,7 +237,7 @@ class MyBuddyCommandGenerator(CommandGenerator):
 
     def send_coord(self, id, coord, data, speed):
         """Send a single coordinate to the robotic arm
-        
+
         Args:
             id: 1/2 (L/R).
             coord: 1 ~ 6 (x/y/z/rx/ry/rz)
@@ -259,25 +262,27 @@ class MyBuddyCommandGenerator(CommandGenerator):
             coord_list.append(self._coord2int(coords[idx]))
         for angle in coords[3:]:
             coord_list.append(self._angle2int(angle))
-        return self._mesg(ProtocolCode.SEND_COORDS, id, coord_list, speed, mode)
-    
+        return self._mesg(
+            ProtocolCode.SEND_COORDS, id, coord_list, speed, mode
+        )
+
     def get_angle(self, id, joint_id):
         """Get the angle of a single joint
-        
+
         Args:
             id (int): 1/2/3 (L/R/W).
             joint_id (int): 1 - 7 (7 is gripper)
         """
-        return self._mesg(ProtocolCode.GET_ANGLE, id, joint_id, has_reply = True)
-    
+        return self._mesg(ProtocolCode.GET_ANGLE, id, joint_id, has_reply=True)
+
     def get_coord(self, id, joint_id):
         """Read a single coordinate parameter
-        
+
         Args:
             id (int): 1/2/3 (L/R/W).
             joint_id (int): 1 - 7 (7 is gripper)
         """
-        return self._mesg(ProtocolCode.GET_COORD, id, joint_id, has_reply = True)
+        return self._mesg(ProtocolCode.GET_COORD, id, joint_id, has_reply=True)
 
     def pause(self, id):
         """Pause movement
@@ -292,7 +297,7 @@ class MyBuddyCommandGenerator(CommandGenerator):
 
         Args:
             id: 0/1/2/3 (ALL/L/R/W).
-            
+
         Return:
             1 - paused
             0 - not paused
@@ -323,7 +328,7 @@ class MyBuddyCommandGenerator(CommandGenerator):
             id: 0/1/2/3 (ALL/L/R/W).
             data: A data list, angles or coords. If id is 1/2. data length is 6. If id is 0. data len 13 (data==[[left_angles/left_coords],[right_angles/right_coords],[waist_angle/waist_coord]]). if id is 3. data len 1
             mode: 1 - coords, 0 - angles
-            
+
 
         Return:
             1 - True
@@ -368,14 +373,16 @@ class MyBuddyCommandGenerator(CommandGenerator):
         else:
             raise Exception("id is not right, please input 0 or 1")
 
-        return self._mesg(ProtocolCode.IS_IN_POSITION, id, data_list, mode, has_reply=True)
+        return self._mesg(
+            ProtocolCode.IS_IN_POSITION, id, data_list, mode, has_reply=True
+        )
 
     def is_moving(self, id):
         """Detect if the robot is moving
-        
+
         Args:
             id: 0/1/2/3 (ALL/L/R/W).
-            
+
         Return:
             0 - not moving
             1 - is moving
@@ -392,7 +399,9 @@ class MyBuddyCommandGenerator(CommandGenerator):
             direction: 0 - decrease, 1 - increase
             speed: int (0 - 100)
         """
-        return self._mesg(ProtocolCode.JOG_ANGLE, id, joint_id, direction, speed)
+        return self._mesg(
+            ProtocolCode.JOG_ANGLE, id, joint_id, direction, speed
+        )
 
     def jog_absolute(self, id, joint_id, angle, speed):
         """Absolute joint control
@@ -404,7 +413,11 @@ class MyBuddyCommandGenerator(CommandGenerator):
             speed: int (0 - 100)
         """
         return self._mesg(
-            ProtocolCode.JOG_ABSOLUTE, id, joint_id, [self._angle2int(angle)], speed
+            ProtocolCode.JOG_ABSOLUTE,
+            id,
+            joint_id,
+            [self._angle2int(angle)],
+            speed,
         )
 
     def jog_coord(self, id, coord_id, direction, speed):
@@ -416,7 +429,9 @@ class MyBuddyCommandGenerator(CommandGenerator):
             direction: 0 - decrease, 1 - increase
             speed: int (0 - 100)
         """
-        return self._mesg(ProtocolCode.JOG_COORD, id, coord_id, direction, speed)
+        return self._mesg(
+            ProtocolCode.JOG_COORD, id, coord_id, direction, speed
+        )
 
     def jog_increment(self, id, joint_id, increment, speed):
         """step mode
@@ -424,14 +439,16 @@ class MyBuddyCommandGenerator(CommandGenerator):
         Args:
             id: 1/2 (L/R).
             joint_id: int 1-6.
-            increment: 
+            increment:
             speed: int (1 - 100)
         """
-        return self._mesg(ProtocolCode.JOG_INCREMENT, id, joint_id, increment, speed)
+        return self._mesg(
+            ProtocolCode.JOG_INCREMENT, id, joint_id, increment, speed
+        )
 
     def jog_stop(self, id):
         """Stop jog moving
-        
+
         Args:
             id: 1/2 (L/R).
         """
@@ -445,7 +462,9 @@ class MyBuddyCommandGenerator(CommandGenerator):
             joint_id: 1 - 6.
             encoder: The value of the set encoder.
         """
-        return self._mesg(ProtocolCode.SET_ENCODER, id, joint_id, [encoder], speed)
+        return self._mesg(
+            ProtocolCode.SET_ENCODER, id, joint_id, [encoder], speed
+        )
 
     def get_encoder(self, id, joint_id):
         """Obtain the specified joint potential value.
@@ -457,7 +476,9 @@ class MyBuddyCommandGenerator(CommandGenerator):
         Returns:
             0 ~ 4096
         """
-        return self._mesg(ProtocolCode.GET_ENCODER, id, joint_id, has_reply=True)
+        return self._mesg(
+            ProtocolCode.GET_ENCODER, id, joint_id, has_reply=True
+        )
 
     def set_encoders(self, id, encoders, speed):
         """Set the six joints of the manipulator to execute synchronously to the specified position.
@@ -476,10 +497,19 @@ class MyBuddyCommandGenerator(CommandGenerator):
         _speed = speed
         encoders_data = []
         if id == 0:
-            encoders_data = (_encoders[0:7] + speed[0:7] + _encoders[7:14] + speed[7:14] + _encoders[-1:] + speed[-1:])
+            encoders_data = (
+                _encoders[0:7]
+                + speed[0:7]
+                + _encoders[7:14]
+                + speed[7:14]
+                + _encoders[-1:]
+                + speed[-1:]
+            )
             return self._mesg(ProtocolCode.SET_ENCODERS, _id, encoders_data)
         if id == 1 or id == 2:
-            return self._mesg(ProtocolCode.SET_ENCODERS, _id, _encoders, _speed)
+            return self._mesg(
+                ProtocolCode.SET_ENCODERS, _id, _encoders, _speed
+            )
 
     def get_encoders(self, id):
         """Get the six joints of the manipulator
@@ -487,7 +517,7 @@ class MyBuddyCommandGenerator(CommandGenerator):
         Args:
             id: 0/1/2 (all/L/R).
             if id==0: return all joint encoder and speed,
-            
+
         Return:
             The list of encoders
         """
@@ -498,7 +528,7 @@ class MyBuddyCommandGenerator(CommandGenerator):
 
         Args:
             id: 1/2/3 (L/R/W).
-            
+
         Return:
             int: speed
         """
@@ -516,7 +546,7 @@ class MyBuddyCommandGenerator(CommandGenerator):
 
     def get_acceleration(self, id):
         """Read acceleration during all moves
-        
+
         Args:
             id: 1/2 (L/R)
         """
@@ -524,7 +554,7 @@ class MyBuddyCommandGenerator(CommandGenerator):
 
     def set_acceleration(self, id, acc):
         """Set acceleration during all moves
-        
+
         Args:
             id: 1/2 (L/R)
             acc: 1 - 100
@@ -593,14 +623,16 @@ class MyBuddyCommandGenerator(CommandGenerator):
             1 - enable
             -1 - error
         """
-        return self._mesg(ProtocolCode.IS_SERVO_ENABLE, id, servo_id, has_reply=True)
+        return self._mesg(
+            ProtocolCode.IS_SERVO_ENABLE, id, servo_id, has_reply=True
+        )
 
     def is_all_servo_enable(self, id):
         """Determine whether the specified steering gear is connected
 
         Args:
             id: 1/2/3 (L/R/W)
-            
+
         Return:
             0 - disable
             1 - enable
@@ -617,7 +649,9 @@ class MyBuddyCommandGenerator(CommandGenerator):
             data_id: Data address.
             value: 0 - 4096
         """
-        return self._mesg(ProtocolCode.SET_SERVO_DATA, id, servo_no, data_id, value)
+        return self._mesg(
+            ProtocolCode.SET_SERVO_DATA, id, servo_no, data_id, value
+        )
 
     def get_servo_data(self, id, servo_no, data_id):
         """Read the data parameter of the specified address of the steering gear.
@@ -675,7 +709,6 @@ class MyBuddyCommandGenerator(CommandGenerator):
         return self._mesg(ProtocolCode.FOCUS_SERVO, id, servo_id)
 
     # Atom IO
-    
 
     def set_tool_pin_mode(self, id, pin_no, pin_mode):
         """Set the state mode of the specified pin in atom.
@@ -695,7 +728,9 @@ class MyBuddyCommandGenerator(CommandGenerator):
             pin_no     (int): 1 - 5
             pin_signal (int): 0 / 1
         """
-        return self._mesg(ProtocolCode.SET_DIGITAL_OUTPUT, id, pin_no, pin_signal)
+        return self._mesg(
+            ProtocolCode.SET_DIGITAL_OUTPUT, id, pin_no, pin_signal
+        )
 
     def get_tool_digital_input(self, id, pin_no):
         """singal value
@@ -704,7 +739,9 @@ class MyBuddyCommandGenerator(CommandGenerator):
             id: 1/2 (L/R)
             pin_no     (int): 1 - 5
         """
-        return self._mesg(ProtocolCode.GET_DIGITAL_INPUT, id, pin_no, has_reply=True)
+        return self._mesg(
+            ProtocolCode.GET_DIGITAL_INPUT, id, pin_no, has_reply=True
+        )
 
     def set_tool_pwm_output(self, id, channel, frequency, pin_val):
         """PWM control
@@ -715,15 +752,17 @@ class MyBuddyCommandGenerator(CommandGenerator):
             frequency (int): clock frequency (0/1: 0 - 1Mhz 1 - 10Mhz)
             pin_val (int): Duty cycle 0 ~ 100: 0 ~ 100%
         """
-        return self._mesg(ProtocolCode.SET_PWM_OUTPUT, id, channel, [frequency], pin_val)
+        return self._mesg(
+            ProtocolCode.SET_PWM_OUTPUT, id, channel, [frequency], pin_val
+        )
 
     def get_gripper_value(self, id):
         """Get the value of gripper.
 
         Args:
             id: 1/2 (L/R)
-            
-        Return: 
+
+        Return:
             gripper value (int)
         """
         return self._mesg(ProtocolCode.GET_GRIPPER_VALUE, id, has_reply=True)
@@ -750,7 +789,7 @@ class MyBuddyCommandGenerator(CommandGenerator):
 
     def set_gripper_calibration(self, id):
         """Set the current position to zero, set current position value is `2048`.
-        
+
         Args:
             id: 1/2 (L/R)
         """
@@ -761,7 +800,7 @@ class MyBuddyCommandGenerator(CommandGenerator):
 
         Args:
             id: 1/2 (L/R)
-            
+
         Returns:
             0 - not moving
             1 - is moving
@@ -799,7 +838,7 @@ class MyBuddyCommandGenerator(CommandGenerator):
 
     def get_tool_reference(self, id):
         """Get tool coordinate system
-        
+
         Args:
             id: 0/1/2 (ALL/L/R)
         """
@@ -807,7 +846,7 @@ class MyBuddyCommandGenerator(CommandGenerator):
 
     def set_world_reference(self, id, coords):
         """Set the world coordinate system
-        
+
         Args:
             id: 0/1/2 (ALL/L/R)
             coords: a list of coords value(List[float]), length 6 [x(mm), y, z, rx(angle), ry, rz]
@@ -842,8 +881,8 @@ class MyBuddyCommandGenerator(CommandGenerator):
 
         Args:
             id: 0/1/2 (ALL/L/R)
-            
-        Return: 
+
+        Return:
             0 - base 1 - tool.
         """
         return self._mesg(ProtocolCode.GET_REFERENCE_FRAME, id, has_reply=True)
@@ -862,8 +901,8 @@ class MyBuddyCommandGenerator(CommandGenerator):
 
         Args:
             id: 0/1/2 (ALL/L/R)
-            
-        Return: 
+
+        Return:
             1 - movel
             0 - moveJ
         """
@@ -883,8 +922,8 @@ class MyBuddyCommandGenerator(CommandGenerator):
 
         Args:
             id: 0/1/2 (ALL/L/R)
-            
-        Return: 
+
+        Return:
             0 - flange
             1 - tool
         """
@@ -898,7 +937,9 @@ class MyBuddyCommandGenerator(CommandGenerator):
             joint_id: 1 - 6
             current: current value
         """
-        return self._mesg(ProtocolCode.SET_JOINT_CURRENT, id, joint_id, current)
+        return self._mesg(
+            ProtocolCode.SET_JOINT_CURRENT, id, joint_id, current
+        )
 
     def get_joint_current(self, id, joint_id):
         """Get Collision Current
@@ -909,27 +950,29 @@ class MyBuddyCommandGenerator(CommandGenerator):
         """
         return self._mesg(ProtocolCode.GET_JOINT_CURRENT, id, joint_id)
 
-    def get_plan_speed(self, id = 0):
+    def get_plan_speed(self, id=0):
         """Get planning speed
 
         Args:
             id: 0/1/2/3 (ALL/L/R/W)
-            
-        Return: 
+
+        Return:
             [movel planning speed, movej planning speed].
         """
         return self._mesg(ProtocolCode.GET_PLAN_SPEED, id, has_reply=True)
 
-    def get_plan_acceleration(self, id = 0):
+    def get_plan_acceleration(self, id=0):
         """Get planning acceleration
 
         Args:
             id: 0/1/2/3 (ALL/L/R/W)
-            
-        Return: 
+
+        Return:
             acceleration value.
         """
-        return self._mesg(ProtocolCode.GET_PLAN_ACCELERATION, id, has_reply=True)
+        return self._mesg(
+            ProtocolCode.GET_PLAN_ACCELERATION, id, has_reply=True
+        )
 
     def set_plan_speed(self, id, speed):
         """Set planning speed
@@ -947,17 +990,15 @@ class MyBuddyCommandGenerator(CommandGenerator):
             id: 0/1/2/3 (ALL/L/R/W)
             acceleration (int): (0 ~ 100).
         """
-        return self._mesg(
-            ProtocolCode.SET_PLAN_ACCELERATION, id, acceleration
-        )
+        return self._mesg(ProtocolCode.SET_PLAN_ACCELERATION, id, acceleration)
 
     # def get_servo_currents(self, id):
     #     """Get joint current
 
     #     Args:
     #         id: 1/2/3 (L/R/W)
-            
-    #     Return: 
+
+    #     Return:
     #         value mA
     #     """
     #     return self._mesg(ProtocolCode.GET_SERVO_CURRENTS, id, has_reply=True)
@@ -967,18 +1008,18 @@ class MyBuddyCommandGenerator(CommandGenerator):
 
         Args:
             id: 1/2/3 (L/R/W)
-        Return: 
+        Return:
             volts < 24 V
         """
-        return self._mesg(ProtocolCode.GET_SERVO_VOLTAGES, id,  has_reply=True)
+        return self._mesg(ProtocolCode.GET_SERVO_VOLTAGES, id, has_reply=True)
 
     def get_servo_status(self, id):
         """Get joint status
 
         Args:
             id: 1/2/3 (L/R/W)
-            
-        Return: 
+
+        Return:
             [voltage, sensor, temperature, current, angle, overload], a value of 0 means no error
         """
         return self._mesg(ProtocolCode.GET_SERVO_STATUS, id, has_reply=True)
@@ -990,14 +1031,14 @@ class MyBuddyCommandGenerator(CommandGenerator):
             id: 1/2/3 (L/R/W)
         """
         return self._mesg(ProtocolCode.GET_SERVO_TEMPS, id, has_reply=True)
-    
+
     def get_base_coords(self, *args):
         """Convert coordinates to base coordinates. Pass in parameters or no parameters
-        
+
         Args:
             coords: a list of coords value(List[float]), length 6 [x(mm), y, z, rx(angle), ry, rz]
             arm: 0 - left. 1 - right
-            
+
         Return:
             Base coords
         """
@@ -1008,17 +1049,25 @@ class MyBuddyCommandGenerator(CommandGenerator):
                 coord_list.append(self._coord2int(coords[idx]))
             for angle in coords[3:]:
                 coord_list.append(self._angle2int(angle))
-            return self._mesg(ProtocolCode.GET_BASE_COORDS, 0, coord_list, arm, has_reply = True)
+            return self._mesg(
+                ProtocolCode.GET_BASE_COORDS,
+                0,
+                coord_list,
+                arm,
+                has_reply=True,
+            )
         elif len(args) == 0:
-            return self._mesg(ProtocolCode.GET_ALL_BASE_COORDS, 0, has_reply = True)
-    
+            return self._mesg(
+                ProtocolCode.GET_ALL_BASE_COORDS, 0, has_reply=True
+            )
+
     def base_to_single_coords(self, base_coords, arm):
         """Convert base coordinates to coordinates
-        
+
         Args:
             coords: a list of base coords value len 6
             arm: 0 - left. 1 - right
-            
+
         Return:
             coords
         """
@@ -1027,34 +1076,42 @@ class MyBuddyCommandGenerator(CommandGenerator):
             coord_list.append(self._coord2int(base_coords[idx]))
         for angle in base_coords[3:]:
             coord_list.append(self._angle2int(angle))
-        return self._mesg(ProtocolCode.BASE_TO_SINGLE_COORDS, 0, coord_list, arm, has_reply = True)
-    
+        return self._mesg(
+            ProtocolCode.BASE_TO_SINGLE_COORDS,
+            0,
+            coord_list,
+            arm,
+            has_reply=True,
+        )
+
     def collision(self, left_angles, right_angles):
         """Collision detection main program
-        
+
         Args:
             left_angles: left arm angle len 6.
             right_angles: right arm angle len 6.
-            
+
         Return:
             int
         """
         degrees1 = [self._angle2int(degree) for degree in left_angles]
         degrees2 = [self._angle2int(degree) for degree in right_angles]
-        
-        return self._mesg(ProtocolCode.COLLISION, 0, degrees1, degrees2, has_reply = True)
-    
+
+        return self._mesg(
+            ProtocolCode.COLLISION, 0, degrees1, degrees2, has_reply=True
+        )
+
     def get_base_coord(self, id):
         """Get the base coordinates of the single arm
-        
+
         Args:
             id: 1/2 (L/R)
         """
-        return self._mesg(ProtocolCode.GET_BASE_COORD, id, has_reply = True)
-    
+        return self._mesg(ProtocolCode.GET_BASE_COORD, id, has_reply=True)
+
     def write_base_coord(self, id, axis, coord, speed):
         """Base single coordinate movement
-        
+
         Args:
             id: 1/2 (L/R)
             axis: 1 - 6 (x/y/z/rx/ry/rz)
@@ -1062,11 +1119,13 @@ class MyBuddyCommandGenerator(CommandGenerator):
             speed: 1 - 100
         """
         value = self._coord2int(coord) if axis <= 3 else self._angle2int(coord)
-        return self._mesg(ProtocolCode.WRITE_BASE_COORD, id, axis, [value], speed)
-    
+        return self._mesg(
+            ProtocolCode.WRITE_BASE_COORD, id, axis, [value], speed
+        )
+
     def write_base_coords(self, id, coords, speed):
         """base coordinate move
-        
+
         Args:
             id: 1/2 (L/R)
             coords: coords: a list of coords value(List[float]), length 6, [x(mm), y, z, rx(angle), ry, rz]
@@ -1077,59 +1136,64 @@ class MyBuddyCommandGenerator(CommandGenerator):
             coord_list.append(self._coord2int(coords[idx]))
         for angle in coords[3:]:
             coord_list.append(self._angle2int(angle))
-        return self._mesg(ProtocolCode.WRITE_BASE_COORDS, id, coord_list, speed)
-    
+        return self._mesg(
+            ProtocolCode.WRITE_BASE_COORDS, id, coord_list, speed
+        )
+
     def jog_inc_coord(self, axis, increment, speed):
         """Double-arm coordinated coordinate stepping
-        
+
         Args:
             axis: 1 - 6 (x/y/z/rx/ry/rz)
-            increment: 
+            increment:
             speed: 1 - 100
         """
-        value = self._coord2int(increment) if axis <= 3 else self._angle2int(increment)
+        value = (
+            self._coord2int(increment)
+            if axis <= 3
+            else self._angle2int(increment)
+        )
         return self._mesg(ProtocolCode.JOG_INC_COORD, 0, axis, [value], speed)
-        
+
     def collision_switch(self, state):
         """Collision Detection Switch
-        
+
         Args:
             state (int): 0 - close 1 - open (Off by default)
         """
         return self._mesg(ProtocolCode.COLLISION_SWITCH, 0, state)
-    
+
     def is_collision_on(self):
         """Get collision detection status
-        
+
         Args:
             0 - close
             1 - open
         """
-        return self._mesg(ProtocolCode.IS_COLLISION_ON, 0, has_reply = True)
-    
+        return self._mesg(ProtocolCode.IS_COLLISION_ON, 0, has_reply=True)
+
     def get_servo_speeds(self, id):
         """Get joint speed
-        
+
         Args:
             id: 1/2 (L/R)
-        
-        Return: 
+
+        Return:
             unit step/s
         """
         return self._mesg(0xE7, id, has_reply=True)
-    
+
     def set_encoders_drag(self, id, encoders, speeds):
         """Send all potential values and speeds
-        
+
         Args:
             id: 1/2 (L/R)
             encoders: encoder value ,list len 6
             speeds: from get_servo_speeds()
-        
+
         """
         return self._mesg(ProtocolCode.SET_ENCODERS_DRAG, id, encoders, speeds)
-        
-    
+
     # def init_iic(self):
     #     from smbus2 import SMBus
     #     i2c = SMBus(1)   # 1 代表 /dev/i2c-1

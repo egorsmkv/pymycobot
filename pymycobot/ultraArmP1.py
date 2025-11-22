@@ -18,9 +18,7 @@ from pymycobot.common import ProtocolCode
 
 
 class UltraArmP1:
-    """Class for controlling the ultraArmP1 robotic arm via serial communication.
-
-    """
+    """Class for controlling the ultraArmP1 robotic arm via serial communication."""
 
     def __init__(self, port, baudrate=115200, timeout=0.1, debug=False):
         """Initialize the ultraArmP1 robot communication.
@@ -61,17 +59,20 @@ class UltraArmP1:
         """
 
         import time
+
         if not _async:
             return 1
         start_time = time.time()
         received_data = b""
         while time.time() - start_time < timeout:
-            received_data += self._serial_port.read(self._serial_port.inWaiting())
+            received_data += self._serial_port.read(
+                self._serial_port.inWaiting()
+            )
             # if b"end" in received_data.lower():
             #     return 'ok'
             end_count = received_data.lower().count(b"end")
             if end_count >= 2:
-                return 'ok'
+                return "ok"
             time.sleep(0.02)
         # Timeout
         if self.debug:
@@ -93,9 +94,14 @@ class UltraArmP1:
 
         while attempt < 5:
             if self._serial_port.inWaiting() > 0:
-                raw_data = self._serial_port.read(self._serial_port.inWaiting()).decode()
+                raw_data = self._serial_port.read(
+                    self._serial_port.inWaiting()
+                ).decode()
                 if self.debug:
-                    print("\nReceived data:\n%s**********************\n" % raw_data)
+                    print(
+                        "\nReceived data:\n%s**********************\n"
+                        % raw_data
+                    )
 
                 if "ERROR: COMMAND NOT RECOGNIZED" in raw_data:
                     flag = None
@@ -103,15 +109,24 @@ class UltraArmP1:
                 if flag == "angle":
                     data_lower = raw_data.lower()
                     if "angles" in data_lower:
-                        angle_str = data_lower[data_lower.find("angles"):]
+                        angle_str = data_lower[data_lower.find("angles") :]
                         start_idx = angle_str.find("[")
                         end_idx = angle_str.find("]")
                         try:
-                            angles_list = list(map(float, angle_str[start_idx + 1:end_idx].split(",")))
+                            angles_list = list(
+                                map(
+                                    float,
+                                    angle_str[start_idx + 1 : end_idx].split(
+                                        ","
+                                    ),
+                                )
+                            )
                             angles_list = [round(a, 2) for a in angles_list]
                             return angles_list
                         except Exception:
-                            print("Received angles is not completed! Retry receive...")
+                            print(
+                                "Received angles is not completed! Retry receive..."
+                            )
                             attempt += 1
                             continue
                     else:
@@ -120,15 +135,24 @@ class UltraArmP1:
                 elif flag == "coord":
                     data_lower = raw_data.lower()
                     if "coords" in data_lower:
-                        coord_str = data_lower[data_lower.find("coords"):]
+                        coord_str = data_lower[data_lower.find("coords") :]
                         start_idx = coord_str.find("[")
                         end_idx = coord_str.find("]")
                         try:
-                            coords_list = list(map(float, coord_str[start_idx + 1:end_idx].split(",")))
+                            coords_list = list(
+                                map(
+                                    float,
+                                    coord_str[start_idx + 1 : end_idx].split(
+                                        ","
+                                    ),
+                                )
+                            )
                             coords_list = [round(c, 2) for c in coords_list]
                             return coords_list
                         except Exception:
-                            print("Received coords is not completed! Retry receive...")
+                            print(
+                                "Received coords is not completed! Retry receive..."
+                            )
                             attempt += 1
                             continue
                     else:
@@ -194,7 +218,9 @@ class UltraArmP1:
             list[float] or int: Joint angles [J1, J2, J3, J4] or -1 if failed.
         """
         with self.lock:
-            command = ProtocolCode.GET_CURRENT_ANGLES_COORDS_INFO + ProtocolCode.END
+            command = (
+                ProtocolCode.GET_CURRENT_ANGLES_COORDS_INFO + ProtocolCode.END
+            )
             self._serial_port.write(command.encode())
             self._serial_port.flush()
             self._debug(command)
@@ -207,7 +233,9 @@ class UltraArmP1:
             list[float] or int: Coordinates [X, Y, Z, E] or -1 if failed.
         """
         with self.lock:
-            command = ProtocolCode.GET_CURRENT_ANGLES_COORDS_INFO + ProtocolCode.END
+            command = (
+                ProtocolCode.GET_CURRENT_ANGLES_COORDS_INFO + ProtocolCode.END
+            )
             self._serial_port.write(command.encode())
             self._serial_port.flush()
             self._debug(command)

@@ -9,8 +9,10 @@ import os
 import glob
 
 try:
-    with open('/proc/device-tree/model', 'r') as model_file:
-        model = model_file.read().strip().lower()  # nvidia jetson xavier nx developer kit
+    with open("/proc/device-tree/model", "r") as model_file:
+        model = (
+            model_file.read().strip().lower()
+        )  # nvidia jetson xavier nx developer kit
     if "xavier" in model:
         import rospy
         import actionlib
@@ -36,25 +38,33 @@ except Exception as e:
 class MapNavigation:
     def __init__(self):
         # Initialize the ROS node
-        rospy.init_node('map_navigation', anonymous=False)
+        rospy.init_node("map_navigation", anonymous=False)
 
         # ros publisher
-        self.pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+        self.pub = rospy.Publisher("/cmd_vel", Twist, queue_size=10)
         self.pub_setpose = rospy.Publisher(
-            '/initialpose', PoseWithCovarianceStamped, queue_size=10)
+            "/initialpose", PoseWithCovarianceStamped, queue_size=10
+        )
         self.pub_cancel = rospy.Publisher(
-            '/move_base/cancel', GoalID, queue_size=10)
+            "/move_base/cancel", GoalID, queue_size=10
+        )
         self.pub_tempPose = rospy.Publisher(
-            'move_base_simple/goal_temp', PoseStamped, queue_size=1)
+            "move_base_simple/goal_temp", PoseStamped, queue_size=1
+        )
         self.goal_pub = rospy.Publisher(
-            'move_base_simple/goal', PoseStamped, queue_size=1)
+            "move_base_simple/goal", PoseStamped, queue_size=1
+        )
 
         # ros subscriber
         # self.voltage_subscriber = rospy.Subscriber("/PowerVoltage", Float32, self.voltage_callback) #Create a battery-voltage topic subscriber
         self.initialpose_subscriber = rospy.Subscriber(
-            '/initialpose', PoseWithCovarianceStamped, self.initial_pose_callback)
+            "/initialpose",
+            PoseWithCovarianceStamped,
+            self.initial_pose_callback,
+        )
         self.goal_subscriber = rospy.Subscriber(
-            'move_base/status', GoalStatusArray, self.goalCntCallback)
+            "move_base/status", GoalStatusArray, self.goalCntCallback
+        )
 
         self.RobotVersion = 1.0
         self.SystemVersion = 1.0
@@ -94,7 +104,6 @@ class MapNavigation:
 
     # 回调函数订阅话题move_base_simple/goal_temp，填入PoseArray
     def goalCntCallback(self, goal_msg):
-
         self.pose_stamped.header = goal_msg.header
         self.pose_stamped.pose = goal_msg.pose
 
@@ -105,7 +114,7 @@ class MapNavigation:
         self.pose = PoseStamped()
         self.pose.header.seq = self.point_count
         self.pose.header.stamp = rospy.Time.now()
-        self.pose.header.frame_id = 'map'
+        self.pose.header.frame_id = "map"
         self.pose.pose.position.x = xGoal
         self.pose.pose.position.y = yGoal
         self.pose.pose.position.z = 0.0
@@ -117,8 +126,11 @@ class MapNavigation:
         rospy.sleep(1)
         self.pub_tempPose.publish(self.pose)
         self.point_count += 1
-        rospy.loginfo(' {} 对应 {} 号点位 pose: {}'.format(
-            identifier, self.point_count, self.pose))
+        rospy.loginfo(
+            " {} 对应 {} 号点位 pose: {}".format(
+                identifier, self.point_count, self.pose
+            )
+        )
         return self.point_count
 
     # 重置点位
@@ -130,15 +142,18 @@ class MapNavigation:
         self.flag_Charge = True
         self.flag_Load = True
         self.flag_Unload = True
-        rospy.loginfo('clearPosition')
+        rospy.loginfo("clearPosition")
 
     def getPose(self, identifier, point_index):
         if point_index > 0:
             if point_index <= len(self.pose_array.poses):
                 curGoalIdx_ = point_index % len(self.pose_array.poses)
-                pose = self.pose_array.poses[curGoalIdx_-1]
-                rospy.loginfo('{} Retrieving {} point pose: {}' .format(
-                    identifier, point_index, pose))
+                pose = self.pose_array.poses[curGoalIdx_ - 1]
+                rospy.loginfo(
+                    "{} Retrieving {} point pose: {}".format(
+                        identifier, point_index, pose
+                    )
+                )
 
     def goTopoint(self, identifier, point_index):
         if point_index > 0:
@@ -146,10 +161,11 @@ class MapNavigation:
                 curGoalIdx_ = point_index % len(self.pose_array.poses)
                 goal = PoseStamped()
                 goal.header = self.pose_array.header
-                goal.pose = self.pose_array.poses[curGoalIdx_-1]
+                goal.pose = self.pose_array.poses[curGoalIdx_ - 1]
                 self.goal_pub.publish(goal)
-                rospy.loginfo('Going to {} point:{}'.format(
-                    identifier, goal.pose))
+                rospy.loginfo(
+                    "Going to {} point:{}".format(identifier, goal.pose)
+                )
 
     def setHomePosition(self, xGoal, yGoal, orientation_z, orientation_w):
         global point_HomePositionCount
@@ -157,10 +173,12 @@ class MapNavigation:
             self.flag_HomePosition = False
             # Returns the navigation point count
             point_HomePositionCount = self.setpoint(
-                "HomePosition", xGoal, yGoal, orientation_z, orientation_w)
+                "HomePosition", xGoal, yGoal, orientation_z, orientation_w
+            )
         else:
             print(
-                "The navigation point has been set. clearPosition() is required to change the navigation.")
+                "The navigation point has been set. clearPosition() is required to change the navigation."
+            )
 
     def setParking(self, xGoal, yGoal, orientation_z, orientation_w):
         global point_ParkingCount
@@ -168,10 +186,12 @@ class MapNavigation:
             self.flag_Parking = False
             # Returns the navigation point count
             point_ParkingCount = self.setpoint(
-                "Parking", xGoal, yGoal, orientation_z, orientation_w)
+                "Parking", xGoal, yGoal, orientation_z, orientation_w
+            )
         else:
             print(
-                "The navigation point has been set. clearPosition() is required to change the navigation.")
+                "The navigation point has been set. clearPosition() is required to change the navigation."
+            )
 
     def setCharge(self, xGoal, yGoal, orientation_z, orientation_w):
         global point_ChargeCount
@@ -179,10 +199,12 @@ class MapNavigation:
             self.flag_Charge = False
             # Returns the navigation point count
             point_ChargeCount = self.setpoint(
-                "Charge", xGoal, yGoal, orientation_z, orientation_w)
+                "Charge", xGoal, yGoal, orientation_z, orientation_w
+            )
         else:
             print(
-                "The navigation point has been set. clearPosition() is required to change the navigation.")
+                "The navigation point has been set. clearPosition() is required to change the navigation."
+            )
 
     def setLoad(self, xGoal, yGoal, orientation_z, orientation_w):
         global point_LoadCount
@@ -190,10 +212,12 @@ class MapNavigation:
             self.flag_Load = False
             # Returns the navigation point count
             point_LoadCount = self.setpoint(
-                "Load", xGoal, yGoal, orientation_z, orientation_w)
+                "Load", xGoal, yGoal, orientation_z, orientation_w
+            )
         else:
             print(
-                "The navigation point has been set. clearPosition() is required to change the navigation.")
+                "The navigation point has been set. clearPosition() is required to change the navigation."
+            )
 
     def setUnload(self, xGoal, yGoal, orientation_z, orientation_w):
         global point_UnloadCount
@@ -201,10 +225,12 @@ class MapNavigation:
             self.flag_Unload = False
             # Returns the navigation point count
             point_UnloadCount = self.setpoint(
-                "Unload", xGoal, yGoal, orientation_z, orientation_w)
+                "Unload", xGoal, yGoal, orientation_z, orientation_w
+            )
         else:
             print(
-                "The navigation point has been set. clearPosition() is required to change the navigation.")
+                "The navigation point has been set. clearPosition() is required to change the navigation."
+            )
 
     # HomePosition
     def getHomePosition(self):
@@ -247,7 +273,7 @@ class MapNavigation:
         pose.header.seq = 0
         pose.header.stamp.secs = 0
         pose.header.stamp.nsecs = 0
-        pose.header.frame_id = 'map'
+        pose.header.frame_id = "map"
         pose.pose.pose.position.x = xGoal
         pose.pose.pose.position.y = yGoal
         pose.pose.pose.position.z = 0.0
@@ -256,18 +282,52 @@ class MapNavigation:
         pose.pose.pose.orientation.y = 0.0
         pose.pose.pose.orientation.z = orientation_z
         pose.pose.pose.orientation.w = orientation_w
-        pose.pose.covariance = [0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                                0.0, 0.0, 0.0, 0.0, covariance]
+        pose.pose.covariance = [
+            0.25,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.25,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            covariance,
+        ]
         rospy.sleep(1)
         self.pub_setpose.publish(pose)
-        rospy.loginfo('Published robot pose: %s' % pose)
+        rospy.loginfo("Published robot pose: %s" % pose)
 
     # move_base
     def moveToGoal(self, xGoal, yGoal, orientation_z, orientation_w):
         ac = actionlib.SimpleActionClient("move_base", MoveBaseAction)
-        while (not ac.wait_for_server(rospy.Duration.from_sec(5.0))):
-
+        while not ac.wait_for_server(rospy.Duration.from_sec(5.0)):
             sys.exit(0)
 
         goal = MoveBaseGoal()
@@ -284,7 +344,7 @@ class MapNavigation:
 
         ac.wait_for_result(rospy.Duration(60))
 
-        if (ac.get_state() == GoalStatus.SUCCEEDED):
+        if ac.get_state() == GoalStatus.SUCCEEDED:
             rospy.loginfo("You have reached the destination")
             return True
         else:
@@ -326,8 +386,11 @@ class MapNavigation:
         # Motion control
         if isinstance(direction, list) and len(direction) == 3:
             while (time.time() - start_time) < duration:
-                self.pub_vel(direction[0] * abs(vel), direction[1]
-                             * abs(vel), direction[2] * abs(vel))
+                self.pub_vel(
+                    direction[0] * abs(vel),
+                    direction[1] * abs(vel),
+                    direction[2] * abs(vel),
+                )
             self.pub_vel(0, 0, 0)
         else:
             print("Direction should be a list containing three elements")
@@ -339,7 +402,7 @@ class MapNavigation:
         self.vel_control([0, 0, 1], speed, control_time)
 
     def goStraight(self, speed, control_time):
-        self.vel_control([1, 0,  0], speed, control_time)
+        self.vel_control([1, 0, 0], speed, control_time)
 
     def goBack(self, speed, control_time):
         self.vel_control([-1, 0, 0], speed, control_time)
@@ -351,7 +414,12 @@ class MapNavigation:
         try:
             launch_command = "roslaunch turn_on_tringai_robot mapping.launch"
             subprocess.run(
-                ['gnome-terminal', '-e', f"bash -c '{launch_command}; exec $SHELL'"])
+                [
+                    "gnome-terminal",
+                    "-e",
+                    f"bash -c '{launch_command}; exec $SHELL'",
+                ]
+            )
         except subprocess.CalledProcessError as e:
             self.LastError = sys.exc_info()
             print(e)
@@ -359,16 +427,20 @@ class MapNavigation:
     def stopMapping(self):
         try:
             # Kill the corresponding process
-            close_command = "ps -ef | grep -E " + "mapping.launch" + \
-                " | grep -v 'grep' | awk '{print $2}' | xargs kill -2"
+            close_command = (
+                "ps -ef | grep -E "
+                + "mapping.launch"
+                + " | grep -v 'grep' | awk '{print $2}' | xargs kill -2"
+            )
             subprocess.run(close_command, shell=True)
         except subprocess.CalledProcessError as e:
             self.LastError = sys.exc_info()
             print(e)
 
     def deleteMap(self):
-        files_to_delete = glob.glob(os.path.join(self.directory, "map.pgm")) + \
-            glob.glob(os.path.join(self.directory, "map.yaml"))
+        files_to_delete = glob.glob(
+            os.path.join(self.directory, "map.pgm")
+        ) + glob.glob(os.path.join(self.directory, "map.yaml"))
         try:
             for file_to_delete in files_to_delete:
                 os.remove(file_to_delete)
@@ -380,9 +452,16 @@ class MapNavigation:
     def agvOn(self):
         try:
             # Start lidar and odometer communication
-            launch_command = "roslaunch turn_on_mercury_robot turn_on_mercury_robot.launch"
+            launch_command = (
+                "roslaunch turn_on_mercury_robot turn_on_mercury_robot.launch"
+            )
             subprocess.run(
-                ['gnome-terminal', '-e', f"bash -c '{launch_command}; exec $SHELL'"])
+                [
+                    "gnome-terminal",
+                    "-e",
+                    f"bash -c '{launch_command}; exec $SHELL'",
+                ]
+            )
         except Exception as e:
             self.LastError = sys.exc_info()
             print(e)
@@ -390,8 +469,11 @@ class MapNavigation:
     def agvOff(self):
         try:
             # Kill the corresponding process
-            close_command = "ps -ef | grep -E " + "turn_on_mercury_robot.launch" + \
-                " | grep -v 'grep' | awk '{print $2}' | xargs kill -2"
+            close_command = (
+                "ps -ef | grep -E "
+                + "turn_on_mercury_robot.launch"
+                + " | grep -v 'grep' | awk '{print $2}' | xargs kill -2"
+            )
             subprocess.run(close_command, shell=True)
         except Exception as e:
             self.LastError = sys.exc_info()
@@ -402,7 +484,11 @@ class MapNavigation:
             # Check whether there is a corresponding process
             process_check_command = "ps -ef | grep -E 'turn_on_tringai_robot.launch' | grep -v 'grep'"
             result = subprocess.run(
-                process_check_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                process_check_command,
+                shell=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
             if len(result.stdout) > 0:
                 return True
             else:
@@ -415,10 +501,13 @@ class MapNavigation:
         voltage_data = self.voltage_callback(None)
         return voltage_data
 
-    def initPosition(self, x_goal, y_goal, orientation_z, orientation_w, covariance):
+    def initPosition(
+        self, x_goal, y_goal, orientation_z, orientation_w, covariance
+    ):
         try:
-            self.set_pose(x_goal, y_goal, orientation_z,
-                          orientation_w, covariance)
+            self.set_pose(
+                x_goal, y_goal, orientation_z, orientation_w, covariance
+            )
         except Exception as e:
             self.LastError = sys.exc_info()
 
@@ -427,7 +516,8 @@ class MapNavigation:
         # return Position
         try:
             transform = self.tf_buffer.lookup_transform(
-                "map", "base_up", rospy.Time(0), rospy.Duration(1.0))
+                "map", "base_up", rospy.Time(0), rospy.Duration(1.0)
+            )
             translation = transform.transform.translation
             rotation = transform.transform.rotation
 
@@ -435,7 +525,8 @@ class MapNavigation:
             y = translation.y
 
             euler = tf_conversions.transformations.euler_from_quaternion(
-                [rotation.x, rotation.y, rotation.z, rotation.w])
+                [rotation.x, rotation.y, rotation.z, rotation.w]
+            )
 
             tw = euler[2]  # Yaw
 
@@ -445,19 +536,25 @@ class MapNavigation:
 
             return x, y, tw
 
-        except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException) as e:
+        except (
+            tf2_ros.LookupException,
+            tf2_ros.ConnectivityException,
+            tf2_ros.ExtrapolationException,
+        ) as e:
             rospy.logerr("TF transformation query failed:{}".format(e))
 
     def goToPosition(self, goal_x, goal_y, orientation_z, orientation_w):
         flag_feed_goalReached = self.moveToGoal(
-            goal_x, goal_y, orientation_z, orientation_w)
+            goal_x, goal_y, orientation_z, orientation_w
+        )
         return flag_feed_goalReached
 
     def pause(self):
         if not self.is_running:
             self.is_running = True
             self.thread = threading.Thread(
-                target=self.stop_navigation, daemon=True)
+                target=self.stop_navigation, daemon=True
+            )
             self.thread.start()
 
     def stop_navigation(self):
@@ -494,15 +591,22 @@ class MapNavigation:
     def startNavigation(self):
         try:
             # Start lidar and odometer communication
-            launch_command = "roslaunch myagv_navigation navigation_active.launch"
+            launch_command = (
+                "roslaunch myagv_navigation navigation_active.launch"
+            )
             subprocess.run(
-                ['gnome-terminal', '-e', f"bash -c '{launch_command}; exec $SHELL'"])
+                [
+                    "gnome-terminal",
+                    "-e",
+                    f"bash -c '{launch_command}; exec $SHELL'",
+                ]
+            )
         except Exception as e:
             self.LastError = sys.exc_info()
             print(e)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # init navigation
     map_navigation = MapNavigation()
 

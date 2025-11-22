@@ -13,7 +13,7 @@ class CommandGenerator(DataProcessor):
     """MyCobot Python API
     Annotations:
         * = Chain operation
-        x = ??? 
+        x = ???
 
     Supported methods:
 
@@ -119,7 +119,7 @@ class CommandGenerator(DataProcessor):
 
     def release_all_servos(self, data=None):
         """Relax all joints
-        
+
         Args:
             data: 1 - Undamping (The default is damping)
         """
@@ -130,7 +130,7 @@ class CommandGenerator(DataProcessor):
 
     def is_controller_connected(self):
         """Wether connected with Atom.
-        
+
         Return:
             1 - succeed
             0 - failed
@@ -140,7 +140,7 @@ class CommandGenerator(DataProcessor):
 
     # MDI mode and operation
     def get_angles(self):
-        """ Get the angle of all joints.
+        """Get the angle of all joints.
 
         Return:
             list: A float list of all angle.
@@ -155,8 +155,20 @@ class CommandGenerator(DataProcessor):
             angle : angle value(float).
             speed : (int) 1 ~ 100
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, id=id, angle=degree, speed=speed)
-        return self._mesg(ProtocolCode.SEND_ANGLE, id, [self._angle2int(degree)], speed, has_reply=True, _async=_async)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__,
+            id=id,
+            angle=degree,
+            speed=speed,
+        )
+        return self._mesg(
+            ProtocolCode.SEND_ANGLE,
+            id,
+            [self._angle2int(degree)],
+            speed,
+            has_reply=True,
+            _async=_async,
+        )
 
     def send_angles(self, angles, speed, _async=False):
         """Send the angles of all joints to robot arm.
@@ -165,9 +177,17 @@ class CommandGenerator(DataProcessor):
             angles: a list of angle values(List[float]). len 6.
             speed : (int) 1 ~ 100
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, angles=angles, speed=speed)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, angles=angles, speed=speed
+        )
         angles = [self._angle2int(angle) for angle in angles]
-        return self._mesg(ProtocolCode.SEND_ANGLES, angles, speed, has_reply=True, _async=_async)
+        return self._mesg(
+            ProtocolCode.SEND_ANGLES,
+            angles,
+            speed,
+            has_reply=True,
+            _async=_async,
+        )
 
     def get_coords(self):
         """Get the coords from robot arm, coordinate system based on base.
@@ -175,21 +195,30 @@ class CommandGenerator(DataProcessor):
         Return:
             list : A float list of coord .[x, y, z, rx, ry, rz]
 
-        
+
         """
         return self._mesg(ProtocolCode.GET_COORDS, has_reply=True)
 
     def send_coord(self, id, coord, speed, _async=False):
-        """Send one coord to robot arm. 
+        """Send one coord to robot arm.
 
         Args:
             id(int) : coord id(genre.Coord) int 1-6.
             coord(float) : coord value, mm
             speed(int) : 1 ~ 100
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, id=id, coord=coord, speed=speed)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, id=id, coord=coord, speed=speed
+        )
         value = self._coord2int(coord) if id <= 3 else self._angle2int(coord)
-        return self._mesg(ProtocolCode.SEND_COORD, id, [value], speed, has_reply=True, _async=_async)
+        return self._mesg(
+            ProtocolCode.SEND_COORD,
+            id,
+            [value],
+            speed,
+            has_reply=True,
+            _async=_async,
+        )
 
     def send_coords(self, coords, speed, mode=None, _async=False):
         """Send all coords to robot arm.
@@ -199,16 +228,30 @@ class CommandGenerator(DataProcessor):
             speed : (int) 1 ~ 100
             mode : (int) 0 - angluar, 1 - linear
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, coords=coords, speed=speed)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, coords=coords, speed=speed
+        )
         coord_list = []
         for idx in range(3):
             coord_list.append(self._coord2int(coords[idx]))
         for angle in coords[3:]:
             coord_list.append(self._angle2int(angle))
         if mode is not None:
-            return self._mesg(ProtocolCode.SEND_COORDS, coord_list, speed, mode, _async=_async)
+            return self._mesg(
+                ProtocolCode.SEND_COORDS,
+                coord_list,
+                speed,
+                mode,
+                _async=_async,
+            )
         else:
-            return self._mesg(ProtocolCode.SEND_COORDS, coord_list, speed, has_reply=True, _async=_async)
+            return self._mesg(
+                ProtocolCode.SEND_COORDS,
+                coord_list,
+                speed,
+                has_reply=True,
+                _async=_async,
+            )
 
     def is_in_position(self, data, id=0):
         """Judge whether in the position.
@@ -222,19 +265,27 @@ class CommandGenerator(DataProcessor):
             0 - False\n
             -1 - Error
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, position_id=id)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, position_id=id
+        )
         if id == 1:
-            self.calibration_parameters(class_name=self.__class__.__name__, coords=data)
+            self.calibration_parameters(
+                class_name=self.__class__.__name__, coords=data
+            )
             data_list = []
             for idx in range(3):
                 data_list.append(self._coord2int(data[idx]))
             for idx in range(3, 6):
                 data_list.append(self._angle2int(data[idx]))
         elif id == 0:
-            self.calibration_parameters(class_name=self.__class__.__name__, angles=data)
+            self.calibration_parameters(
+                class_name=self.__class__.__name__, angles=data
+            )
             data_list = [self._angle2int(i) for i in data]
 
-        return self._mesg(ProtocolCode.IS_IN_POSITION, data_list, id, has_reply=True)
+        return self._mesg(
+            ProtocolCode.IS_IN_POSITION, data_list, id, has_reply=True
+        )
 
     def is_moving(self):
         """Detect if the robot is moving
@@ -255,8 +306,15 @@ class CommandGenerator(DataProcessor):
             direction: 0 - decrease, 1 - increase
             speed: int (1 - 100)
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, id=joint_id, direction=direction, speed=speed)
-        return self._mesg(ProtocolCode.JOG_ANGLE, joint_id, direction, speed, _async=_async)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__,
+            id=joint_id,
+            direction=direction,
+            speed=speed,
+        )
+        return self._mesg(
+            ProtocolCode.JOG_ANGLE, joint_id, direction, speed, _async=_async
+        )
 
     def jog_coord(self, coord_id, direction, speed, _async=False):
         """Jog control coord.
@@ -266,8 +324,15 @@ class CommandGenerator(DataProcessor):
             direction: 0 - decrease, 1 - increase
             speed: int (1 - 100)
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, coord_id=coord_id, direction=direction, speed=speed)
-        return self._mesg(ProtocolCode.JOG_COORD, coord_id, direction, speed, _async=_async)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__,
+            coord_id=coord_id,
+            direction=direction,
+            speed=speed,
+        )
+        return self._mesg(
+            ProtocolCode.JOG_COORD, coord_id, direction, speed, _async=_async
+        )
 
     def jog_increment(self, joint_id, increment, speed, _async=False):
         """step mode
@@ -277,8 +342,16 @@ class CommandGenerator(DataProcessor):
             increment:
             speed: int (0 - 100)
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, id=joint_id, speed=speed)
-        return self._mesg(ProtocolCode.JOG_INCREMENT, joint_id, [self._angle2int(increment)], speed, _async=_async)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, id=joint_id, speed=speed
+        )
+        return self._mesg(
+            ProtocolCode.JOG_INCREMENT,
+            joint_id,
+            [self._angle2int(increment)],
+            speed,
+            _async=_async,
+        )
 
     def pause(self):
         """Pause movement"""
@@ -311,8 +384,12 @@ class CommandGenerator(DataProcessor):
             encoder: The value of the set encoder.
             speed : 1 - 100
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, encode_id=joint_id, encoder=encoder,
-                                    speed=speed)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__,
+            encode_id=joint_id,
+            encoder=encoder,
+            speed=speed,
+        )
         return self._mesg(ProtocolCode.SET_ENCODER, joint_id, [encoder], speed)
 
     def get_encoder(self, joint_id):
@@ -322,7 +399,9 @@ class CommandGenerator(DataProcessor):
             joint_id: (int) 1 - 6
                 for gripper: Joint id 7
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, encode_id=joint_id)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, encode_id=joint_id
+        )
         return self._mesg(ProtocolCode.GET_ENCODER, joint_id, has_reply=True)
 
     def set_encoders(self, encoders, sp):
@@ -332,7 +411,9 @@ class CommandGenerator(DataProcessor):
             encoders: A encoder list. len 6.
             sp: speed 1 ~ 100
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, encoders=encoders, speed=sp)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, encoders=encoders, speed=sp
+        )
         return self._mesg(ProtocolCode.SET_ENCODERS, encoders, sp)
 
     def get_encoders(self):
@@ -350,7 +431,11 @@ class CommandGenerator(DataProcessor):
             encoders: encoders list.
             speeds: Obtained by the get_servo_speeds() method
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, encoders=encoders, speeds=speeds)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__,
+            encoders=encoders,
+            speeds=speeds,
+        )
         return self._mesg(ProtocolCode.SET_ENCODERS_DRAG, encoders, speeds)
 
     # Running status and Settings
@@ -358,26 +443,34 @@ class CommandGenerator(DataProcessor):
     def get_joint_min_angle(self, joint_id):
         """Gets the minimum movement angle of the specified joint
 
-        Args: 
-            joint_id: 1 - 6
-
-        Return:
-            angle value(float)
-        """
-        self.calibration_parameters(class_name=self.__class__.__name__, id=joint_id)
-        return self._mesg(ProtocolCode.GET_JOINT_MIN_ANGLE, joint_id, has_reply=True)
-
-    def get_joint_max_angle(self, joint_id):
-        """Gets the maximum movement angle of the specified joint
-        
         Args:
             joint_id: 1 - 6
 
         Return:
             angle value(float)
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, id=joint_id)
-        return self._mesg(ProtocolCode.GET_JOINT_MAX_ANGLE, joint_id, has_reply=True)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, id=joint_id
+        )
+        return self._mesg(
+            ProtocolCode.GET_JOINT_MIN_ANGLE, joint_id, has_reply=True
+        )
+
+    def get_joint_max_angle(self, joint_id):
+        """Gets the maximum movement angle of the specified joint
+
+        Args:
+            joint_id: 1 - 6
+
+        Return:
+            angle value(float)
+        """
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, id=joint_id
+        )
+        return self._mesg(
+            ProtocolCode.GET_JOINT_MAX_ANGLE, joint_id, has_reply=True
+        )
 
     # Servo control
     def is_servo_enable(self, servo_id):
@@ -390,8 +483,12 @@ class CommandGenerator(DataProcessor):
             1 - enable
             -1 - error
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, id=servo_id)
-        return self._mesg(ProtocolCode.IS_SERVO_ENABLE, servo_id, has_reply=True)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, id=servo_id
+        )
+        return self._mesg(
+            ProtocolCode.IS_SERVO_ENABLE, servo_id, has_reply=True
+        )
 
     def is_all_servo_enable(self):
         """Detect the connection status of all joints
@@ -413,12 +510,26 @@ class CommandGenerator(DataProcessor):
             mode: 0 - indicates that value is one byte(default), 1 - 1 represents a value of two bytes.
         """
         if mode is None:
-            self.calibration_parameters(class_name=self.__class__.__name__, servo_data_id=servo_id, address_id=data_id, value=value)
-            return self._mesg(ProtocolCode.SET_SERVO_DATA, servo_id, data_id, value)
+            self.calibration_parameters(
+                class_name=self.__class__.__name__,
+                servo_data_id=servo_id,
+                address_id=data_id,
+                value=value,
+            )
+            return self._mesg(
+                ProtocolCode.SET_SERVO_DATA, servo_id, data_id, value
+            )
         else:
-            self.calibration_parameters(class_name=self.__class__.__name__, servo_data_id=servo_id, address_id=data_id, value=value,
-                                        mode=mode)
-            return self._mesg(ProtocolCode.SET_SERVO_DATA, servo_id, data_id, [value], mode)
+            self.calibration_parameters(
+                class_name=self.__class__.__name__,
+                servo_data_id=servo_id,
+                address_id=data_id,
+                value=value,
+                mode=mode,
+            )
+            return self._mesg(
+                ProtocolCode.SET_SERVO_DATA, servo_id, data_id, [value], mode
+            )
 
     def get_servo_data(self, servo_id, data_id, mode=None):
         """Read the data parameter of the specified address of the steering gear.
@@ -432,32 +543,49 @@ class CommandGenerator(DataProcessor):
             values 0 - 4096
         """
         if mode is not None:
-            self.calibration_parameters(class_name=self.__class__.__name__, servo_data_id=servo_id, address=data_id, mode=mode)
-            return self._mesg(
-                ProtocolCode.GET_SERVO_DATA, servo_id, data_id, mode, has_reply=True
+            self.calibration_parameters(
+                class_name=self.__class__.__name__,
+                servo_data_id=servo_id,
+                address=data_id,
+                mode=mode,
             )
-        self.calibration_parameters(class_name=self.__class__.__name__, servo_data_id=servo_id, address=data_id)
+            return self._mesg(
+                ProtocolCode.GET_SERVO_DATA,
+                servo_id,
+                data_id,
+                mode,
+                has_reply=True,
+            )
+        self.calibration_parameters(
+            class_name=self.__class__.__name__,
+            servo_data_id=servo_id,
+            address=data_id,
+        )
         return self._mesg(
             ProtocolCode.GET_SERVO_DATA, servo_id, data_id, has_reply=True
         )
 
     def set_servo_calibration(self, servo_id):
-        """The current position of the calibration joint actuator is the angle zero point, 
+        """The current position of the calibration joint actuator is the angle zero point,
             and the corresponding potential value is 2048.
 
         Args:
             servo_id: Serial number of articulated steering gear. 1 - 6
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, id=servo_id)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, id=servo_id
+        )
         return self._mesg(ProtocolCode.SET_SERVO_CALIBRATION, servo_id)
 
     def joint_brake(self, joint_id):
         """Make it stop when the joint is in motion, and the buffer distance is positively related to the existing speed
-        
+
         Args:
             joint_id:  1 - 6
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, id=joint_id)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, id=joint_id
+        )
         return self._mesg(ProtocolCode.JOINT_BRAKE, joint_id)
 
     def release_servo(self, servo_id, mode=None):
@@ -469,11 +597,15 @@ class CommandGenerator(DataProcessor):
             mode: Default damping, set to 1, cancel damping
         """
         if mode is None:
-            self.calibration_parameters(class_name=self.__class__.__name__, id=servo_id)
+            self.calibration_parameters(
+                class_name=self.__class__.__name__, id=servo_id
+            )
             return self._mesg(ProtocolCode.RELEASE_SERVO, servo_id)
 
         else:
-            self.calibration_parameters(class_name=self.__class__.__name__, id=servo_id)
+            self.calibration_parameters(
+                class_name=self.__class__.__name__, id=servo_id
+            )
             return self._mesg(ProtocolCode.RELEASE_SERVO, servo_id, mode)
 
     def focus_servo(self, servo_id):
@@ -482,16 +614,16 @@ class CommandGenerator(DataProcessor):
         Args:
             servo_id: int 1 - 6
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, id=servo_id)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, id=servo_id
+        )
         return self._mesg(ProtocolCode.FOCUS_SERVO, servo_id)
-    
+
     def focus_all_servos(self):
         return self._mesg(ProtocolCode.FOCUS_SERVO, 0)
 
     def focus_all_servos(self):
-        """Power on all servo
-
-        """
+        """Power on all servo"""
         return self._mesg(ProtocolCode.FOCUS_SERVO, 0)
 
     # Atom IO
@@ -504,7 +636,9 @@ class CommandGenerator(DataProcessor):
             b (int): 0 ~ 255
 
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, rgb=[r, g, b])
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, rgb=[r, g, b]
+        )
         return self._mesg(ProtocolCode.SET_COLOR, r, g, b)
 
     def set_digital_output(self, pin_no, pin_signal):
@@ -514,14 +648,22 @@ class CommandGenerator(DataProcessor):
             pin_no     (int):
             pin_signal (int): 0 / 1
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, pin_no=pin_no, pin_signal=pin_signal)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__,
+            pin_no=pin_no,
+            pin_signal=pin_signal,
+        )
         return self._mesg(ProtocolCode.SET_DIGITAL_OUTPUT, pin_no, pin_signal)
 
     def get_digital_input(self, pin_no):
         """singal value"""
         # TODO pin_no范围未知
-        self.calibration_parameters(class_name=self.__class__.__name__, pin_no=pin_no)
-        return self._mesg(ProtocolCode.GET_DIGITAL_INPUT, pin_no, has_reply=True)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, pin_no=pin_no
+        )
+        return self._mesg(
+            ProtocolCode.GET_DIGITAL_INPUT, pin_no, has_reply=True
+        )
 
     def set_gripper_state(self, flag, speed, _type_1=None):
         """Set gripper switch state
@@ -536,11 +678,20 @@ class CommandGenerator(DataProcessor):
                 4 : Flexible gripper
         """
         if _type_1 is None:
-            self.calibration_parameters(class_name=self.__class__.__name__, flag=flag, speed=speed)
+            self.calibration_parameters(
+                class_name=self.__class__.__name__, flag=flag, speed=speed
+            )
             return self._mesg(ProtocolCode.SET_GRIPPER_STATE, flag, speed)
         else:
-            self.calibration_parameters(class_name=self.__class__.__name__, flag=flag, speed=speed, _type_1=_type_1)
-            return self._mesg(ProtocolCode.SET_GRIPPER_STATE, flag, speed, _type_1)
+            self.calibration_parameters(
+                class_name=self.__class__.__name__,
+                flag=flag,
+                speed=speed,
+                _type_1=_type_1,
+            )
+            return self._mesg(
+                ProtocolCode.SET_GRIPPER_STATE, flag, speed, _type_1
+            )
 
     def set_gripper_value(self, gripper_value, speed, gripper_type=None):
         """Set gripper value
@@ -554,11 +705,26 @@ class CommandGenerator(DataProcessor):
                 4: Flexible gripper
         """
         if gripper_type is not None:
-            self.calibration_parameters(class_name=self.__class__.__name__, gripper_value=gripper_value, speed=speed,
-                                        gripper_type=gripper_type)
-            return self._mesg(ProtocolCode.SET_GRIPPER_VALUE, gripper_value, speed, gripper_type, has_reply=True)
+            self.calibration_parameters(
+                class_name=self.__class__.__name__,
+                gripper_value=gripper_value,
+                speed=speed,
+                gripper_type=gripper_type,
+            )
+            return self._mesg(
+                ProtocolCode.SET_GRIPPER_VALUE,
+                gripper_value,
+                speed,
+                gripper_type,
+                has_reply=True,
+            )
         else:
-            return self._mesg(ProtocolCode.SET_GRIPPER_VALUE, gripper_value, speed, has_reply=True)
+            return self._mesg(
+                ProtocolCode.SET_GRIPPER_VALUE,
+                gripper_value,
+                speed,
+                has_reply=True,
+            )
 
     def set_gripper_calibration(self):
         """Set the current position to zero, set current position value is `2048`."""
@@ -572,7 +738,11 @@ class CommandGenerator(DataProcessor):
             pin_no: pin port number.
             pin_signal: 0 / 1
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, pin_no_basic=pin_no, pin_signal=pin_signal)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__,
+            pin_no_basic=pin_no,
+            pin_signal=pin_signal,
+        )
         return self._mesg(ProtocolCode.SET_BASIC_OUTPUT, pin_no, pin_signal)
 
     def get_basic_input(self, pin_no):
@@ -581,7 +751,9 @@ class CommandGenerator(DataProcessor):
         Args:
             pin_no: (int) pin port number.
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, pin_no_basic=pin_no)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, pin_no_basic=pin_no
+        )
         return self._mesg(ProtocolCode.GET_BASIC_INPUT, pin_no, has_reply=True)
 
     def set_ssid_pwd(self, account, password):
@@ -591,16 +763,22 @@ class CommandGenerator(DataProcessor):
             account: (str) new wifi account.
             password: (str) new wifi password.
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, account=account, password=password)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__,
+            account=account,
+            password=password,
+        )
 
         self._mesg(ProtocolCode.SET_SSID_PWD)  # 先发指令，再发设置的账号密码
         time.sleep(0.02)
-        return self._mesg(ProtocolCode.SET_SSID_PWD, account, password, has_reply=True)
+        return self._mesg(
+            ProtocolCode.SET_SSID_PWD, account, password, has_reply=True
+        )
 
     def get_ssid_pwd(self):
         """Get connected wifi account and password. (Apply to m5 or seeed)
 
-        Return: 
+        Return:
             (account, password)
         """
         return self._mesg(ProtocolCode.GET_SSID_PWD, has_reply=True)
@@ -614,7 +792,7 @@ class CommandGenerator(DataProcessor):
         return self._mesg(ProtocolCode.SET_SERVER_PORT, port)
 
     def get_tof_distance(self):
-        """ Get the detected distance (Requires external distance detector).
+        """Get the detected distance (Requires external distance detector).
 
         Return:
             (int) The unit is mm.
@@ -623,7 +801,7 @@ class CommandGenerator(DataProcessor):
 
     def get_error_information(self):
         """Obtaining robot error information
-        
+
         Return:
             0: No error message.
             1 ~ 6: The corresponding joint exceeds the limit position.
@@ -636,7 +814,3 @@ class CommandGenerator(DataProcessor):
     def get_basic_version(self):
         """Get basic firmware version"""
         return self._mesg(ProtocolCode.GET_BASIC_VERSION, has_reply=True)
-
-
-    
-

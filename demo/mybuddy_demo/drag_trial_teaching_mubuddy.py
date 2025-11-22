@@ -1,15 +1,18 @@
-'''
+"""
 Drag and teach in windows version
-'''
+"""
+
 import time
 import os
 import sys
+
 # import termios
 # import tty
 import threading
 import json
 import serial
 import serial.tools.list_ports
+
 sys.path.append(os.getcwd())
 from pymycobot import MyBuddy
 
@@ -92,10 +95,10 @@ class TeachingTest(Helper):
             start_t = time.time()
 
             while self.recording:
-                angles_1 =  self.mc.get_encoders(1)
+                angles_1 = self.mc.get_encoders(1)
                 angles_2 = self.mc.get_encoders(2)
                 if angles_1 and angles_2:
-                    self.record_list.append([angles_1,angles_2])
+                    self.record_list.append([angles_1, angles_2])
                     time.sleep(0.1)
                     # print("\r {}".format(time.time() - start_t), end="")
 
@@ -113,9 +116,9 @@ class TeachingTest(Helper):
         self.echo("Start play")
         for angles in self.record_list:
             print(angles[1])
-            self.mc.set_encoders(1,angles[0], 80, 1)
+            self.mc.set_encoders(1, angles[0], 80, 1)
             time.sleep(0.05)
-            self.mc.set_encoders(2,angles[1], 80,1)
+            self.mc.set_encoders(2, angles[1], 80, 1)
             time.sleep(0.1)
         self.echo("Finish play")
 
@@ -151,7 +154,6 @@ class TeachingTest(Helper):
             self.echo("save dir:  {}".format(os.path.dirname(__file__)))
 
     def load_from_local(self):
-
         with open(os.path.dirname(__file__) + "/record.txt", "r") as f:
             try:
                 data = json.load(f)

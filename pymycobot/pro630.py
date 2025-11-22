@@ -31,14 +31,7 @@ class Pro630Api(CloseLoop):
     power_control_1 = 3
     power_control_2 = 4
     arm_span_maximum = 630
-    pin_numbered_mapping_table = {
-        1: 17,
-        2: 27,
-        3: 22,
-        4: 5,
-        5: 6,
-        6: 19
-    }
+    pin_numbered_mapping_table = {1: 17, 2: 27, 3: 22, 4: 5, 5: 6, 6: 19}
 
     def __init__(self, debug=False, save_serial_log=False, method=None):
         super(Pro630Api, self).__init__(debug)
@@ -52,7 +45,9 @@ class Pro630Api(CloseLoop):
 
         self.calibration_parameters = calibration_parameters
         self.language = get_local_language()
-        self.read_threading = threading.Thread(target=self.read_thread, args=(method, ))
+        self.read_threading = threading.Thread(
+            target=self.read_thread, args=(method,)
+        )
         self.read_threading.daemon = True
         self.read_threading.start()
 
@@ -76,8 +71,11 @@ class Pro630Api(CloseLoop):
                     decode_respond.append(valid_data[v])
             elif data_len == 8 and genre == ProtocolCode.GET_DOWN_ENCODERS:
                 decode_respond = self.bytes4_to_int(valid_data)
-            elif data_len == 6 and genre in [ProtocolCode.GET_SERVO_STATUS, ProtocolCode.GET_SERVO_VOLTAGES,
-                                             ProtocolCode.GET_SERVO_CURRENTS]:
+            elif data_len == 6 and genre in [
+                ProtocolCode.GET_SERVO_STATUS,
+                ProtocolCode.GET_SERVO_VOLTAGES,
+                ProtocolCode.GET_SERVO_CURRENTS,
+            ]:
                 for i in range(data_len):
                     decode_respond.append(valid_data[i])
             elif genre == ProtocolCode.MERCURY_ROBOT_STATUS:
@@ -88,13 +86,13 @@ class Pro630Api(CloseLoop):
                         res.append(valid_data[i])
                         i += 1
                     else:
-                        one = valid_data[i: i + 2]
+                        one = valid_data[i : i + 2]
                         res.append(self._decode_int16(one))
                         i += 2
                 return res
             else:
                 for header_i in range(0, len(valid_data), 2):
-                    one = valid_data[header_i: header_i + 2]
+                    one = valid_data[header_i : header_i + 2]
                     decode_respond.append(self._decode_int16(one))
         elif data_len == 2:
             if genre in [ProtocolCode.IS_SERVO_ENABLE]:
@@ -133,7 +131,7 @@ class Pro630Api(CloseLoop):
                     decode_respond += self.bytes4_to_int(valid_data)
                     i += 4
                 else:
-                    one = valid_data[i: i + 2]
+                    one = valid_data[i : i + 2]
                     decode_respond.append(self._decode_int16(one))
                     i += 2
         elif data_len == 32:
@@ -144,7 +142,7 @@ class Pro630Api(CloseLoop):
                     res.append(valid_data[i])
                     i += 1
                 elif i < 23:
-                    one = valid_data[i: i + 2]
+                    one = valid_data[i : i + 2]
                     res.append(self._decode_int16(one))
                     i += 2
             return res
@@ -156,13 +154,15 @@ class Pro630Api(CloseLoop):
                     res.append(valid_data[i])
                     i += 1
                 elif i < 38:
-                    one = valid_data[i: i + 2]
+                    one = valid_data[i : i + 2]
                     res.append(self._decode_int16(one))
                     i += 2
             return res
         elif data_len == 56:
             for i in range(0, data_len, 8):
-                byte_value = int.from_bytes(valid_data[i:i + 4], byteorder='big', signed=True)
+                byte_value = int.from_bytes(
+                    valid_data[i : i + 4], byteorder="big", signed=True
+                )
                 decode_respond.append(byte_value)
         elif data_len == 6:
             for i in valid_data:
@@ -174,7 +174,7 @@ class Pro630Api(CloseLoop):
                 ProtocolCode.GET_SERVO_TEMPS,
             ]:
                 for i in range(data_len):
-                    data1 = self._decode_int8(valid_data[i: i + 1])
+                    data1 = self._decode_int8(valid_data[i : i + 1])
                     decode_respond.append(0xFF & data1 if data1 < 0 else data1)
             decode_respond.append(self._decode_int8(valid_data))
 
@@ -226,10 +226,13 @@ class Pro630Api(CloseLoop):
             ProtocolCode.GET_FILTER_LEN,
             ProtocolCode.IS_SERVO_ENABLE,
             ProtocolCode.GET_POS_SWITCH,
-            ProtocolCode.GET_ERROR_INFO
+            ProtocolCode.GET_ERROR_INFO,
         ]:
             return self._process_single(res)
-        elif genre in [ProtocolCode.GET_ANGLES, ProtocolCode.SOLVE_INV_KINEMATICS]:
+        elif genre in [
+            ProtocolCode.GET_ANGLES,
+            ProtocolCode.SOLVE_INV_KINEMATICS,
+        ]:
             return [self._int3angle(angle) for angle in res]
         elif genre in [
             ProtocolCode.GET_COORDS,
@@ -248,7 +251,11 @@ class Pro630Api(CloseLoop):
                 return res
         elif genre in [ProtocolCode.GET_SERVO_VOLTAGES]:
             return [self._int2coord(angle) for angle in res]
-        elif genre in [ProtocolCode.GET_BASIC_VERSION, ProtocolCode.SOFTWARE_VERSION, ProtocolCode.GET_ATOM_VERSION]:
+        elif genre in [
+            ProtocolCode.GET_BASIC_VERSION,
+            ProtocolCode.SOFTWARE_VERSION,
+            ProtocolCode.GET_ATOM_VERSION,
+        ]:
             return self._int2coord(self._process_single(res))
         elif genre in [
             ProtocolCode.GET_JOINT_MAX_ANGLE,
@@ -275,8 +282,11 @@ class Pro630Api(CloseLoop):
                         if res[i] == 1:
                             r.append(i)
             return r
-        elif genre in [ProtocolCode.COBOTX_GET_ANGLE, ProtocolCode.COBOTX_GET_SOLUTION_ANGLES,
-                       ProtocolCode.GET_POS_OVER]:
+        elif genre in [
+            ProtocolCode.COBOTX_GET_ANGLE,
+            ProtocolCode.COBOTX_GET_SOLUTION_ANGLES,
+            ProtocolCode.GET_POS_OVER,
+        ]:
             return self._int2angle(res[0])
         elif genre == ProtocolCode.MERCURY_ROBOT_STATUS:
             for i in range(9, len(res)):
@@ -347,12 +357,16 @@ class Pro630Api(CloseLoop):
         first_three = new_coords[:3]
         first_three[2] -= 83.64
 
-        magnitude = np.linalg.norm(first_three)  # Calculate the Euclidean norm (magnitude)
+        magnitude = np.linalg.norm(
+            first_three
+        )  # Calculate the Euclidean norm (magnitude)
         if is_print == 1:
             if self.language == "zh_CN":
                 error_info += f"当前臂展为{magnitude}, 最大的臂展为{self.arm_span_maximum}"
             else:
-                error_info += f"Arm span is {magnitude}, max is {self.arm_span_maximum}"
+                error_info += (
+                    f"Arm span is {magnitude}, max is {self.arm_span_maximum}"
+                )
 
         return error_info
 
@@ -375,11 +389,18 @@ class Pro630Api(CloseLoop):
 
 
 class Pro630(Pro630Api):
-
-    def __init__(self, port, baudrate="115200", timeout=0.1, debug=False, save_serial_log=False):
+    def __init__(
+        self,
+        port,
+        baudrate="115200",
+        timeout=0.1,
+        debug=False,
+        save_serial_log=False,
+    ):
         self._serial_port = setup_serial_connect(port, baudrate, timeout)
         super(Pro630, self).__init__(debug, save_serial_log)
         import RPi.GPIO as GPIO
+
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
         GPIO.setup(self.power_control_1, GPIO.IN)
@@ -393,18 +414,21 @@ class Pro630(Pro630Api):
 
     def power_on(self, delay=2):
         import RPi.GPIO as GPIO
+
         GPIO.output(self.power_control_2, GPIO.HIGH)
         time.sleep(delay)
         return super(Pro630, self).power_on()
 
     def power_off(self):
         import RPi.GPIO as GPIO
+
         res = super(Pro630, self).power_off()
         GPIO.output(self.power_control_2, GPIO.LOW)
         return res
 
     def power_on_only(self):
         import RPi.GPIO as GPIO
+
         GPIO.output(self.power_control_2, GPIO.HIGH)
 
     def set_basic_output(self, pin_no, pin_signal):
@@ -415,6 +439,7 @@ class Pro630(Pro630Api):
             pin_signal: 0 / 1
         """
         import RPi.GPIO as GPIO
+
         pin_number = self.pin_numbered_mapping_table.get(pin_no, None)
         if pin_number is None:
             raise ValueError("pin_no must be in range 1 ~ 6")
@@ -432,6 +457,7 @@ class Pro630(Pro630Api):
             0 - low
         """
         import RPi.GPIO as GPIO
+
         pin_number = self.pin_numbered_mapping_table.get(pin_no, None)
         if pin_number is None:
             raise ValueError("pin_no must be in range 1 ~ 6")
@@ -440,8 +466,12 @@ class Pro630(Pro630Api):
 
     def send_angles_sync(self, angles, speed):
         angles = [self._angle2int(angle) for angle in angles]
-        self.calibration_parameters(class_name=self.__class__.__name__, angles=angles, speed=speed)
-        return self._mesg(ProtocolCode.SEND_ANGLES, angles, speed, no_return=True)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, angles=angles, speed=speed
+        )
+        return self._mesg(
+            ProtocolCode.SEND_ANGLES, angles, speed, no_return=True
+        )
 
     def set_monitor_mode(self, mode):
         raise NotImplementedError("Pro630 does not support monitor mode")

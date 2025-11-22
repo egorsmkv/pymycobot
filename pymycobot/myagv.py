@@ -3,7 +3,12 @@
 import threading
 import time
 
-from .myagvapi import CommunicationProtocol, Utils, setup_serial_connect, setup_logging
+from .myagvapi import (
+    CommunicationProtocol,
+    Utils,
+    setup_serial_connect,
+    setup_logging,
+)
 
 
 class ProtocolCode:
@@ -15,18 +20,19 @@ class ProtocolCode:
     GET_FIRMWARE_VERSION = (0x01, 0x03)
     GET_MODIFIED_VERSION = (0x01, 0x09)
     SET_GYRO_STATE = (0x01, 0x07)
-    SET_AUTO_REPORT_STATE = (0x01, 0x0c)
-    GET_AUTO_REPORT_STATE = (0x01, 0x0d)
+    SET_AUTO_REPORT_STATE = (0x01, 0x0C)
+    GET_AUTO_REPORT_STATE = (0x01, 0x0D)
     GET_GYRO_STATE = (0x01, 0x08)
     GET_MCU_INFO = ()
 
 
 class MyAGVCommandProtocolApi(CommunicationProtocol):
-
     def __init__(self, debug=False):
         self.__movement = False
         self.__mutex = threading.Lock()
-        self.log = setup_logging(name=f"{__name__}.{self.__class__.__name__}", debug=debug)
+        self.log = setup_logging(
+            name=f"{__name__}.{self.__class__.__name__}", debug=debug
+        )
 
     def _read_command_buffer(self, timeout=1, conditional=None):
         previous_frame = b""
@@ -36,11 +42,15 @@ class MyAGVCommandProtocolApi(CommunicationProtocol):
         start_time = time.time()
         while time.time() - start_time < timeout:
             current_frame = self.read()
-            if current_frame == b'':
+            if current_frame == b"":
                 time.sleep(0.001)
                 continue
 
-            if current_frame == b"\xfe" and previous_frame == b"\xfe" and is_record is False:
+            if (
+                current_frame == b"\xfe"
+                and previous_frame == b"\xfe"
+                and is_record is False
+            ):
                 is_record = True
                 commands += b"\xfe\xfe"
                 continue
@@ -52,13 +62,15 @@ class MyAGVCommandProtocolApi(CommunicationProtocol):
             commands += current_frame
 
             cond_res = True if conditional is None else conditional(commands)
-            if sum(commands[2:-1]) & 0xff == commands[-1] and cond_res:
+            if sum(commands[2:-1]) & 0xFF == commands[-1] and cond_res:
                 break
         else:
             commands = b""
         return commands
 
-    def _compose_complete_command(self, genre: ProtocolCode, params):  # packing command
+    def _compose_complete_command(
+        self, genre: ProtocolCode, params
+    ):  # packing command
         command_args = Utils.process_data_command(params)
         command_args = Utils.flatten(command_args)
 
@@ -69,7 +81,7 @@ class MyAGVCommandProtocolApi(CommunicationProtocol):
             command.append(genre)
 
         command.extend(command_args)
-        command.append(sum(command[2:]) & 0xff)
+        command.append(sum(command[2:]) & 0xFF)
         return command
 
     def _parse_reply_instruction(self, genre, reply_data):  # unpacking command
@@ -82,14 +94,16 @@ class MyAGVCommandProtocolApi(CommunicationProtocol):
         elif genre == ProtocolCode.GET_MCU_INFO:
             index = 0
             res = []
-            datas = reply_data[2:][:-1]  # header and footer frames are not counted
+            datas = reply_data[2:][
+                :-1
+            ]  # header and footer frames are not counted
             while index < len(datas):
                 if index in range(0, 3):
                     res.append(datas[index])
                     index += 1
 
                 elif index in range(3, 15, 2):
-                    data = Utils.decode_int16(datas[index:index + 2])
+                    data = Utils.decode_int16(datas[index : index + 2])
                     res.append(Utils.float(data, 2))
                     index += 2
 
@@ -104,11 +118,19 @@ class MyAGVCommandProtocolApi(CommunicationProtocol):
                     index += 1
 
                 elif index in range(18, 26, 2):
-                    res.append(Utils.float(Utils.decode_int16(datas[index:index + 2]), 3))
+                    res.append(
+                        Utils.float(
+                            Utils.decode_int16(datas[index : index + 2]), 3
+                        )
+                    )
                     index += 2
 
                 elif index in range(26, 32, 2):
-                    res.append(Utils.float(Utils.decode_int16(datas[index:index + 2]), 3))
+                    res.append(
+                        Utils.float(
+                            Utils.decode_int16(datas[index : index + 2]), 3
+                        )
+                    )
                     index += 2
 
                 elif index in range(32, 42, 1):
@@ -125,13 +147,17 @@ class MyAGVCommandProtocolApi(CommunicationProtocol):
             self.clear()
             if genre not in (ProtocolCode.GET_MCU_INFO,):
                 real_command = self._compose_complete_command(genre, args)
-                self.log.info(f"write: {' '.join(f'{x:02x}' for x in real_command)}")
+                self.log.info(
+                    f"write: {' '.join(f'{x:02x}' for x in real_command)}"
+                )
                 self.write(real_command)
                 if has_reply is False:
                     return None
 
                 for _ in range(8):
-                    reply_data = self._read_command_buffer(conditional=lambda x: len(x) > 5, timeout=1)
+                    reply_data = self._read_command_buffer(
+                        conditional=lambda x: len(x) > 5, timeout=1
+                    )
                     if len(reply_data) == 0:
                         time.sleep(0.01)
                         continue
@@ -144,7 +170,9 @@ class MyAGVCommandProtocolApi(CommunicationProtocol):
                 else:
                     reply_data = b""
             else:
-                reply_data = self._read_command_buffer(conditional=lambda x: len(x) in (45, 29), timeout=1)
+                reply_data = self._read_command_buffer(
+                    conditional=lambda x: len(x) in (45, 29), timeout=1
+                )
 
             self.log.info(f" read: {' '.join(f'{x:02x}' for x in reply_data)}")
             return self._parse_reply_instruction(genre, reply_data)
@@ -359,7 +387,6 @@ class MyAGVCommandApi(MyAGVCommandProtocolApi):
 
 
 class MyAgv(MyAGVCommandApi):
-
     def __init__(self, comport, baudrate=115200, timeout=0.1, debug=False):
         super().__init__(debug=debug)
         self._serial_port = setup_serial_connect(comport, baudrate, timeout)

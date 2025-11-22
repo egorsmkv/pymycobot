@@ -11,7 +11,7 @@ import time
 from pymycobot.myarm import MyArm
 
 # Create a MyArm object and specify the serial port '/dev/ttyAMA0'
-mc = MyArm('/dev/ttyAMA0')
+mc = MyArm("/dev/ttyAMA0")
 
 # Set interpolation mode
 mc.set_fresh_mode(0)

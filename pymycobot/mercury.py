@@ -7,8 +7,16 @@ import serial.serialutil
 
 from pymycobot.mercury_api import MercuryCommandGenerator
 
+
 class Mercury(MercuryCommandGenerator):
-    def __init__(self, port="/dev/ttyAMA1", baudrate="115200", timeout=0.1, debug=False, save_serial_log=False):
+    def __init__(
+        self,
+        port="/dev/ttyAMA1",
+        baudrate="115200",
+        timeout=0.1,
+        debug=False,
+        save_serial_log=False,
+    ):
         """
         Args:
             port     : port string
@@ -42,6 +50,6 @@ class Mercury(MercuryCommandGenerator):
 
     def open(self):
         self._serial_port.open()
-        
+
     def close(self):
         self._serial_port.close()

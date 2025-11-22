@@ -3,7 +3,7 @@ import time
 import serial
 import serial.tools.list_ports
 
-#以上需写在代码开头，意为导入项目包
+# 以上需写在代码开头，意为导入项目包
 
 # ultraArmP340 类初始化需要两个参数：串口和波特率
 #   第一个是串口字符串， 如：
@@ -35,7 +35,7 @@ time.sleep(2)
 print(coords)
 
 # # 让机械臂到达[57.0,-10,30]这个坐标，速度为80mm/s
-ua.set_coords([57.0,-10,30], 80)
+ua.set_coords([57.0, -10, 30], 80)
 
 # 设置等待时间2秒
 time.sleep(2)

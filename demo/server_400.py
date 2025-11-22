@@ -22,6 +22,8 @@ Please change the parameters passed in the last line of the Server.py file, Merc
 
 
 """
+
+
 class ProtocolCode(object):
     # BASIC
     HEADER = 0xFE
@@ -33,15 +35,15 @@ class ProtocolCode(object):
     GET_ROBOT_ID = 0x03
     OVER_LIMIT_RETURN_ZERO = 0x04
     SET_ROBOT_ID = 0x04
-    
+
     GET_ERROR_INFO = 0x07
     CLEAR_ERROR_INFO = 0x08
     GET_ATOM_VERSION = 0x09
-    
+
     SET_CW = 0x0B
     GET_CW = 0x0C
     CLEAR_WAIST_QUEUE = 0x0D
-    
+
     SetHTSGripperTorque = 0x35
     GetHTSGripperTorque = 0x36
     GetGripperProtectCurrent = 0x37
@@ -93,10 +95,10 @@ class ProtocolCode(object):
     JOG_INCREMENT = 0x33
     JOG_STOP = 0x34
     JOG_INCREMENT_COORD = 0x34
-    
+
     COBOTX_GET_SOLUTION_ANGLES = 0x35
     COBOTX_SET_SOLUTION_ANGLES = 0x36
-    
+
     SET_ENCODER = 0x3A
     GET_ENCODER = 0x3B
     SET_ENCODERS = 0x3C
@@ -126,8 +128,7 @@ class ProtocolCode(object):
     SET_GRIPPER_ENABLED = 0x58
     GET_ZERO_POS = 0x59
     IS_INIT_CALIBRATION = 0x5A
-    
-    
+
     # ATOM IO
     SET_PIN_MODE = 0x60
     SET_DIGITAL_OUTPUT = 0x61
@@ -160,7 +161,6 @@ class ProtocolCode(object):
     SET_MODEL_DIRECTION = 0x7D
     GET_FILTER_LEN = 0x7E
     SET_FILTER_LEN = 0x7F
-    
 
     # Basic
     SET_BASIC_OUTPUT = 0xA0
@@ -241,12 +241,12 @@ class ProtocolCode(object):
     SET_VOID_COMPENSATE = 0xE7
     SET_ERROR_DETECT_MODE = 0xE8
     GET_ERROR_DETECT_MODE = 0xE9
-    
+
     MERCURY_GET_BASE_COORDS = 0xF0
     MERCURY_SET_BASE_COORD = 0xF1
     MERCURY_SET_BASE_COORDS = 0xF2
     MERCURY_JOG_BASE_COORD = 0xF3
-    
+
     MERCURY_DRAG_TECH_SAVE = 0x70
     MERCURY_DRAG_TECH_EXECUTE = 0x71
     MERCURY_DRAG_TECH_PAUSE = 0x72
@@ -261,18 +261,18 @@ class ProtocolCode(object):
     SET_ROBOT_ERROR_CHECK_STATE = 6
     GET_ROBOT_ERROR_CHECK_STATE = 7
     GET_ROBOT_ERROR_STATUS = 0x15
-    GET_ATOM_PRESS_STATUS = 0x6b
-    GET_ATOM_LED_COLOR = 0x6a
+    GET_ATOM_PRESS_STATUS = 0x6B
+    GET_ATOM_LED_COLOR = 0x6A
     SET_ATOM_PIN_STATUS = 0x61
     GET_ATOM_PIN_STATUS = 0x62
     SET_MASTER_PIN_STATUS = 0x65
     GET_MASTER_PIN_STATUS = 0x66
-    SET_AUXILIARY_PIN_STATUS = 0xa0
-    GET_AUXILIARY_PIN_STATUS = 0xa1
+    SET_AUXILIARY_PIN_STATUS = 0xA0
+    GET_AUXILIARY_PIN_STATUS = 0xA1
     SET_SERVO_MOTOR_CLOCKWISE = 0x73
-    GET_SERVO_MOTOR_CLOCKWISE = 0Xea
+    GET_SERVO_MOTOR_CLOCKWISE = 0xEA
     SET_SERVO_MOTOR_COUNTER_CLOCKWISE = 0x74
-    GET_SERVO_MOTOR_COUNTER_CLOCKWISE = 0xeb
+    GET_SERVO_MOTOR_COUNTER_CLOCKWISE = 0xEB
     SET_SERVO_MOTOR_CONFIG = 0x52
     GET_SERVO_MOTOR_CONFIG = 0x53
     CLEAR_RECV_QUEUE = 0x19
@@ -290,8 +290,55 @@ class ProtocolCode(object):
     CLEAR_ROBOT_ERROR = 0x16
     GET_RECV_QUEUE_SIZE = 0x17
     SET_RECV_QUEUE_SIZE = 0x18
-has_return = [0x02, 0x03, 0x04, 0x09, 0x10, 0x11, 0x12, 0x13, 0x1c, 0x18, 0x19, 0x20, 0x23, 0x27, 0x29, 0x2A, 0x2B, 0x35, 0x4A, 0x4B,0x4C, 0x4D,
-              0x50, 0x51, 0x56,0x57, 0x59,0x5A,0x62, 0x82, 0x84, 0x86, 0x88, 0x8A, 0xA1, 0xA2, 0xB2, 0xB3, 0xB4, 0xB5, 0xB7, 0xD6, 0xe1, 0xe2, 0xe4]
+
+
+has_return = [
+    0x02,
+    0x03,
+    0x04,
+    0x09,
+    0x10,
+    0x11,
+    0x12,
+    0x13,
+    0x1C,
+    0x18,
+    0x19,
+    0x20,
+    0x23,
+    0x27,
+    0x29,
+    0x2A,
+    0x2B,
+    0x35,
+    0x4A,
+    0x4B,
+    0x4C,
+    0x4D,
+    0x50,
+    0x51,
+    0x56,
+    0x57,
+    0x59,
+    0x5A,
+    0x62,
+    0x82,
+    0x84,
+    0x86,
+    0x88,
+    0x8A,
+    0xA1,
+    0xA2,
+    0xB2,
+    0xB3,
+    0xB4,
+    0xB5,
+    0xB7,
+    0xD6,
+    0xE1,
+    0xE2,
+    0xE4,
+]
 
 
 def get_logger(name):
@@ -306,7 +353,8 @@ def get_logger(name):
     console.setFormatter(formatter)
 
     save = logging.handlers.RotatingFileHandler(
-        "server.log", maxBytes=10485760, backupCount=1)
+        "server.log", maxBytes=10485760, backupCount=1
+    )
     save.setFormatter(formatter)
 
     logger.addHandler(save)
@@ -315,7 +363,6 @@ def get_logger(name):
 
 
 class MercuryServer(object):
-
     def __init__(self, host, port, serial_num="/dev/ttyAMA1", baud=115200):
         """Server class
 
@@ -360,8 +407,11 @@ class MercuryServer(object):
                         if self.mc.isOpen() == False:
                             self.mc.open()
                         else:
-                            self.logger.info("get command: {}".format(
-                                [hex(v) for v in command]))
+                            self.logger.info(
+                                "get command: {}".format(
+                                    [hex(v) for v in command]
+                                )
+                            )
                             # command = self.re_data_2(command)
 
                             self.write(command)
@@ -369,7 +419,11 @@ class MercuryServer(object):
                                 self.connected = False
                             if command[3] in has_return:
                                 # res = self.read(command)
-                                self.read_thread = threading.Thread(target=self.read, args=(command,), daemon=True)
+                                self.read_thread = threading.Thread(
+                                    target=self.read,
+                                    args=(command,),
+                                    daemon=True,
+                                )
                                 self.read_thread.start()
                     except ConnectionResetError:
                         self.connected = False
@@ -381,7 +435,7 @@ class MercuryServer(object):
                 self.logger.error(traceback.format_exc())
                 self.conn.close()
                 self.mc.close()
-                
+
     def _encode_int16(self, data):
         if isinstance(data, int):
             return [
@@ -394,15 +448,15 @@ class MercuryServer(object):
                 t = self._encode_int16(v)
                 res.extend(t)
         return res
-              
-    @classmethod  
+
+    @classmethod
     def crc_check(cls, command):
-        crc = 0xffff
+        crc = 0xFFFF
         for index in range(len(command)):
             crc ^= command[index]
             for _ in range(8):
                 if crc & 1 == 1:
-                    crc >>=  1
+                    crc >>= 1
                     crc ^= 0xA001
                 else:
                     crc >>= 1
@@ -438,7 +492,7 @@ class MercuryServer(object):
                     datas += data
                     crc = self.mc.read(2)
                     if self.crc_check(datas) == [v for v in crc]:
-                        datas+=crc
+                        datas += crc
                         break
                 if data_len == 1 and data == b"\xfa":
                     datas += data
@@ -473,14 +527,16 @@ class MercuryServer(object):
                             datas = b"\xfe"
                             pre = k
         if self.conn is not None:
-            self.logger.info("return datas: {}".format([hex(v) for v in datas]))
-            
+            self.logger.info(
+                "return datas: {}".format([hex(v) for v in datas])
+            )
+
             self.conn.sendall(datas)
-            datas = b''
+            datas = b""
         return datas
 
     def re_data_2(self, command):
-        r2 = re.compile(r'[[](.*?)[]]')
+        r2 = re.compile(r"[[](.*?)[]]")
         data_str = re.findall(r2, command)[0]
         data_list = data_str.split(",")
         data_list = [int(i) for i in data_list]
@@ -490,8 +546,13 @@ class MercuryServer(object):
 if __name__ == "__main__":
     ifname = "wlan0"
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    HOST = socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8915, struct.pack(
-        '256s', bytes(ifname, encoding="utf8")))[20:24])
+    HOST = socket.inet_ntoa(
+        fcntl.ioctl(
+            s.fileno(),
+            0x8915,
+            struct.pack("256s", bytes(ifname, encoding="utf8")),
+        )[20:24]
+    )
     PORT = 9000
     print("ip: {} port: {}".format(HOST, PORT))
     MercuryServer(HOST, PORT, "/dev/ttyAMA1", 115200)

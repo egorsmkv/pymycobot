@@ -13,6 +13,7 @@ import time
 import logging
 from logging.handlers import RotatingFileHandler
 from concurrent.futures import ThreadPoolExecutor, Future
+
 """
 This is a demo server for Mercury X1 robot arm. It can be used to control the robot arm via TCP/IP.
 """
@@ -22,8 +23,10 @@ def get_local_host(name: str = "eth0") -> Optional[str]:
     host = None
     dgram_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
-        pack_res = struct.pack('256s', bytes(name, encoding="utf8"))
-        host = socket.inet_ntoa(fcntl.ioctl(dgram_socket.fileno(), 0x8915, pack_res)[20:24])
+        pack_res = struct.pack("256s", bytes(name, encoding="utf8"))
+        host = socket.inet_ntoa(
+            fcntl.ioctl(dgram_socket.fileno(), 0x8915, pack_res)[20:24]
+        )
     except Exception as e:
         print(e)
     finally:
@@ -34,7 +37,12 @@ def get_local_host(name: str = "eth0") -> Optional[str]:
 def init_logging(name: str, level: int = logging.INFO):
     logger = logging.getLogger(name)
     logger.setLevel(level=level)
-    handle = RotatingFileHandler(f"{name}.log", maxBytes=1024 * 1024 * 5, backupCount=5, encoding="utf-8")
+    handle = RotatingFileHandler(
+        f"{name}.log",
+        maxBytes=1024 * 1024 * 5,
+        backupCount=5,
+        encoding="utf-8",
+    )
     handle.setLevel(level=level)
     logger.addHandler(handle)
     return logger
@@ -54,16 +62,18 @@ class Client:
 
     def receive(self) -> Optional[dict]:
         message = None
-        buffer_prefix = self.socket.recv(4)  # Let's assume that each message length prefix occupies 4 bytes
+        buffer_prefix = self.socket.recv(
+            4
+        )  # Let's assume that each message length prefix occupies 4 bytes
         if buffer_prefix:
-            buffer_size = struct.unpack('!I', buffer_prefix)[0]
+            buffer_size = struct.unpack("!I", buffer_prefix)[0]
             data_bytes = self.socket.recv(buffer_size)
-            message = json.loads(data_bytes.decode('utf-8'))
+            message = json.loads(data_bytes.decode("utf-8"))
         return message
 
     def send(self, message: dict):
         message_bytes = json.dumps(message).encode()
-        buffer_size = struct.pack('!I', len(message_bytes))
+        buffer_size = struct.pack("!I", len(message_bytes))
         self.socket.sendall(buffer_size + message_bytes)
 
     def raw_send(self, data: bytes):
@@ -75,22 +85,31 @@ class Client:
 
 
 class MercurySerialApi(object):
-
-    def __init__(self, comport: str, baudrate: int, timeout: float = 1, debug: bool = False):
+    def __init__(
+        self,
+        comport: str,
+        baudrate: int,
+        timeout: float = 1,
+        debug: bool = False,
+    ):
         level = logging.DEBUG if debug else logging.INFO
         self.comport = comport
         self.baudrate = baudrate
         self.timeout = timeout
         self.mutex = threading.Lock()
         self.log = init_logging("server.serial", level)
-        self.serial = serial.Serial(self.comport, self.baudrate, timeout=self.timeout)
+        self.serial = serial.Serial(
+            self.comport, self.baudrate, timeout=self.timeout
+        )
 
     def open(self):
         if self.serial.is_open:
             self.log.debug(f"Serial port {self.comport} is already opened")
             return
         self.serial.open()
-        self.log.debug(f"Open serial port {self.comport} with baudrate {self.baudrate}")
+        self.log.debug(
+            f"Open serial port {self.comport} with baudrate {self.baudrate}"
+        )
 
     def close(self):
         self.serial.close()
@@ -102,7 +121,10 @@ class MercurySerialApi(object):
 
     def _encode_int16(self, data):
         if isinstance(data, int):
-            return [ord(i) if isinstance(i, str) else i for i in list(struct.pack(">h", data))]
+            return [
+                ord(i) if isinstance(i, str) else i
+                for i in list(struct.pack(">h", data))
+            ]
 
         res = []
         for v in data:
@@ -111,7 +133,7 @@ class MercurySerialApi(object):
 
     @classmethod
     def _crc_check(cls, commands: bytes) -> Optional[List[int]]:
-        crc = 0xffff
+        crc = 0xFFFF
         for command in commands:
             crc ^= command
             for _ in range(8):
@@ -134,7 +156,6 @@ class MercurySerialApi(object):
         datas = b""
         stime = time.time()
         while time.time() - stime < timeout:
-
             if self.serial.is_open and self.serial.in_waiting > 0:
                 data = self.serial.read()
                 k += 1
@@ -169,10 +190,9 @@ class MercurySerialApi(object):
 
 
 class MercurySerialManager(object):
-
     def __init__(self):
         self.__mian_arm = Arm.RIGHT_ARM
-        self.__arm_serial_map: Union[str:Optional[MercurySerialApi]] = {}
+        self.__arm_serial_map: Union[str : Optional[MercurySerialApi]] = {}
 
     def __setitem__(self, key: str, value: MercurySerialApi):
         self.__arm_serial_map[key] = value
@@ -196,12 +216,13 @@ class MercurySerialManager(object):
 
     @main_arm.setter
     def main_arm(self, arm_name: str):
-        assert arm_name in self.__arm_serial_map, f"Arm {arm_name} is not exist"
+        assert arm_name in self.__arm_serial_map, (
+            f"Arm {arm_name} is not exist"
+        )
         self.__mian_arm = arm_name
 
 
 class MercurySocketInlet(object):
-
     def __init__(self, host: str, port: int, debug: bool = False):
         level = logging.DEBUG if debug else logging.INFO
         self.host = host
@@ -222,8 +243,12 @@ class MercurySocketInlet(object):
 
 
 class MercuryCommandServer(object):
-
-    def __init__(self, serial_manager: MercurySerialManager, socket_inlet: MercurySocketInlet, debug: bool = False):
+    def __init__(
+        self,
+        serial_manager: MercurySerialManager,
+        socket_inlet: MercurySocketInlet,
+        debug: bool = False,
+    ):
         level = logging.DEBUG if debug else logging.INFO
         self.log = init_logging("server.command", level)
         self.serial_manager = serial_manager
@@ -251,12 +276,16 @@ class MercuryCommandServer(object):
         """Accept client connection and return a client object"""
         for client_socket, client_address in self.socket_inlet.accept():
             if len(self.connected_client_list) >= self.max_thread_pool:
-                self.log.warning(f"too many clients, reject connection from {client_address}")
+                self.log.warning(
+                    f"too many clients, reject connection from {client_address}"
+                )
                 client_socket.close()
                 continue
 
             self.log.info(f" * connection from {client_address}")
-            yield Client(arm=Arm.UNKNOWN, address=client_address, socket=client_socket)
+            yield Client(
+                arm=Arm.UNKNOWN, address=client_address, socket=client_socket
+            )
 
     def __on_future_done(self, future: Future):
         client: Client = future.result()
@@ -281,9 +310,11 @@ class MercuryCommandServer(object):
                 break
 
             except Exception as e:
-                self.log.error(f"Error occurred while handling client {client.host}: {e}")
+                self.log.error(
+                    f"Error occurred while handling client {client.host}: {e}"
+                )
                 self.log.error(traceback.format_exc())
-        return client   # must be returned
+        return client  # must be returned
 
     def enter_mian_loop(self):
         try:
@@ -294,17 +325,26 @@ class MercuryCommandServer(object):
                     self.log.error(f"Arm {arm_name} not found")
                     continue
 
-                thread = threading.Thread(target=self.robot_serial_data_reader, args=(arm_name, serial_api),
-                                          daemon=True)
+                thread = threading.Thread(
+                    target=self.robot_serial_data_reader,
+                    args=(arm_name, serial_api),
+                    daemon=True,
+                )
                 self.respond_client_threads.append(thread)
 
             for thread in self.respond_client_threads:
                 thread.start()
 
-            with ThreadPoolExecutor(max_workers=self.max_thread_pool) as executor:
+            with ThreadPoolExecutor(
+                max_workers=self.max_thread_pool
+            ) as executor:
                 for client in self.accept_client_connection():
-                    self.log.info(f" * accept connection from {client.address}")
-                    future: Future = executor.submit(self.__client_request_handle, client)
+                    self.log.info(
+                        f" * accept connection from {client.address}"
+                    )
+                    future: Future = executor.submit(
+                        self.__client_request_handle, client
+                    )
                     future.add_done_callback(self.__on_future_done)
                     self.connected_client_list.append(client)
 
@@ -319,9 +359,11 @@ class MercuryCommandServer(object):
 
 def main(host: str, port: int, debug: bool = False):
     basic_level = logging.DEBUG if debug else logging.INFO
-    basic_format = '[%(levelname)8s] | [%(name)14s] %(asctime)s - %(message)s'
-    basic_date_format = '%Y-%m-%d %H:%M:%S'
-    logging.basicConfig(level=basic_level, format=basic_format, datefmt=basic_date_format)
+    basic_format = "[%(levelname)8s] | [%(name)14s] %(asctime)s - %(message)s"
+    basic_date_format = "%Y-%m-%d %H:%M:%S"
+    logging.basicConfig(
+        level=basic_level, format=basic_format, datefmt=basic_date_format
+    )
 
     serial_manager = MercurySerialManager()
 
@@ -333,11 +375,11 @@ def main(host: str, port: int, debug: bool = False):
 
     socket_inlet = MercurySocketInlet(host=host, port=port, debug=debug)
 
-    mercury_command = MercuryCommandServer(serial_manager=serial_manager, socket_inlet=socket_inlet, debug=debug)
+    mercury_command = MercuryCommandServer(
+        serial_manager=serial_manager, socket_inlet=socket_inlet, debug=debug
+    )
     mercury_command.enter_mian_loop()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main(host="0.0.0.0", port=9000, debug=True)
-
-

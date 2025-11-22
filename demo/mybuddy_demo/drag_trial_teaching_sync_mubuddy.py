@@ -1,6 +1,7 @@
-'''
+"""
 Drag and teach in windows version
-'''
+"""
+
 from pickle import FALSE
 import time
 import os
@@ -22,21 +23,22 @@ os_version: str
 WIN = False
 LINUX = False
 
+
 def setup():
     print("")
     global port, mb, baud, os_version, WIN, LINUX
     os_version = platform.system()
-    if os_version == 'Windows':
+    if os_version == "Windows":
         WIN = True
         LINUX = False
-    elif os_version == 'Linux':
+    elif os_version == "Linux":
         WIN = False
         LINUX = True
     if WIN:
-        port = 'COM21'
+        port = "COM21"
         baud = 115200
     elif LINUX:
-        port = '/dev/ttyACM0'
+        port = "/dev/ttyACM0"
         baud = 115200
     mb = MyBuddy(port, baud, debug=True)
 
@@ -44,10 +46,10 @@ def setup():
 class Raw(object):
     """Set raw input mode for device"""
 
-
     def __init__(self, stream):
         import termios
         import tty
+
         self.stream = stream
         self.fd = self.stream.fileno()
 
@@ -92,6 +94,7 @@ class TeachingTest(Helper):
                         self.record_list.append(_encoders)
                         time.sleep(0.05)
                     # print("\r {}".format(time.time() - start_t), end="")
+
         self.echo("Start recording.")
         self.record_t = threading.Thread(target=_record, daemon=True)
         self.record_t.start()
@@ -106,9 +109,17 @@ class TeachingTest(Helper):
         self.echo("Start play")
         for _encoders_data in self.record_list:
             print(_encoders_data)
-            _encoders = _encoders_data[0:7] + _encoders_data[14:21] + _encoders_data[-2:-1]
-            _speeds = _encoders_data[7:14] + _encoders_data[21:28] + _encoders_data[-1:]
-            self.mb.set_encoders(0, _encoders,_speeds)
+            _encoders = (
+                _encoders_data[0:7]
+                + _encoders_data[14:21]
+                + _encoders_data[-2:-1]
+            )
+            _speeds = (
+                _encoders_data[7:14]
+                + _encoders_data[21:28]
+                + _encoders_data[-1:]
+            )
+            self.mb.set_encoders(0, _encoders, _speeds)
             time.sleep(0.05)
         self.echo("Finish play")
 
@@ -123,9 +134,17 @@ class TeachingTest(Helper):
                 i += 1
                 _encoders_data = self.record_list[idx_]
                 print(_encoders_data)
-                _encoders = _encoders_data[0:7] + _encoders_data[14:21] + _encoders_data[-2:-1]
-                _speeds = _encoders_data[7:14] + _encoders_data[21:28] + _encoders_data[-1:]
-                self.mb.set_encoders(0, _encoders,_speeds)
+                _encoders = (
+                    _encoders_data[0:7]
+                    + _encoders_data[14:21]
+                    + _encoders_data[-2:-1]
+                )
+                _speeds = (
+                    _encoders_data[7:14]
+                    + _encoders_data[21:28]
+                    + _encoders_data[-1:]
+                )
+                self.mb.set_encoders(0, _encoders, _speeds)
                 time.sleep(0.05)
 
         self.echo("Start loop play.")
@@ -148,7 +167,6 @@ class TeachingTest(Helper):
             self.echo("save dir:  {}".format(os.path.dirname(__file__)))
 
     def load_from_local(self):
-
         with open(os.path.dirname(__file__) + "/record.txt", "r") as f:
             try:
                 data = json.load(f)

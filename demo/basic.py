@@ -39,7 +39,9 @@ def test(mycobot):
 
     coords = [160, 160, 160, 0, 0, 0]
     mycobot.send_coords(coords, 70, 0)
-    print("::send_coords() ==> send coords {}, speed 70, mode 0\n".format(coords))
+    print(
+        "::send_coords() ==> send coords {}, speed 70, mode 0\n".format(coords)
+    )
     time.sleep(3)
 
     print("::get_coords() ==> coords {}\n".format(mycobot.get_coords()))
@@ -78,7 +80,7 @@ if __name__ == "__main__":
     # port = subprocess.check_output(['echo -n /dev/ttyUSB*'],
     # shell=True).decode()
     # with open(os.path.dirname(__file__) + "/port.txt") as f:
-        # port = f.read().strip().replace("\n", "")
-        # print(port)
+    # port = f.read().strip().replace("\n", "")
+    # print(port)
     mycobot = setup()
     test(mycobot)

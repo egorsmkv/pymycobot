@@ -17,23 +17,23 @@ def setup_serial_connect(port, baudrate, timeout=None):
 
 
 class CommandGenre(object):
-    SET_SERVO_DIRECTION = 0XA0
-    GET_SERVO_DIRECTION = 0XA2
+    SET_SERVO_DIRECTION = 0xA0
+    GET_SERVO_DIRECTION = 0xA2
 
-    SET_SERVO_SPEED = 0XA5
-    GET_SERVO_SPEED = 0XA3
+    SET_SERVO_SPEED = 0xA5
+    GET_SERVO_SPEED = 0xA3
 
     # WRITE_SERVO_ANGLE = 0XA6
     # WRITE_SERVO_STEP = 0XA7
 
-    READ_FIRMWARE_VERSION = 0XAA
+    READ_FIRMWARE_VERSION = 0xAA
 
 
 class Command(object):
-    HEADER = 0XFF
+    HEADER = 0xFF
 
     def __init__(self, genre, address, check_digit, params, length=None):
-        self.__header = [0xff, 0xff]
+        self.__header = [0xFF, 0xFF]
         self.__length = length or len(params)
         self.__address = address
         self.__params = params
@@ -45,13 +45,22 @@ class Command(object):
         return self.__genre
 
     def to_bytes(self):
-        return bytes([*self.__header, self.__address, self.__length, *self.__params, self.__genre, *self.__check_digit])
+        return bytes(
+            [
+                *self.__header,
+                self.__address,
+                self.__length,
+                *self.__params,
+                self.__genre,
+                *self.__check_digit,
+            ]
+        )
 
     def get_params(self):
         return self.__params[0] if self.__length == 1 else self.__params
 
     def __str__(self):
-        return ' '.join(f'{x:02x}' for x in self.to_bytes())
+        return " ".join(f"{x:02x}" for x in self.to_bytes())
 
     def __bytes__(self):
         return self.to_bytes()
@@ -59,7 +68,12 @@ class Command(object):
     @classmethod
     def packing(cls, genre: int, addr: int, *params):
         check_code = cls.check_digit(genre, params)
-        return cls(genre=genre, address=addr, check_digit=(check_code,), params=(*params,))
+        return cls(
+            genre=genre,
+            address=addr,
+            check_digit=(check_code,),
+            params=(*params,),
+        )
 
     @classmethod
     def parsing(cls, buffer: bytes):
@@ -69,14 +83,19 @@ class Command(object):
         if buffer[0] != cls.HEADER or buffer[1] != cls.HEADER:
             return None
         length = buffer[3]
-        return cls(genre=buffer[-2], address=buffer[2], length=length, params=(*buffer[4:4 + length],),
-                   check_digit=buffer[4 + length:4 + length + 1])
+        return cls(
+            genre=buffer[-2],
+            address=buffer[2],
+            length=length,
+            params=(*buffer[4 : 4 + length],),
+            check_digit=buffer[4 + length : 4 + length + 1],
+        )
 
     @classmethod
     def unpack_args(cls, *parameters):
         bits_pack_list = []
         for param in parameters:
-            pair = struct.pack('>h', param)
+            pair = struct.pack(">h", param)
             if len(pair) == 2:
                 bits_pack_list.extend(list(pair))
             else:
@@ -91,7 +110,7 @@ class Command(object):
         :param params: bytes, function parameters
         :return: int, check-code
         """
-        return sum([genre, *params]) & 0xff
+        return sum([genre, *params]) & 0xFF
 
     @classmethod
     def has_header(cls, buffer: bytes):
@@ -106,12 +125,13 @@ class Command(object):
 
 
 class SerialProtocol(object):
-
     def __init__(self, comport, baudrate, timeout=0.5):
         self._comport = comport
         self._baudrate = baudrate
         self._timeout = timeout
-        self._serial_port = setup_serial_connect(port=comport, baudrate=baudrate, timeout=timeout)
+        self._serial_port = setup_serial_connect(
+            port=comport, baudrate=baudrate, timeout=timeout
+        )
 
     def open(self):
         if self._serial_port.is_open is False:
@@ -137,9 +157,18 @@ class ConveyorAPI(SerialProtocol):
         STEPPER_MOTOR_42 = 0x30
         STEPPER_MOTOR_57 = 0x31
 
-    def __init__(self, comport, baudrate="115200", timeout=0.1, debug=False, motor_model=MotorModel.STEPPER_MOTOR_57):
+    def __init__(
+        self,
+        comport,
+        baudrate="115200",
+        timeout=0.1,
+        debug=False,
+        motor_model=MotorModel.STEPPER_MOTOR_57,
+    ):
         super().__init__(comport, baudrate, timeout)
-        time.sleep(2)   # If the Arduino mega 2560 is reset, you need to wait for the reset to complete
+        time.sleep(
+            2
+        )  # If the Arduino mega 2560 is reset, you need to wait for the reset to complete
         self._debug = debug
         self._motor_model = motor_model
         self._mutex = threading.Lock()
@@ -148,8 +177,8 @@ class ConveyorAPI(SerialProtocol):
         handler = logging.StreamHandler()
         handler.setLevel(logging.DEBUG if debug else logging.INFO)
         formatter = logging.Formatter(
-            fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-            datefmt='%Y-%m-%d %H:%M:%S'
+            fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S",
         )
         handler.setFormatter(formatter)
         self._log.addHandler(handler)
@@ -166,7 +195,9 @@ class ConveyorAPI(SerialProtocol):
                 continue
             break
 
-        return Command.parsing(buffers) if Command.has_header(buffers) else None
+        return (
+            Command.parsing(buffers) if Command.has_header(buffers) else None
+        )
 
     def _merge(self, genre, address, *parameters, has_reply=False):
         command = Command.packing(genre, address, *parameters)
@@ -191,26 +222,51 @@ class ConveyorAPI(SerialProtocol):
         """Modify the direction of movement of the conveyor belt"""
         if direction not in (0, 1):
             raise ValueError("direction must be 0 or 1")
-        return self._merge(CommandGenre.SET_SERVO_DIRECTION, self._motor_model, direction, has_reply=True)
+        return self._merge(
+            CommandGenre.SET_SERVO_DIRECTION,
+            self._motor_model,
+            direction,
+            has_reply=True,
+        )
 
     def get_motor_direction(self):
         """Get the direction of movement of the conveyor belt"""
-        return self._merge(CommandGenre.GET_SERVO_DIRECTION, self._motor_model, has_reply=True)
+        return self._merge(
+            CommandGenre.GET_SERVO_DIRECTION, self._motor_model, has_reply=True
+        )
 
     def get_motor_speed(self):
         """Get the speed of the conveyor belt"""
-        return self._merge(CommandGenre.GET_SERVO_SPEED, self._motor_model, has_reply=True)
+        return self._merge(
+            CommandGenre.GET_SERVO_SPEED, self._motor_model, has_reply=True
+        )
 
     def set_motor_speed(self, speed):
         """modify the speed of the conveyor belt"""
         if not 1 <= speed <= 100:
             raise ValueError("speed must be in range [1, 100]")
-        return self._merge(CommandGenre.SET_SERVO_SPEED, self._motor_model, 1, speed, has_reply=True)
+        return self._merge(
+            CommandGenre.SET_SERVO_SPEED,
+            self._motor_model,
+            1,
+            speed,
+            has_reply=True,
+        )
 
     def stop(self):
         """stop the conveyor belt"""
-        return self._merge(CommandGenre.SET_SERVO_SPEED, self._motor_model, 0, 0, has_reply=True)
+        return self._merge(
+            CommandGenre.SET_SERVO_SPEED,
+            self._motor_model,
+            0,
+            0,
+            has_reply=True,
+        )
 
     def read_firmware_version(self):
         """Get the firmware version of the conveyor belt"""
-        return self._merge(CommandGenre.READ_FIRMWARE_VERSION, self._motor_model, has_reply=True)
+        return self._merge(
+            CommandGenre.READ_FIRMWARE_VERSION,
+            self._motor_model,
+            has_reply=True,
+        )

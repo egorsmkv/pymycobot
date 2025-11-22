@@ -19,4 +19,3 @@ class Coord(enum.Enum):
     Rx = 4
     Ry = 5
     Rz = 6
-    

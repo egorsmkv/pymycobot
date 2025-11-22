@@ -7,6 +7,7 @@ import threading
 import json
 import serial
 import serial.tools.list_ports
+
 sys.path.append(os.getcwd())
 
 from pymycobot.mycobot320 import MyCobot320
@@ -124,7 +125,9 @@ class TeachingTest(Helper):
             while self.playing:
                 idx_ = i % len_
                 i += 1
-                self.mc.send_encoders_drag(self.record_list[idx_][0], self.record_list[idx_][1])
+                self.mc.send_encoders_drag(
+                    self.record_list[idx_][0], self.record_list[idx_][1]
+                )
                 time.sleep(0.1)
 
         self.echo("Start loop play.")
@@ -147,7 +150,6 @@ class TeachingTest(Helper):
             self.echo("save dir:  {}".format(os.path.dirname(__file__)))
 
     def load_from_local(self):
-
         with open(os.path.dirname(__file__) + "/record.txt", "r") as f:
             try:
                 data = json.load(f)

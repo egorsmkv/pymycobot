@@ -142,7 +142,9 @@ def get_joystick():
     return joystick
 
 
-def dispatch_key_action(key: T.Union[JoyStickKey, JoyStickContinous], value: float):
+def dispatch_key_action(
+    key: T.Union[JoyStickKey, JoyStickContinous], value: float
+):
     global mc, arm_angle_table, global_states
     # print(f"key : {key} value : {value}")
 
@@ -232,7 +234,9 @@ def dispatch_key_action(key: T.Union[JoyStickKey, JoyStickContinous], value: flo
 
     # 工具
     if key == JoyStickKey.RLeftKey:
-        global_states["gripper_val"] = min(100, global_states["gripper_val"] + 5)
+        global_states["gripper_val"] = min(
+            100, global_states["gripper_val"] + 5
+        )
         mc.set_gripper_value(global_states["gripper_val"], 50)
         time.sleep(0.5)
     elif key == JoyStickKey.RTopKey:
@@ -325,7 +329,10 @@ def retreive_joystick_input(joystick, context):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 context["running"] = False
-            elif event.type == pygame.JOYBUTTONDOWN or event.type == pygame.JOYBUTTONUP:
+            elif (
+                event.type == pygame.JOYBUTTONDOWN
+                or event.type == pygame.JOYBUTTONUP
+            ):
                 n = joystick.get_numbuttons()
                 for key_id in range(n):
                     button_status = joystick.get_button(key_id)
@@ -340,7 +347,8 @@ def retreive_joystick_input(joystick, context):
 
                     if (
                         joystick_continous_map[key_id] == JoyStickContinous.L2
-                        or joystick_continous_map[key_id] == JoyStickContinous.R2
+                        or joystick_continous_map[key_id]
+                        == JoyStickContinous.R2
                     ):
                         axis = math.ceil(axis)
                         if int(axis) == -1:

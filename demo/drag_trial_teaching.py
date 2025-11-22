@@ -59,9 +59,9 @@ def setup():
         robot_model = MyArm
         print("MyArm300\n")
 
-    elif _in == '5':
+    elif _in == "5":
         robot_model = MyPalletizer260
-        print('MyPalletizer260\n')
+        print("MyPalletizer260\n")
 
     else:
         print("Please choose from 1 - 5.")
@@ -168,7 +168,6 @@ class TeachingTest(Helper):
         self.record_t.start()
 
     def stop_record(self):
-
         if isinstance(self.mc, MyArm):
             self.mc.power_on()
         else:
@@ -262,7 +261,9 @@ class TeachingTest(Helper):
                     if not self.playing:
                         self.play()
                     else:
-                        print("Already playing. Please wait till current play stop or stop loop play.")
+                        print(
+                            "Already playing. Please wait till current play stop or stop loop play."
+                        )
                 elif key == "P":  # loop play
                     if not self.playing:
                         self.loop_play()

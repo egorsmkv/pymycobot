@@ -12,8 +12,7 @@ class SwitchButton(QCheckBox):
         bg_color="#777",
         circle_color="#ddd",
         active_color="#409eff",
-        animation_curve=QEasingCurve.OutQuint
-
+        animation_curve=QEasingCurve.OutQuint,
     ):
         QCheckBox.__init__(self)
 
@@ -39,7 +38,7 @@ class SwitchButton(QCheckBox):
     def circle_position(self, pos):
         self._circle_position = pos
         self.update()
-        
+
     def reset_state(self):
         self.setChecked(False)
         self.animation.setEndValue(3)
@@ -52,7 +51,7 @@ class SwitchButton(QCheckBox):
         self.animation.stop()
 
         if value:
-            self.animation.setEndValue(self.width()-25)
+            self.animation.setEndValue(self.width() - 25)
             self.status_button.emit(True)
         else:
             self.animation.setEndValue(3)
@@ -73,19 +72,29 @@ class SwitchButton(QCheckBox):
         rect = QRect(0, 0, self.width(), self.height())
 
         if self.isChecked():
-
             p.setBrush(QColor(self._active_color))
-            p.drawRoundedRect(0, 0, rect.width(), self.height(),
-                              self.height()/2, self.height()/2)
+            p.drawRoundedRect(
+                0,
+                0,
+                rect.width(),
+                self.height(),
+                self.height() / 2,
+                self.height() / 2,
+            )
 
             p.setBrush(QColor(self._circle_color))
             p.drawEllipse(self._circle_position, 3, 22, 22)
 
         else:
-
             p.setBrush(QColor(self._bg_corlor))
-            p.drawRoundedRect(0, 0, rect.width(), self.height(),
-                              self.height()/2, self.height()/2)
+            p.drawRoundedRect(
+                0,
+                0,
+                rect.width(),
+                self.height(),
+                self.height() / 2,
+                self.height() / 2,
+            )
 
             p.setBrush(QColor(self._circle_color))
 

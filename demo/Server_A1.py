@@ -22,8 +22,53 @@ Please change the parameters passed in the last line of the Server.py file, Merc
 
 """
 
-has_return = [0x02, 0x03, 0x04, 0x09, 0x10, 0x11, 0x12, 0x13, 0x1c, 0x18, 0x19, 0x20, 0x23, 0x27, 0x29, 0x2A, 0x2B, 0x35, 0x4A, 0x4B,0x4C, 0x4D,
-              0x50, 0x51, 0x56,0x57, 0x59,0x5A,0x62, 0x82, 0x84, 0x86, 0x88, 0x8A, 0xA1, 0xA2, 0xB2, 0xB3, 0xB4, 0xB5, 0xB7, 0xD6, 0xe1, 0xe2, 0xe4]
+has_return = [
+    0x02,
+    0x03,
+    0x04,
+    0x09,
+    0x10,
+    0x11,
+    0x12,
+    0x13,
+    0x1C,
+    0x18,
+    0x19,
+    0x20,
+    0x23,
+    0x27,
+    0x29,
+    0x2A,
+    0x2B,
+    0x35,
+    0x4A,
+    0x4B,
+    0x4C,
+    0x4D,
+    0x50,
+    0x51,
+    0x56,
+    0x57,
+    0x59,
+    0x5A,
+    0x62,
+    0x82,
+    0x84,
+    0x86,
+    0x88,
+    0x8A,
+    0xA1,
+    0xA2,
+    0xB2,
+    0xB3,
+    0xB4,
+    0xB5,
+    0xB7,
+    0xD6,
+    0xE1,
+    0xE2,
+    0xE4,
+]
 
 
 def get_logger(name):
@@ -38,7 +83,8 @@ def get_logger(name):
     console.setFormatter(formatter)
 
     save = logging.handlers.RotatingFileHandler(
-        "server.log", maxBytes=10485760, backupCount=1)
+        "server.log", maxBytes=10485760, backupCount=1
+    )
     save.setFormatter(formatter)
 
     logger.addHandler(save)
@@ -47,7 +93,6 @@ def get_logger(name):
 
 
 class MercuryServer(object):
-
     def __init__(self, host, port, serial_num="/dev/ttyAMA1", baud=115200):
         """Server class
 
@@ -88,15 +133,21 @@ class MercuryServer(object):
                         if self.mc.isOpen() == False:
                             self.mc.open()
                         else:
-                            self.logger.info("get command: {}".format(
-                                [hex(v) for v in command]))
+                            self.logger.info(
+                                "get command: {}".format(
+                                    [hex(v) for v in command]
+                                )
+                            )
                             # command = self.re_data_2(command)
 
                             self.write(command)
                             if command[3] in has_return:
                                 res = self.read(command)
                                 self.logger.info(
-                                    "return datas: {}".format([hex(v) for v in res]))
+                                    "return datas: {}".format(
+                                        [hex(v) for v in res]
+                                    )
+                                )
 
                                 conn.sendall(res)
                     except ConnectionResetError:
@@ -109,7 +160,7 @@ class MercuryServer(object):
                 self.logger.error(traceback.format_exc())
                 self.conn.close()
                 self.mc.close()
-                
+
     def _encode_int16(self, data):
         if isinstance(data, int):
             return [
@@ -122,15 +173,15 @@ class MercuryServer(object):
                 t = self._encode_int16(v)
                 res.extend(t)
         return res
-              
-    @classmethod  
+
+    @classmethod
     def crc_check(cls, command):
-        crc = 0xffff
+        crc = 0xFFFF
         for index in range(len(command)):
             crc ^= command[index]
             for _ in range(8):
                 if crc & 1 == 1:
-                    crc >>=  1
+                    crc >>= 1
                     crc ^= 0xA001
                 else:
                     crc >>= 1
@@ -160,12 +211,12 @@ class MercuryServer(object):
                 datas += data
                 crc = self.mc.read(2)
                 if self.crc_check(datas) == [v for v in crc]:
-                    datas+=crc
+                    datas += crc
                     break
             if data_len == 1 and data == b"\xfa":
                 datas += data
                 if [i for i in datas] == command:
-                    datas = b''
+                    datas = b""
                     data_len = -1
                     k = 0
                     pre = 0
@@ -179,7 +230,7 @@ class MercuryServer(object):
                 data_len -= 1
                 if len(datas) == 4:
                     if datas[-1] != command[3]:
-                        datas = b''
+                        datas = b""
                         data_len = -1
                         k = 0
                         pre = 0
@@ -195,11 +246,11 @@ class MercuryServer(object):
                         datas = b"\xfe"
                         pre = k
         else:
-            datas = b''
+            datas = b""
         return datas
 
     def re_data_2(self, command):
-        r2 = re.compile(r'[[](.*?)[]]')
+        r2 = re.compile(r"[[](.*?)[]]")
         data_str = re.findall(r2, command)[0]
         data_list = data_str.split(",")
         data_list = [int(i) for i in data_list]
@@ -209,8 +260,13 @@ class MercuryServer(object):
 if __name__ == "__main__":
     ifname = "wlan0"
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    HOST = socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8915, struct.pack(
-        '256s', bytes(ifname, encoding="utf8")))[20:24])
+    HOST = socket.inet_ntoa(
+        fcntl.ioctl(
+            s.fileno(),
+            0x8915,
+            struct.pack("256s", bytes(ifname, encoding="utf8")),
+        )[20:24]
+    )
     PORT = 9000
     print("ip: {} port: {}".format(HOST, PORT))
     MercuryServer(HOST, PORT, "/dev/ttyAMA1", 115200)

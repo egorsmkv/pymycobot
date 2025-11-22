@@ -46,14 +46,17 @@ def setup_serial_port(port, baudrate, timeout=0.1):
 
 
 class MyArmMProcessor(DataProcessor):
-
     def __init__(self, port, baudrate, timeout=0.1, debug=False):
         super().__init__(debug)
         self.lock = threading.Lock()
         self._serial_port = setup_serial_port(port, baudrate, timeout)
-        self.calibration_parameters = functools.partial(calibration_parameters, class_name=self.__class__.__name__)
+        self.calibration_parameters = functools.partial(
+            calibration_parameters, class_name=self.__class__.__name__
+        )
         self._write = functools.partial(write, self, method=None)
-        self._read = functools.partial(read, self, _class=self.__class__.__name__)
+        self._read = functools.partial(
+            read, self, _class=self.__class__.__name__
+        )
 
     # def _write(self, command):
     #     write(self, command, method=None)
@@ -67,10 +70,12 @@ class MyArmMProcessor(DataProcessor):
         Check if the command is a return command.
         """
         return len(command) == 6 and command[3] == genre
-    
+
     def _mesg(self, genre, *args, **kwargs):
         kwargs["has_reply"] = True
-        real_command, has_reply, _ = super(MyArmMProcessor, self)._mesg(genre, *args, **kwargs)
+        real_command, has_reply, _ = super(MyArmMProcessor, self)._mesg(
+            genre, *args, **kwargs
+        )
         real_command = self._flatten(real_command)
         self._write(real_command)
 
@@ -91,12 +96,12 @@ class MyArmMProcessor(DataProcessor):
             res = []
             valid_data = data[4:-1]
             for header_i in range(0, len(valid_data), 2):
-                d = self._decode_int16(valid_data[header_i: header_i + 2])
+                d = self._decode_int16(valid_data[header_i : header_i + 2])
                 if d == 0:
                     res.append(d)
                     continue
                 reverse_bins = reversed(bin(d)[2:])
-                rank = [i for i, e in enumerate(reverse_bins) if e != '0']
+                rank = [i for i, e in enumerate(reverse_bins) if e != "0"]
                 res.append(rank)
 
         else:
@@ -137,12 +142,19 @@ class MyArmMProcessor(DataProcessor):
             ProtocolCode.SET_FOUR_PIECES_ZERO,
             ProtocolCode.STOP,
             ProtocolCode.IS_TOOL_BTN_CLICKED,
-            ProtocolCode.GET_ROBOT_TOOL_MODIFY_VERSION
+            ProtocolCode.GET_ROBOT_TOOL_MODIFY_VERSION,
         ]:
             return self._process_single(res)
-        elif genre in [ProtocolCode.GET_ANGLES, ProtocolCode.SOLVE_INV_KINEMATICS]:
+        elif genre in [
+            ProtocolCode.GET_ANGLES,
+            ProtocolCode.SOLVE_INV_KINEMATICS,
+        ]:
             return [self._int2angle(angle) for angle in res]
-        elif genre in [ProtocolCode.GET_COORDS, ProtocolCode.GET_TOOL_REFERENCE, ProtocolCode.GET_WORLD_REFERENCE]:
+        elif genre in [
+            ProtocolCode.GET_COORDS,
+            ProtocolCode.GET_TOOL_REFERENCE,
+            ProtocolCode.GET_WORLD_REFERENCE,
+        ]:
             r = []
             for idx in range(3):
                 r.append(self._int2coord(res[idx]))
@@ -151,10 +163,16 @@ class MyArmMProcessor(DataProcessor):
             return r
         elif genre in [ProtocolCode.GET_SERVO_VOLTAGES]:
             return [self._int2coord(angle) for angle in res]
-        elif genre in [ProtocolCode.GET_JOINT_MAX_ANGLE, ProtocolCode.GET_JOINT_MIN_ANGLE]:
+        elif genre in [
+            ProtocolCode.GET_JOINT_MAX_ANGLE,
+            ProtocolCode.GET_JOINT_MIN_ANGLE,
+        ]:
             return self._int2coord(res[0])
-        elif genre in [ProtocolCode.GET_BASIC_VERSION, ProtocolCode.SOFTWARE_VERSION,
-                       ProtocolCode.GET_ATOM_VERSION]:
+        elif genre in [
+            ProtocolCode.GET_BASIC_VERSION,
+            ProtocolCode.SOFTWARE_VERSION,
+            ProtocolCode.GET_ATOM_VERSION,
+        ]:
             return self._int2coord(self._process_single(res))
         elif genre == ProtocolCode.GET_ANGLES_COORDS:
             r = []
@@ -173,9 +191,10 @@ class MyArmMProcessor(DataProcessor):
 
 
 class MyArmMControl(MyArmMProcessor):
-
     def __init__(self, port, baudrate=115200, timeout=0.1, debug=False):
-        super(MyArmMControl, self).__init__(port=port, baudrate=baudrate, timeout=timeout, debug=debug)
+        super(MyArmMControl, self).__init__(
+            port=port, baudrate=baudrate, timeout=timeout, debug=debug
+        )
 
     # System status
     def get_robot_modify_version(self):
@@ -243,7 +262,7 @@ class MyArmMControl(MyArmMProcessor):
         return self._mesg(ProtocolCode.GET_ROBOT_STATUS)
 
     def get_angles(self):
-        """ Get the angle of all joints.
+        """Get the angle of all joints.
 
         Return:
             list: A float list of all angle.
@@ -258,8 +277,12 @@ class MyArmMControl(MyArmMProcessor):
             degree: (float) -150 ~ 150
             speed : (int) 1 ~ 100
         """
-        self.calibration_parameters(joint_id=joint_id, angle=degree, speed=speed)
-        return self._mesg(ProtocolCode.SEND_ANGLE, joint_id, [self._angle2int(degree)], speed)
+        self.calibration_parameters(
+            joint_id=joint_id, angle=degree, speed=speed
+        )
+        return self._mesg(
+            ProtocolCode.SEND_ANGLE, joint_id, [self._angle2int(degree)], speed
+        )
 
     def write_angles(self, angles, speed):
         """Send the angles of all joints to robot arm.
@@ -288,8 +311,12 @@ class MyArmMControl(MyArmMProcessor):
             coord: (float) -150 ~ 150
             speed : (int) 1 ~ 100
         """
-        self.calibration_parameters(coord_id=coord_id, coord=coord, speed=speed)
-        value = self._coord2int(coord) if coord_id <= 3 else self._angle2int(coord)
+        self.calibration_parameters(
+            coord_id=coord_id, coord=coord, speed=speed
+        )
+        value = (
+            self._coord2int(coord) if coord_id <= 3 else self._angle2int(coord)
+        )
         return self._mesg(ProtocolCode.SEND_COORD, coord_id, [value], speed)
 
     def write_coords(self, coords, speed, mode=None):
@@ -307,7 +334,9 @@ class MyArmMControl(MyArmMProcessor):
         for angle in coords[3:]:
             coord_list.append(self._angle2int(angle))
         if mode is not None:
-            return self._mesg(ProtocolCode.SEND_COORDS, coord_list, speed, mode)
+            return self._mesg(
+                ProtocolCode.SEND_COORDS, coord_list, speed, mode
+            )
         else:
             return self._mesg(ProtocolCode.SEND_COORDS, coord_list, speed)
 
@@ -357,9 +386,12 @@ class MyArmMControl(MyArmMProcessor):
             direction (int): 1 - forward rotation, 0 - reverse rotation
             speed (int): 1 ~ 100
         """
-        self.calibration_parameters(direction=direction, speed=speed, end_direction=end_direction
+        self.calibration_parameters(
+            direction=direction, speed=speed, end_direction=end_direction
         )
-        return self._mesg(ProtocolCode.JOG_ABSOLUTE, end_direction, direction, speed)
+        return self._mesg(
+            ProtocolCode.JOG_ABSOLUTE, end_direction, direction, speed
+        )
 
     # JOG mode and operation
     def jog_angle(self, joint_id, direction, speed):
@@ -371,7 +403,9 @@ class MyArmMControl(MyArmMProcessor):
             direction: 0 - decrease, 1 - increase
             speed: int (0 - 100)
         """
-        self.calibration_parameters(joint_id=joint_id, direction=direction, speed=speed)
+        self.calibration_parameters(
+            joint_id=joint_id, direction=direction, speed=speed
+        )
         return self._mesg(ProtocolCode.JOG_ANGLE, joint_id, direction, speed)
 
     def jog_coord(self, coord_id, direction, speed):
@@ -382,7 +416,9 @@ class MyArmMControl(MyArmMProcessor):
             direction: 0 - decrease, 1 - increase
             speed: int (1 - 100)
         """
-        self.calibration_parameters(coord_id=coord_id, direction=direction, speed=speed)
+        self.calibration_parameters(
+            coord_id=coord_id, direction=direction, speed=speed
+        )
         return self._mesg(ProtocolCode.JOG_COORD, coord_id, direction, speed)
 
     def jog_increment(self, joint_id, increment, speed):
@@ -397,8 +433,15 @@ class MyArmMControl(MyArmMProcessor):
         if not isinstance(increment, (int, float)):
             raise ValueError("increment must be int or float")
 
-        self.calibration_parameters(joint_id=joint_id, angle=increment, speed=speed)
-        return self._mesg(ProtocolCode.JOG_INCREMENT, joint_id, [self._angle2int(increment)], speed)
+        self.calibration_parameters(
+            joint_id=joint_id, angle=increment, speed=speed
+        )
+        return self._mesg(
+            ProtocolCode.JOG_INCREMENT,
+            joint_id,
+            [self._angle2int(increment)],
+            speed,
+        )
 
     def pause(self):
         """Pause movement"""
@@ -546,11 +589,19 @@ class MyArmMControl(MyArmMProcessor):
             raise TypeError("value must be int")
 
         if mode is None:
-            self.calibration_parameters(servo_id=servo_id, servo_addr=data_id, value=value)
-            return self._mesg(ProtocolCode.SET_SERVO_DATA, servo_id, data_id, value)
+            self.calibration_parameters(
+                servo_id=servo_id, servo_addr=data_id, value=value
+            )
+            return self._mesg(
+                ProtocolCode.SET_SERVO_DATA, servo_id, data_id, value
+            )
         else:
-            self.calibration_parameters(servo_id=servo_id, servo_addr=data_id, value=value, mode=mode)
-            return self._mesg(ProtocolCode.SET_SERVO_DATA, servo_id, data_id, [value], mode)
+            self.calibration_parameters(
+                servo_id=servo_id, servo_addr=data_id, value=value, mode=mode
+            )
+            return self._mesg(
+                ProtocolCode.SET_SERVO_DATA, servo_id, data_id, [value], mode
+            )
 
     def get_servo_data(self, servo_id, data_id, mode=None):
         """Read the data parameter of the specified address of the steering gear.
@@ -565,7 +616,9 @@ class MyArmMControl(MyArmMProcessor):
         """
         if mode is not None:
             self.calibration_parameters(servo_id=servo_id, mode=mode)
-            return self._mesg(ProtocolCode.GET_SERVO_DATA, servo_id, data_id, mode)
+            return self._mesg(
+                ProtocolCode.GET_SERVO_DATA, servo_id, data_id, mode
+            )
 
         self.calibration_parameters(servo_id=servo_id)
         return self._mesg(ProtocolCode.GET_SERVO_DATA, servo_id, data_id)
@@ -699,7 +752,9 @@ class MyArmMControl(MyArmMProcessor):
             pin_no: pin port number.
             pin_signal: 0 / 1
         """
-        self.calibration_parameters(pin_signal=pin_signal, basic_pin_number=pin_no)
+        self.calibration_parameters(
+            pin_signal=pin_signal, basic_pin_number=pin_no
+        )
         return self._mesg(ProtocolCode.SET_BASIC_OUTPUT, pin_no, pin_signal)
 
     def get_basic_input(self, pin_no):
@@ -742,7 +797,7 @@ class MyArmMControl(MyArmMProcessor):
         return self._mesg(ProtocolCode.SET_SERVER_PORT, port)
 
     def get_tof_distance(self):
-        """ Get the detected distance (Requires external distance detector).
+        """Get the detected distance (Requires external distance detector).
 
         Return:
             (int) The unit is mm.
@@ -764,7 +819,7 @@ class MyArmMControl(MyArmMProcessor):
         return self._mesg(ProtocolCode.SET_TOOL_REFERENCE, coord_list)
 
     def get_tool_reference(self):
-        """Get tool coordinate system """
+        """Get tool coordinate system"""
         return self._mesg(ProtocolCode.GET_TOOL_REFERENCE)
 
     def set_world_reference(self, coords):
@@ -870,7 +925,9 @@ class MyArmMControl(MyArmMProcessor):
             is_linear(int): 0 -> joint 1 -> straight line
         """
         self.calibration_parameters(speed=acceleration, is_linear=is_linear)
-        return self._mesg(ProtocolCode.SET_PLAN_ACCELERATION, acceleration, is_linear)
+        return self._mesg(
+            ProtocolCode.SET_PLAN_ACCELERATION, acceleration, is_linear
+        )
 
     def get_servo_speeds(self):
         """Get the joint speed .
@@ -922,4 +979,3 @@ class MyArmMControl(MyArmMProcessor):
         """
         self.calibration_parameters(mode=mode)
         return self._mesg(ProtocolCode.SET_VOID_COMPENSATE, mode)
-

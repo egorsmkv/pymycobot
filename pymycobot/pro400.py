@@ -8,7 +8,14 @@ from pymycobot.common import ProtocolCode
 
 
 class Pro400(CloseLoop):
-    def __init__(self, port="/dev/ttyAMA1", baudrate="115200", timeout=0.1, debug=False, save_serial_log=False):
+    def __init__(
+        self,
+        port="/dev/ttyAMA1",
+        baudrate="115200",
+        timeout=0.1,
+        debug=False,
+        save_serial_log=False,
+    ):
         """
         Args:
             port     : port string
@@ -27,7 +34,7 @@ class Pro400(CloseLoop):
         self.read_threading = threading.Thread(target=self.read_thread)
         self.read_threading.daemon = True
         self.read_threading.start()
-        
+
     def _mesg(self, genre, *args, **kwargs):
         read_data = super(Pro400, self)._mesg(genre, *args, **kwargs)
         if read_data is None:
@@ -41,11 +48,15 @@ class Pro400(CloseLoop):
                 if valid_data[0] == 1:
                     return 1
                 n = len(valid_data)
-                for v in range(1,n):
+                for v in range(1, n):
                     res.append(valid_data[v])
             elif data_len == 8 and genre == ProtocolCode.GET_DOWN_ENCODERS:
                 res = self.bytes4_to_int(valid_data)
-            elif data_len == 6 and genre in [ProtocolCode.GET_SERVO_STATUS, ProtocolCode.GET_SERVO_VOLTAGES, ProtocolCode.GET_SERVO_CURRENTS]:
+            elif data_len == 6 and genre in [
+                ProtocolCode.GET_SERVO_STATUS,
+                ProtocolCode.GET_SERVO_VOLTAGES,
+                ProtocolCode.GET_SERVO_CURRENTS,
+            ]:
                 for i in range(data_len):
                     res.append(valid_data[i])
             else:
@@ -63,16 +74,16 @@ class Pro400(CloseLoop):
         elif data_len == 4:
             if genre == ProtocolCode.COBOTX_GET_ANGLE:
                 res = self.bytes4_to_int(valid_data)
-            for i in range(1,4):
+            for i in range(1, 4):
                 res.append(valid_data[i])
         elif data_len == 7:
             error_list = [i for i in valid_data]
             for i in error_list:
-                if i in range(16,23):
+                if i in range(16, 23):
                     res.append(1)
-                elif i in range(23,29):
+                elif i in range(23, 29):
                     res.append(2)
-                elif i in range(32,112):
+                elif i in range(32, 112):
                     res.append(3)
                 else:
                     res.append(i)
@@ -83,37 +94,38 @@ class Pro400(CloseLoop):
             while i < data_len:
                 if i < 28:
                     res += self.bytes4_to_int(valid_data)
-                    i+=4
+                    i += 4
                 else:
                     one = valid_data[i : i + 2]
                     res.append(self._decode_int16(one))
-                    i+=2
+                    i += 2
         elif data_len == 30:
             i = 0
             res = []
             while i < 30:
                 if i < 9 or i >= 23:
                     res.append(valid_data[i])
-                    i+=1
+                    i += 1
                 elif i < 23:
                     one = valid_data[i : i + 2]
                     res.append(self._decode_int16(one))
-                    i+=2
+                    i += 2
         elif data_len == 38:
             i = 0
             res = []
             while i < data_len:
                 if i < 10 or i >= 30:
                     res.append(valid_data[i])
-                    i+=1
+                    i += 1
                 elif i < 38:
                     one = valid_data[i : i + 2]
                     res.append(self._decode_int16(one))
-                    i+=2
+                    i += 2
         elif data_len == 56:
             for i in range(0, data_len, 8):
-                
-                byte_value = int.from_bytes(valid_data[i:i+4], byteorder='big', signed=True)
+                byte_value = int.from_bytes(
+                    valid_data[i : i + 4], byteorder="big", signed=True
+                )
                 res.append(byte_value)
         elif data_len == 6:
             for i in valid_data:
@@ -130,7 +142,7 @@ class Pro400(CloseLoop):
             res.append(self._decode_int8(valid_data))
         if res == []:
             return None
-        
+
         if genre in [
             ProtocolCode.ROBOT_VERSION,
             ProtocolCode.GET_ROBOT_ID,
@@ -169,7 +181,7 @@ class Pro400(CloseLoop):
             ProtocolCode.GET_VR_MODE,
             ProtocolCode.GET_FILTER_LEN,
             ProtocolCode.IS_SERVO_ENABLE,
-            ProtocolCode.GET_POS_SWITCH
+            ProtocolCode.GET_POS_SWITCH,
         ]:
             return self._process_single(res)
         elif genre in [ProtocolCode.GET_ANGLES]:
@@ -191,7 +203,11 @@ class Pro400(CloseLoop):
                 return res
         elif genre in [ProtocolCode.GET_SERVO_VOLTAGES]:
             return [self._int2coord(angle) for angle in res]
-        elif genre in [ProtocolCode.GET_BASIC_VERSION, ProtocolCode.SOFTWARE_VERSION, ProtocolCode.GET_ATOM_VERSION]:
+        elif genre in [
+            ProtocolCode.GET_BASIC_VERSION,
+            ProtocolCode.SOFTWARE_VERSION,
+            ProtocolCode.GET_ATOM_VERSION,
+        ]:
             return self._int2coord(self._process_single(res))
         elif genre in [
             ProtocolCode.GET_JOINT_MAX_ANGLE,
@@ -218,8 +234,12 @@ class Pro400(CloseLoop):
                         if res[i] == 1:
                             r.append(i)
             return r
-        elif genre in [ProtocolCode.COBOTX_GET_ANGLE, ProtocolCode.COBOTX_GET_SOLUTION_ANGLES, ProtocolCode.GET_POS_OVER]:
-                return self._int2angle(res[0])
+        elif genre in [
+            ProtocolCode.COBOTX_GET_ANGLE,
+            ProtocolCode.COBOTX_GET_SOLUTION_ANGLES,
+            ProtocolCode.GET_POS_OVER,
+        ]:
+            return self._int2angle(res[0])
         elif genre == ProtocolCode.MERCURY_ROBOT_STATUS:
             if len(res) == 23:
                 i = 9
@@ -228,10 +248,10 @@ class Pro400(CloseLoop):
                         data = bin(res[i])[2:]
                         res[i] = []
                         while len(data) != 16:
-                            data = "0"+data
+                            data = "0" + data
                         for j in range(16):
                             if data[j] != "0":
-                                res[i].append(15-j)
+                                res[i].append(15 - j)
                 return res
             else:
                 for i in range(10, len(res)):
@@ -239,24 +259,24 @@ class Pro400(CloseLoop):
                         data = bin(res[i])[2:]
                         res[i] = []
                         while len(data) != 16:
-                            data = "0"+data
+                            data = "0" + data
                         for j in range(16):
                             if data[j] != "0":
-                                res[i].append(15-j)
+                                res[i].append(15 - j)
                 return res
         else:
             return res
 
     def open(self):
         self._serial_port.open()
-        
+
     def close(self):
         self._serial_port.close()
-    
+
     # def power_on_only(self):
-        # import RPi.GPIO as GPIO
-        # GPIO.output(self.power_control_2, GPIO.HIGH)
-        
+    # import RPi.GPIO as GPIO
+    # GPIO.output(self.power_control_2, GPIO.HIGH)
+
     # def set_basic_output(self, pin_no, pin_signal):
     #     """Set basic output.IO low-level output high-level, high-level output high resistance state
 
@@ -279,19 +299,19 @@ class Pro400(CloseLoop):
     #         pin_no = 19
     #     GPIO.setup(pin_no, GPIO.OUT)
     #     GPIO.output(pin_no, pin_signal)
-        
+
     # def get_basic_input(self, pin_no):
     #     """Get basic input.
 
     #     Args:
     #         pin_no: pin port number. range 1 ~ 6
-            
+
     #     Return:
     #         1 - high
     #         0 - low
     #     """
     #     import RPi.GPIO as GPIO
-    #     if pin_no == 1: 
+    #     if pin_no == 1:
     #         pin_no = 26
     #     elif pin_no == 2:
     #         pin_no = 21
@@ -305,7 +325,7 @@ class Pro400(CloseLoop):
     #         pin_no = 23
     #     GPIO.setup(pin_no, GPIO.IN)
     #     return GPIO.input(pin_no)
-    
+
     def set_pos_switch(self, mode):
         """Set position switch mode.
 
@@ -313,9 +333,11 @@ class Pro400(CloseLoop):
             mode: 0 - switch off, 1 - switch on
         """
         if mode == 0:
-            return self._mesg(ProtocolCode.SET_POS_SWITCH, mode, asyn_mode=True)
-        return self._mesg(ProtocolCode.SET_POS_SWITCH, mode,asyn_mode=False)
-    
+            return self._mesg(
+                ProtocolCode.SET_POS_SWITCH, mode, asyn_mode=True
+            )
+        return self._mesg(ProtocolCode.SET_POS_SWITCH, mode, asyn_mode=False)
+
     def get_pos_switch(self):
         """Get position switch mode.
 

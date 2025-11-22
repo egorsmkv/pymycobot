@@ -42,7 +42,7 @@ class Pro630Client(Pro630Api):
         self.timeout = timeout
         self.host = host
         self.port = port
-        super().__init__(debug=debug, method='socket')
+        super().__init__(debug=debug, method="socket")
 
     def close(self):
         self.sock.close()
@@ -82,7 +82,7 @@ class Pro630Client(Pro630Api):
 
         Args:
             pin_no: pin port number. range 1 ~ 6
-            
+
         Return:
             1 - high
             0 - low
@@ -90,9 +90,13 @@ class Pro630Client(Pro630Api):
         return self._mesg(ProtocolCode.GET_BASIC_INPUT, pin_no)
 
     def send_angles_sync(self, angles, speed):
-        self.calibration_parameters(class_name = self.__class__.__name__, angles=angles, speed=speed)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, angles=angles, speed=speed
+        )
         angles = [self._angle2int(angle) for angle in angles]
-        return self._mesg(ProtocolCode.SEND_ANGLES, angles, speed, no_return=True)
+        return self._mesg(
+            ProtocolCode.SEND_ANGLES, angles, speed, no_return=True
+        )
 
     def set_monitor_mode(self, mode):
         raise NotImplementedError("Pro630 does not support monitor mode")

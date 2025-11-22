@@ -13,7 +13,7 @@ if platform.system() == "Windows":
     ua = ultraArmP340(plist[0], 115200)
     ua.go_zero()
 elif platform.system() == "Linux":
-    ua = ultraArmP340('/dev/ttyUSB0', 115200)
+    ua = ultraArmP340("/dev/ttyUSB0", 115200)
     ua.go_zero()
 
 # 机械臂运动的位置
@@ -22,7 +22,7 @@ angles = [
     [-90.53, 21.77, 47.56],
     [-90.53, 0.0, 0.0],
     [-59.01, 21.77, 45.84],
-    [-59.01, 0.0, 0.0]
+    [-59.01, 0.0, 0.0],
 ]
 
 ua.set_angles(angles[0], 50)

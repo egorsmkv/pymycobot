@@ -2,7 +2,7 @@
 import time
 from pymycobot.mybuddy import MyBuddy
 
-port = '/dev/ttyAMA0'
+port = "/dev/ttyAMA0"
 mb = MyBuddy(port)
 
 pid = [21, 22, 23]
@@ -55,37 +55,39 @@ def get_pid():
         for j in range(1, 7):  # 舵机
             for p in range(3):  # pid
                 data = mb.get_servo_data(i, j, pid[p])
-                arm = '右臂'
+                arm = "右臂"
                 if i == 1:
-                    arm = '左臂'
-                print(f'{arm},关节{j}，data_id：{pid[p]}   data: {data}')
+                    arm = "左臂"
+                print(f"{arm},关节{j}，data_id：{pid[p]}   data: {data}")
                 time.sleep(0.05)
 
     for p in range(3):  # 腰部pid
         data = mb.get_servo_data(3, 1, pid[p])
-        print(f'腰部,data_id：{pid[p]}   data: {data}')
+        print(f"腰部,data_id：{pid[p]}   data: {data}")
         time.sleep(0.05)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     key = 0
     status = True
     while status:
-        print('请选择PID操作=======================\n'
-              '1  设置出厂PID\n'
-              '2  设置高精度PID\n'
-              '3  设置拖动示教（高稳定）PID\n'
-              '4  读取当前PID\n'
-              '==================================================')
-        print('请选择数字1-4，按下ENTER键确认：')
+        print(
+            "请选择PID操作=======================\n"
+            "1  设置出厂PID\n"
+            "2  设置高精度PID\n"
+            "3  设置拖动示教（高稳定）PID\n"
+            "4  读取当前PID\n"
+            "=================================================="
+        )
+        print("请选择数字1-4，按下ENTER键确认：")
         key = input()
         key = int(key)
         if key <= 0 or key > 4:
-            print('没有该选项，请重新选择！')
+            print("没有该选项，请重新选择！")
         else:
             status = False
     if key != 4:
-        print('正在设置中！！')
+        print("正在设置中！！")
     if key == 1:
         set_pid_factory()
     elif key == 2:
@@ -95,4 +97,4 @@ if __name__ == '__main__':
     elif key == 4:
         get_pid()
     if key != 4:
-        print('设置完成！！')
+        print("设置完成！！")

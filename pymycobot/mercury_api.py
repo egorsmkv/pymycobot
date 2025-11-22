@@ -2,6 +2,8 @@
 
 import locale
 
+import numpy as np
+
 from pymycobot.error import restrict_serial_port
 from pymycobot.common import ProtocolCode, FingerGripper
 from pymycobot.robot_info import _interpret_status_code
@@ -11,10 +13,6 @@ from pymycobot.close_loop import CloseLoop
 class MercuryCommandGenerator(CloseLoop):
     def __init__(self, debug=False):
         super(MercuryCommandGenerator, self).__init__(debug)
-        try:
-            import numpy as np
-        except ImportError:
-            raise ImportError("Please install numpy")
         # 同步模式
         self.language, _ = locale.getdefaultlocale()
         if self.language not in ["zh_CN", "en_US"]:
@@ -33,7 +31,11 @@ class MercuryCommandGenerator(CloseLoop):
         offset = 3
         try:
             for i in range(7):
-                if self.min_joint[i] + offset < angles[i] < self.max_joint[i] - offset:
+                if (
+                    self.min_joint[i] + offset
+                    < angles[i]
+                    < self.max_joint[i] - offset
+                ):
                     pass
                 else:
                     if self.language == "zh_CN":
@@ -53,7 +55,9 @@ class MercuryCommandGenerator(CloseLoop):
                 if singular - offset < angles[5] < singular + offset:
                     if self.language == "zh_CN":
                         return f"在关节 6 处检测到奇点：{angles[5]} 度"
-                    return f"Singularity detected at joint 6: {angles[5]} degrees"
+                    return (
+                        f"Singularity detected at joint 6: {angles[5]} degrees"
+                    )
             return state
         except:
             return "Singularity error"
@@ -67,7 +71,9 @@ class MercuryCommandGenerator(CloseLoop):
             magnitude = np.linalg.norm(first_three)
             if is_print == 1:
                 if self.language == "zh_CN":
-                    info += f"当前臂展为{magnitude}, 最大的臂展为{self.arm_span}"
+                    info += (
+                        f"当前臂展为{magnitude}, 最大的臂展为{self.arm_span}"
+                    )
                 else:
                     info += f"Arm span is {magnitude}, max is {self.arm_span}"
 
@@ -111,7 +117,8 @@ class MercuryCommandGenerator(CloseLoop):
                 has_reply: Whether there is a return value to accept.
         """
         return_data = super(MercuryCommandGenerator, self)._mesg(
-            genre, *args, **kwargs)
+            genre, *args, **kwargs
+        )
         if isinstance(return_data, tuple):
             valid_data, data_len = return_data
         elif isinstance(return_data, int):
@@ -142,17 +149,20 @@ class MercuryCommandGenerator(CloseLoop):
                 i = 0
                 while i < data_len:
                     byte_value = int.from_bytes(
-                        valid_data[i:i + 4], byteorder='big', signed=True)
+                        valid_data[i : i + 4], byteorder="big", signed=True
+                    )
                     i += 4
                     res.append(byte_value)
-            elif data_len == 6 and genre in [ProtocolCode.GET_SERVO_STATUS, ProtocolCode.GET_SERVO_VOLTAGES,
-                                             ProtocolCode.GET_SERVO_CURRENTS]:
+            elif data_len == 6 and genre in [
+                ProtocolCode.GET_SERVO_STATUS,
+                ProtocolCode.GET_SERVO_VOLTAGES,
+                ProtocolCode.GET_SERVO_CURRENTS,
+            ]:
                 for i in range(data_len):
                     res.append(valid_data[i])
             else:
-                
                 for header_i in range(0, len(valid_data), 2):
-                    one = valid_data[header_i: header_i + 2]
+                    one = valid_data[header_i : header_i + 2]
                     res.append(self._decode_int16(one))
         elif data_len == 2:
             if genre in [ProtocolCode.IS_SERVO_ENABLE]:
@@ -164,8 +174,10 @@ class MercuryCommandGenerator(CloseLoop):
                 res.append(self._decode_int8(valid_data[1:]))
             else:
                 res.append(self._decode_int16(valid_data))
-                if hand_address in [FingerGripper.GET_HAND_MAJOR_FIRMWARE_VERSION]:
-                    res[0] /=10
+                if hand_address in [
+                    FingerGripper.GET_HAND_MAJOR_FIRMWARE_VERSION
+                ]:
+                    res[0] /= 10
         elif data_len == 3:
             if genre in [ProtocolCode.GET_DIGITAL_INPUTS]:
                 for i in valid_data:
@@ -173,9 +185,14 @@ class MercuryCommandGenerator(CloseLoop):
             else:
                 res.append(self._decode_int16(valid_data[1:]))
         elif data_len == 4:
-            if genre in [ProtocolCode.COBOTX_GET_ANGLE, ProtocolCode.GET_ENCODER, ProtocolCode.GET_DYNAMIC_PARAMETERS]:
+            if genre in [
+                ProtocolCode.COBOTX_GET_ANGLE,
+                ProtocolCode.GET_ENCODER,
+                ProtocolCode.GET_DYNAMIC_PARAMETERS,
+            ]:
                 byte_value = int.from_bytes(
-                    valid_data, byteorder='big', signed=True)
+                    valid_data, byteorder="big", signed=True
+                )
                 if genre in [ProtocolCode.GET_DYNAMIC_PARAMETERS]:
                     byte_value /= 1000
                 res.append(byte_value)
@@ -197,21 +214,26 @@ class MercuryCommandGenerator(CloseLoop):
             #             res.append(3)
             #         else:
             #             res.append(i)
-        elif data_len in [28, 32]:  # 28 left get_zero_pos, 32 right get_zero_pos
+        elif data_len in [
+            28,
+            32,
+        ]:  # 28 left get_zero_pos, 32 right get_zero_pos
             for i in range(0, data_len, 4):
                 byte_value = int.from_bytes(
-                    valid_data[i:i + 4], byteorder='big', signed=True)
+                    valid_data[i : i + 4], byteorder="big", signed=True
+                )
                 res.append(byte_value)
         elif data_len == 40 and genre == ProtocolCode.GET_ANGLES_COORDS:
             i = 0
             while i < data_len:
                 if i < 28:
                     byte_value = int.from_bytes(
-                        valid_data[i:i + 4], byteorder='big', signed=True)
+                        valid_data[i : i + 4], byteorder="big", signed=True
+                    )
                     res.append(byte_value)
                     i += 4
                 else:
-                    one = valid_data[i: i + 2]
+                    one = valid_data[i : i + 2]
                     res.append(self._decode_int16(one))
                     i += 2
         elif data_len == 40 and genre == ProtocolCode.MERCURY_ROBOT_STATUS:
@@ -223,7 +245,7 @@ class MercuryCommandGenerator(CloseLoop):
                     res.append(valid_data[i])
                     i += 1
                 elif i < 30:
-                    one = valid_data[i: i + 2]
+                    one = valid_data[i : i + 2]
                     res.append(self._decode_int16(one))
                     i += 2
         elif data_len == 41 and genre == ProtocolCode.MERCURY_ROBOT_STATUS:
@@ -235,7 +257,7 @@ class MercuryCommandGenerator(CloseLoop):
                     res.append(valid_data[i])
                     i += 1
                 else:
-                    one = valid_data[i: i + 2]
+                    one = valid_data[i : i + 2]
                     res.append(self._decode_int16(one))
                     i += 2
         elif data_len in [37, 46]:
@@ -251,7 +273,7 @@ class MercuryCommandGenerator(CloseLoop):
                     res.append(valid_data[i])
                     i += 1
                 else:
-                    one = valid_data[i: i + 2]
+                    one = valid_data[i : i + 2]
                     res.append(self._decode_int16(one))
                     i += 2
         elif data_len == 38:
@@ -262,17 +284,19 @@ class MercuryCommandGenerator(CloseLoop):
                     res.append(valid_data[i])
                     i += 1
                 elif i < 38:
-                    one = valid_data[i: i + 2]
+                    one = valid_data[i : i + 2]
                     res.append(self._decode_int16(one))
                     i += 2
         elif data_len == 56:
             i = 0
             while i < data_len:
                 byte_value_send = int.from_bytes(
-                    valid_data[i:i + 4], byteorder='big', signed=True)
+                    valid_data[i : i + 4], byteorder="big", signed=True
+                )
                 i += 4
                 byte_value_current = int.from_bytes(
-                    valid_data[i:i + 4], byteorder='big', signed=True)
+                    valid_data[i : i + 4], byteorder="big", signed=True
+                )
                 res.append([byte_value_send, byte_value_current])
                 i += 4
         elif data_len == 48:
@@ -284,12 +308,12 @@ class MercuryCommandGenerator(CloseLoop):
             while i < data_len:
                 if i < 28:
                     byte_value_send = int.from_bytes(
-                        valid_data[i:i + 4], byteorder='big', signed=True)
+                        valid_data[i : i + 4], byteorder="big", signed=True
+                    )
                     angles.append(self._int2angle(byte_value_send))
                     i += 4
                 elif i < 40:
-
-                    one = valid_data[i: i + 2]
+                    one = valid_data[i : i + 2]
                     one = self._decode_int16(one)
                     if j < 3:
                         one = self._int2coord(one)
@@ -317,7 +341,7 @@ class MercuryCommandGenerator(CloseLoop):
                 ProtocolCode.GET_SERVO_TEMPS,
             ]:
                 for i in range(data_len):
-                    data1 = self._decode_int8(valid_data[i: i + 1])
+                    data1 = self._decode_int8(valid_data[i : i + 1])
                     res.append(0xFF & data1 if data1 < 0 else data1)
             res.append(self._decode_int8(valid_data))
         if res == []:
@@ -364,7 +388,7 @@ class MercuryCommandGenerator(CloseLoop):
             ProtocolCode.GET_MONITOR_MODE,
             ProtocolCode.GET_COLLISION_MODE,
             ProtocolCode.GET_DYNAMIC_PARAMETERS,
-            ProtocolCode.GET_ERROR_INFO
+            ProtocolCode.GET_ERROR_INFO,
         ]:
             return self._process_single(res)
         elif genre in [ProtocolCode.GET_DRAG_FIFO]:
@@ -386,7 +410,11 @@ class MercuryCommandGenerator(CloseLoop):
                 return res
         elif genre in [ProtocolCode.GET_SERVO_VOLTAGES]:
             return [self._int2coord(angle) for angle in res]
-        elif genre in [ProtocolCode.GET_BASIC_VERSION, ProtocolCode.SOFTWARE_VERSION, ProtocolCode.GET_ATOM_VERSION]:
+        elif genre in [
+            ProtocolCode.GET_BASIC_VERSION,
+            ProtocolCode.SOFTWARE_VERSION,
+            ProtocolCode.GET_ATOM_VERSION,
+        ]:
             return self._int2coord(self._process_single(res))
         elif genre in [
             ProtocolCode.GET_JOINT_MAX_ANGLE,
@@ -413,8 +441,11 @@ class MercuryCommandGenerator(CloseLoop):
                         if res[i] == 1:
                             r.append(i)
             return r
-        elif genre in [ProtocolCode.COBOTX_GET_SOLUTION_ANGLES, ProtocolCode.MERCURY_GET_POS_OVER_SHOOT,
-                       ProtocolCode.GET_SERVO_CW]:
+        elif genre in [
+            ProtocolCode.COBOTX_GET_SOLUTION_ANGLES,
+            ProtocolCode.MERCURY_GET_POS_OVER_SHOOT,
+            ProtocolCode.GET_SERVO_CW,
+        ]:
             return self._int2angle(res[0])
         elif genre == ProtocolCode.GET_ANGLES:
             return [self._int3angle(angle) for angle in res]
@@ -480,12 +511,24 @@ class MercuryCommandGenerator(CloseLoop):
             speed (int): 1 ~ 100
         """
         self.calibration_parameters(
-            class_name=self.__class__.__name__, coord_id=coord_id, base_coord=base_coord, speed=speed, serial_port=self._serial_port.port)
+            class_name=self.__class__.__name__,
+            coord_id=coord_id,
+            base_coord=base_coord,
+            speed=speed,
+            serial_port=self._serial_port.port,
+        )
         if coord_id < 4:
             coord = self._coord2int(base_coord)
         else:
             coord = self._angle2int(base_coord)
-        return self._mesg(ProtocolCode.MERCURY_SET_BASE_COORD, coord_id, [coord], speed, _async=_async, has_reply=True)
+        return self._mesg(
+            ProtocolCode.MERCURY_SET_BASE_COORD,
+            coord_id,
+            [coord],
+            speed,
+            _async=_async,
+            has_reply=True,
+        )
 
     @restrict_serial_port
     def send_base_coords(self, base_coords, speed, _async=False):
@@ -495,13 +538,24 @@ class MercuryCommandGenerator(CloseLoop):
             base_coords (list): coordinate value, [x, y, z, rx, ry, rz]
             speed (int): 1 ~ 100
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, base_coords=base_coords, speed=speed, serial_port=self._serial_port.port)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__,
+            base_coords=base_coords,
+            speed=speed,
+            serial_port=self._serial_port.port,
+        )
         coord_list = []
         for idx in range(3):
             coord_list.append(self._coord2int(base_coords[idx]))
         for angle in base_coords[3:]:
             coord_list.append(self._angle2int(angle))
-        return self._mesg(ProtocolCode.MERCURY_SET_BASE_COORDS, coord_list, speed, _async=_async, has_reply=True)
+        return self._mesg(
+            ProtocolCode.MERCURY_SET_BASE_COORDS,
+            coord_list,
+            speed,
+            _async=_async,
+            has_reply=True,
+        )
 
     @restrict_serial_port
     def jog_base_coord(self, axis, direction, speed, _async=True):
@@ -523,7 +577,14 @@ class MercuryCommandGenerator(CloseLoop):
             51: Motor encoder error
             52: Not reaching the designated location or not reaching the designated location for more than 5 minutes (only J11, J12 available)
         """
-        return self._mesg(ProtocolCode.MERCURY_JOG_BASE_COORD, axis, direction, speed, _async=_async, has_reply=True)
+        return self._mesg(
+            ProtocolCode.MERCURY_JOG_BASE_COORD,
+            axis,
+            direction,
+            speed,
+            _async=_async,
+            has_reply=True,
+        )
 
     @restrict_serial_port
     def set_servo_cw(self, head_id, err_angle):
@@ -534,8 +595,13 @@ class MercuryCommandGenerator(CloseLoop):
             err_angle (float): Error range is 0 ~ 5.
         """
         self.calibration_parameters(
-            class_name=self.__class__.__name__, head_id=head_id, err_angle=err_angle)
-        return self._mesg(ProtocolCode.SET_SERVO_CW, head_id, [self._angle2int(err_angle)])
+            class_name=self.__class__.__name__,
+            head_id=head_id,
+            err_angle=err_angle,
+        )
+        return self._mesg(
+            ProtocolCode.SET_SERVO_CW, head_id, [self._angle2int(err_angle)]
+        )
 
     @restrict_serial_port
     def get_servo_cw(self, head_id):
@@ -548,13 +614,13 @@ class MercuryCommandGenerator(CloseLoop):
             float: Error angle, range is 0 ~ 5.
         """
         self.calibration_parameters(
-            class_name=self.__class__.__name__, head_id=head_id)
+            class_name=self.__class__.__name__, head_id=head_id
+        )
         return self._mesg(ProtocolCode.GET_SERVO_CW, head_id)
 
     @restrict_serial_port
     def clear_waist_queue(self):
-        """Clear the cache points of the three motors in the torso
-        """
+        """Clear the cache points of the three motors in the torso"""
         return self._mesg(ProtocolCode.CLEAR_WAIST_QUEUE)
 
     @restrict_serial_port
@@ -577,15 +643,22 @@ class MercuryCommandGenerator(CloseLoop):
             52: Not reaching the designated location or not reaching the designated location for more than 5 minutes (only J11, J12 available)
         """
         self.calibration_parameters(
-            class_name=self.__class__.__name__, coord_id=axis_id, speed=speed)
+            class_name=self.__class__.__name__, coord_id=axis_id, speed=speed
+        )
         coord_list = []
         if axis_id < 4:
             coord_list.append(self._coord2int(increment))
         else:
             coord_list.append(self._angle2int(increment))
-        return self._mesg(ProtocolCode.JOG_BASE_INCREMENT_COORD, axis_id, coord_list, speed, has_reply=True,
-                          _async=_async)
-        
+        return self._mesg(
+            ProtocolCode.JOG_BASE_INCREMENT_COORD,
+            axis_id,
+            coord_list,
+            speed,
+            has_reply=True,
+            _async=_async,
+        )
+
     def is_in_position(self, data, mode=0):
         """Judge whether in the position.
 
@@ -598,23 +671,31 @@ class MercuryCommandGenerator(CloseLoop):
             0 - False\n
             -1 - Error
         """
-        if mode in [1,2]:
+        if mode in [1, 2]:
             if mode == 2:
-                self.calibration_parameters(class_name=self.__class__.__name__, base_coords=data, serial_port=self._serial_port.port)
+                self.calibration_parameters(
+                    class_name=self.__class__.__name__,
+                    base_coords=data,
+                    serial_port=self._serial_port.port,
+                )
             else:
-                self.calibration_parameters(class_name=self.__class__.__name__, coords=data)
+                self.calibration_parameters(
+                    class_name=self.__class__.__name__, coords=data
+                )
             data_list = []
             for idx in range(3):
                 data_list.append(self._coord2int(data[idx]))
             for idx in range(3, 6):
                 data_list.append(self._angle2int(data[idx]))
         elif mode == 0:
-            self.calibration_parameters(class_name=self.__class__.__name__, angles=data)
+            self.calibration_parameters(
+                class_name=self.__class__.__name__, angles=data
+            )
             data_list = [self._angle2int(i) for i in data]
         else:
             raise Exception("mode is not right, please input 0 or 1 or 2")
         return self._mesg(ProtocolCode.IS_IN_POSITION, data_list, mode)
-    
+
     def write_waist_sync(self, current_angle, target_angle, speed):
         """_summary_
 
@@ -623,9 +704,18 @@ class MercuryCommandGenerator(CloseLoop):
             target_angle (_type_): _description_
             speed (_type_): _description_
         """
-        self.calibration_parameters(class_name=self.__class__.__name__,
-                                    current_angle=current_angle, target_angle=target_angle, speed=speed)
-        return self._mesg(ProtocolCode.WRITE_WAIST_SYNC, [self._angle2int(current_angle)], [self._angle2int(target_angle)], speed)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__,
+            current_angle=current_angle,
+            target_angle=target_angle,
+            speed=speed,
+        )
+        return self._mesg(
+            ProtocolCode.WRITE_WAIST_SYNC,
+            [self._angle2int(current_angle)],
+            [self._angle2int(target_angle)],
+            speed,
+        )
 
     @restrict_serial_port
     def jog_base_rpy(self, axis, direction, speed, _async=True):
@@ -637,6 +727,16 @@ class MercuryCommandGenerator(CloseLoop):
             speed (int): 1 ~ 100.
         """
         self.calibration_parameters(
-            class_name=self.__class__.__name__, axis=axis, direction=direction, speed=speed)
-        return self._mesg(ProtocolCode.JOG_BASE_RPY, axis, direction, speed, _async=_async, has_reply=True)
-
+            class_name=self.__class__.__name__,
+            axis=axis,
+            direction=direction,
+            speed=speed,
+        )
+        return self._mesg(
+            ProtocolCode.JOG_BASE_RPY,
+            axis,
+            direction,
+            speed,
+            _async=_async,
+            has_reply=True,
+        )

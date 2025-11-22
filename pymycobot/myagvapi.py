@@ -18,7 +18,9 @@ def setup_logging(name: str = __name__, debug: bool = False) -> logging.Logger:
         logger.addHandler(stream_handler)
         logger.setLevel(logging.INFO)  # 100M日志
         file_handler = logging.handlers.RotatingFileHandler(
-            filename="python_debug.log", maxBytes=100 * 1024 * 1024, backupCount=1
+            filename="python_debug.log",
+            maxBytes=100 * 1024 * 1024,
+            backupCount=1,
         )
         file_handler.setFormatter(debug_formatter)
         logger.addHandler(file_handler)
@@ -88,7 +90,7 @@ class Utils:
 
     @classmethod
     def float(cls, number, decimal=2):
-        return round(number / 10 ** decimal, 2)
+        return round(number / 10**decimal, 2)
 
     @classmethod
     def encode_int16(cls, data):
@@ -110,7 +112,7 @@ class Utils:
 
     @classmethod
     def crc16_check(cls, command):
-        crc = 0xffff
+        crc = 0xFFFF
         for index in range(len(command)):
             crc ^= command[index]
             for _ in range(8):
@@ -137,5 +139,5 @@ class Utils:
     @classmethod
     def get_bits(cls, data):
         reverse_bins = reversed(bin(data)[2:])
-        rank = [i for i, e in enumerate(reverse_bins) if e != '0']
+        rank = [i for i, e in enumerate(reverse_bins) if e != "0"]
         return rank

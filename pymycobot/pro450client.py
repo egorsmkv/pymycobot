@@ -8,11 +8,11 @@ import numpy as np
 
 from pymycobot.close_loop import CloseLoop
 from pymycobot.robot_info import _interpret_status_code
-from pymycobot.common import ProtocolCode,ProGripper
+from pymycobot.common import ProtocolCode, ProGripper
 
 
 class Pro450Client(CloseLoop):
-    def __init__(self, ip='192.168.0.232', netport=4500, debug=False):
+    def __init__(self, ip="192.168.0.232", netport=4500, debug=False):
         """
         Args:
             ip     : Server IP address, default '192.168.0.232'
@@ -26,7 +26,9 @@ class Pro450Client(CloseLoop):
         self.lock = threading.Lock()
         self.is_stop = False
         self.sync_mode = True
-        self.read_threading = threading.Thread(target=self.read_thread, args=("socket",))
+        self.read_threading = threading.Thread(
+            target=self.read_thread, args=("socket",)
+        )
         self.read_threading.daemon = True
         self.read_threading.start()
         self.language, _ = locale.getdefaultlocale()
@@ -38,7 +40,7 @@ class Pro450Client(CloseLoop):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((self.SERVER_IP, self.SERVER_PORT))
         return sock
-        
+
     def _mesg(self, genre, *args, **kwargs):
         read_data = super(Pro450Client, self)._mesg(genre, *args, **kwargs)
         if read_data is None:
@@ -59,14 +61,20 @@ class Pro450Client(CloseLoop):
                 if valid_data[0] == 1:
                     return 1
                 n = len(valid_data)
-                for v in range(1,n):
+                for v in range(1, n):
                     res.append(valid_data[v])
             elif data_len == 8 and genre == ProtocolCode.GET_DOWN_ENCODERS:
                 res = self.bytes4_to_int(valid_data)
-            elif data_len == 6 and genre in [ProtocolCode.GET_SERVO_STATUS, ProtocolCode.GET_SERVO_VOLTAGES, ProtocolCode.GET_SERVO_CURRENTS]:
+            elif data_len == 6 and genre in [
+                ProtocolCode.GET_SERVO_STATUS,
+                ProtocolCode.GET_SERVO_VOLTAGES,
+                ProtocolCode.GET_SERVO_CURRENTS,
+            ]:
                 for i in range(data_len):
                     res.append(valid_data[i])
-            elif data_len == 8 and genre == ProtocolCode.TOOL_SERIAL_WRITE_DATA:
+            elif (
+                data_len == 8 and genre == ProtocolCode.TOOL_SERIAL_WRITE_DATA
+            ):
                 res_list = [i for i in valid_data]
                 return res_list
             else:
@@ -84,7 +92,7 @@ class Pro450Client(CloseLoop):
         elif data_len == 4:
             if genre == ProtocolCode.COBOTX_GET_ANGLE:
                 res = self.bytes4_to_int(valid_data)
-            for i in range(1,4):
+            for i in range(1, 4):
                 res.append(valid_data[i])
         elif data_len == 7:
             error_list = [i for i in valid_data]
@@ -108,36 +116,36 @@ class Pro450Client(CloseLoop):
             while i < data_len:
                 if i < 28:
                     res += self.bytes4_to_int(valid_data)
-                    i+=4
+                    i += 4
                 else:
                     one = valid_data[i : i + 2]
                     res.append(self._decode_int16(one))
-                    i+=2
+                    i += 2
         elif data_len == 30:
             i = 0
             res = []
             while i < 30:
                 if i < 9 or i >= 23:
                     res.append(valid_data[i])
-                    i+=1
+                    i += 1
                 elif i < 23:
                     one = valid_data[i : i + 2]
                     res.append(self._decode_int16(one))
-                    i+=2
+                    i += 2
         elif data_len == 38:
             i = 0
             res = []
             while i < data_len:
                 if i < 10 or i >= 30:
                     res.append(valid_data[i])
-                    i+=1
+                    i += 1
                 elif i < 38:
                     one = valid_data[i : i + 2]
                     res.append(self._decode_int16(one))
-                    i+=2
+                    i += 2
         # elif data_len == 56:
         #     for i in range(0, data_len, 8):
-                
+
         #         byte_value = int.from_bytes(valid_data[i:i+4], byteorder='big', signed=True)
         #         res.append(byte_value)
         elif data_len in [6, 9, 32]:
@@ -155,7 +163,7 @@ class Pro450Client(CloseLoop):
             res.append(self._decode_int8(valid_data))
         if res == []:
             return -1
-        
+
         if genre in [
             ProtocolCode.ROBOT_VERSION,
             ProtocolCode.GET_ROBOT_ID,
@@ -224,9 +232,13 @@ class Pro450Client(CloseLoop):
             return [self._int2coord(angle) for angle in res]
         elif genre in [ProtocolCode.SOLVE_INV_KINEMATICS]:
             if res == [-57295, -57295, -57295, -57295, -57295, -57295]:
-                return 'No solution for conversion'
+                return "No solution for conversion"
             return [self._int2angle(angle) for angle in res]
-        elif genre in [ProtocolCode.GET_BASIC_VERSION, ProtocolCode.SOFTWARE_VERSION, ProtocolCode.GET_ATOM_VERSION]:
+        elif genre in [
+            ProtocolCode.GET_BASIC_VERSION,
+            ProtocolCode.SOFTWARE_VERSION,
+            ProtocolCode.GET_ATOM_VERSION,
+        ]:
             return self._int2coord(self._process_single(res))
         elif genre in [
             ProtocolCode.GET_JOINT_MAX_ANGLE,
@@ -253,7 +265,11 @@ class Pro450Client(CloseLoop):
                         if res[i] == 1:
                             r.append(i)
             return r
-        elif genre in [ProtocolCode.COBOTX_GET_ANGLE, ProtocolCode.COBOTX_GET_SOLUTION_ANGLES, ProtocolCode.GET_POS_OVER]:
+        elif genre in [
+            ProtocolCode.COBOTX_GET_ANGLE,
+            ProtocolCode.COBOTX_GET_SOLUTION_ANGLES,
+            ProtocolCode.GET_POS_OVER,
+        ]:
             return self._int2angle(res[0])
         elif genre == ProtocolCode.MERCURY_ROBOT_STATUS:
             if len(res) == 32:
@@ -270,8 +286,12 @@ class Pro450Client(CloseLoop):
             return res
         elif genre == ProtocolCode.GET_BASE_EXTERNAL_CONFIG:
             mode = res[0]
-            baud_rate = int.from_bytes(res[1:5], byteorder="little", signed=False)
-            timeout = int.from_bytes(res[5:9], byteorder="little", signed=False)
+            baud_rate = int.from_bytes(
+                res[1:5], byteorder="little", signed=False
+            )
+            timeout = int.from_bytes(
+                res[5:9], byteorder="little", signed=False
+            )
             return [mode, baud_rate, timeout]
         else:
             return res
@@ -291,9 +311,17 @@ class Pro450Client(CloseLoop):
                     crc ^= 0xA001
                 else:
                     crc >>= 1
-        return crc.to_bytes(2, byteorder='little')
+        return crc.to_bytes(2, byteorder="little")
 
-    def _send_modbus_command(self, gripper_id, func_code, reg_addr, value_high=None, value_low=None, expect_len=7):
+    def _send_modbus_command(
+        self,
+        gripper_id,
+        func_code,
+        reg_addr,
+        value_high=None,
+        value_low=None,
+        expect_len=7,
+    ):
         """
         General Modbus command sending method
 
@@ -324,15 +352,22 @@ class Pro450Client(CloseLoop):
         return cmd, recv
 
     def _check_gripper_id(self, gripper_id):
-
-        self.calibration_parameters(class_name=self.__class__.__name__, gripper_id=gripper_id)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, gripper_id=gripper_id
+        )
 
     def _write_and_check(self, gripper_id, reg_addr, value):
         """Write register and verify return"""
         self._check_gripper_id(gripper_id)
         high, low = (value >> 8) & 0xFF, value & 0xFF
-        cmd, recv = self._send_modbus_command(gripper_id, 0x06, reg_addr, high, low)
-        if isinstance(recv, (list, bytearray)) and len(recv) >= 6 and recv[1] == 0x06:
+        cmd, recv = self._send_modbus_command(
+            gripper_id, 0x06, reg_addr, high, low
+        )
+        if (
+            isinstance(recv, (list, bytearray))
+            and len(recv) >= 6
+            and recv[1] == 0x06
+        ):
             if recv[4] == 0x00 and recv[5] == 0x01:
                 return 1
             elif recv[4] == 0x00 and recv[5] == 0x00:
@@ -345,7 +380,11 @@ class Pro450Client(CloseLoop):
         """Reads a register and returns an integer value"""
         self._check_gripper_id(gripper_id)
         _, recv = self._send_modbus_command(gripper_id, 0x03, reg_addr)
-        if isinstance(recv, (list, bytearray)) and len(recv) >= 5 and recv[1] == 0x03:
+        if (
+            isinstance(recv, (list, bytearray))
+            and len(recv) >= 5
+            and recv[1] == 0x03
+        ):
             return (recv[4] << 8) | recv[5]
         return -1
 
@@ -361,7 +400,11 @@ class Pro450Client(CloseLoop):
         offset = 3
         try:
             for i in range(6):
-                if self.min_joint[i] + offset < angles[i] < self.max_joint[i] - offset:
+                if (
+                    self.min_joint[i] + offset
+                    < angles[i]
+                    < self.max_joint[i] - offset
+                ):
                     pass
                 else:
                     if self.language == "zh_CN":
@@ -381,7 +424,9 @@ class Pro450Client(CloseLoop):
                 if singular - offset < angles[5] < singular + offset:
                     if self.language == "zh_CN":
                         return f"在关节 6 处检测到奇点：{angles[5]} 度"
-                    return f"Singularity detected at joint 6: {angles[5]} degrees"
+                    return (
+                        f"Singularity detected at joint 6: {angles[5]} degrees"
+                    )
             return state
         except:
             return "Singularity error"
@@ -395,7 +440,9 @@ class Pro450Client(CloseLoop):
             magnitude = np.linalg.norm(first_three)
             if is_print == 1:
                 if self.language == "zh_CN":
-                    info += f"当前臂展为{magnitude}, 最大的臂展为{self.arm_span}"
+                    info += (
+                        f"当前臂展为{magnitude}, 最大的臂展为{self.arm_span}"
+                    )
                 else:
                     info += f"Arm span is {magnitude}, max is {self.arm_span}"
 
@@ -428,7 +475,7 @@ class Pro450Client(CloseLoop):
 
     def open(self):
         self.sock = self.connect_socket()
-        
+
     def close(self):
         self.sock.close()
 
@@ -440,7 +487,10 @@ class Pro450Client(CloseLoop):
             state: 1 - enable, 0 - disable
         """
         self.calibration_parameters(
-            class_name=self.__class__.__name__, set_motor_enabled=joint_id, state=state)
+            class_name=self.__class__.__name__,
+            set_motor_enabled=joint_id,
+            state=state,
+        )
         return self._mesg(ProtocolCode.SET_MOTOR_ENABLED, joint_id, state)
 
     def set_over_time(self, timeout=1000):
@@ -452,7 +502,9 @@ class Pro450Client(CloseLoop):
             timeout (int): Timeout period, in ms, range 0~65535
         """
         if not isinstance(timeout, int) or not (0 <= timeout <= 65535):
-            raise ValueError("Timeout must be an integer between 0 and 65535 milliseconds.")
+            raise ValueError(
+                "Timeout must be an integer between 0 and 65535 milliseconds."
+            )
 
         high_byte = (timeout >> 8) & 0xFF
         low_byte = timeout & 0xFF
@@ -467,9 +519,15 @@ class Pro450Client(CloseLoop):
             modified_version (int): Tool firmware modified version, 0~255, defaults to 0
 
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, tool_main_version=main_version, tool_modified_version=modified_version)
-        main_version = int(float(main_version) *10)
-        return self._mesg(ProtocolCode.FLASH_TOOL_FIRMWARE, [main_version], modified_version)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__,
+            tool_main_version=main_version,
+            tool_modified_version=modified_version,
+        )
+        main_version = int(float(main_version) * 10)
+        return self._mesg(
+            ProtocolCode.FLASH_TOOL_FIRMWARE, [main_version], modified_version
+        )
 
     def get_comm_error_counts(self, joint_id):
         """Read the number of communication exceptions
@@ -478,7 +536,8 @@ class Pro450Client(CloseLoop):
             joint_id (int): joint ID, 1 ~ 6
         """
         self.calibration_parameters(
-            class_name=self.__class__.__name__, joint_id=joint_id)
+            class_name=self.__class__.__name__, joint_id=joint_id
+        )
         return self._mesg(ProtocolCode.MERCURY_ERROR_COUNTS, joint_id)
 
     def set_break(self, joint_id, value):
@@ -493,16 +552,16 @@ class Pro450Client(CloseLoop):
             1 : success
         """
         self.calibration_parameters(
-            class_name=self.__class__.__name__, joint_id=joint_id, value=value)
+            class_name=self.__class__.__name__, joint_id=joint_id, value=value
+        )
         return self._mesg(ProtocolCode.SET_BREAK, joint_id, value)
 
     def get_tool_modify_version(self):
-        """Read end correction version number
-        """
+        """Read end correction version number"""
         return self._mesg(ProtocolCode.GET_TOOL_MODIFY_VERSION)
 
     def get_pro_gripper_firmware_version(self, gripper_id=14):
-        """ Read the firmware major and minor version numbers
+        """Read the firmware major and minor version numbers
 
         Args:
             gripper_id (int): 1 ~ 254, defaults to 14
@@ -510,11 +569,13 @@ class Pro450Client(CloseLoop):
         Returns:
             version number (float): x.x
         """
-        val = self._read_register(gripper_id, ProGripper.MODBUS_GET_FIRMWARE_VERSION)
+        val = self._read_register(
+            gripper_id, ProGripper.MODBUS_GET_FIRMWARE_VERSION
+        )
         return val / 10.0 if val >= 0 else -1
 
     def get_pro_gripper_firmware_modified_version(self, gripper_id=14):
-        """ Read the firmware revision number
+        """Read the firmware revision number
 
         Args:
             gripper_id (int): 1 ~ 254, defaults to 14
@@ -522,11 +583,13 @@ class Pro450Client(CloseLoop):
         Returns:
             version number (int)
         """
-        val = self._read_register(gripper_id, ProGripper.MODBUS_GET_FIRMWARE_MODIFY_VERSION)
+        val = self._read_register(
+            gripper_id, ProGripper.MODBUS_GET_FIRMWARE_MODIFY_VERSION
+        )
         return val if val >= 0 else -1
 
     def set_pro_gripper_id(self, target_id, gripper_id=14):
-        """ Set the gripper ID
+        """Set the gripper ID
 
         Args:
             target_id (int): Target ID, 1 ~ 254
@@ -535,11 +598,15 @@ class Pro450Client(CloseLoop):
         Returns:
             1 - success, 0 - failed
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, target_id=target_id)
-        return self._write_and_check(gripper_id, ProGripper.MODBUS_SET_ID, target_id)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, target_id=target_id
+        )
+        return self._write_and_check(
+            gripper_id, ProGripper.MODBUS_SET_ID, target_id
+        )
 
     def get_pro_gripper_id(self, gripper_id=14):
-        """ Read the gripper ID
+        """Read the gripper ID
 
         Args:
             gripper_id (int): 1 ~ 254, defaults to 14
@@ -550,7 +617,7 @@ class Pro450Client(CloseLoop):
         return self._read_register(gripper_id, ProGripper.MODBUS_GET_ID)
 
     def set_pro_gripper_angle(self, gripper_angle, gripper_id=14):
-        """ Set the gripper angle
+        """Set the gripper angle
 
         Args:
             gripper_angle (int): 0 ~ 100
@@ -559,11 +626,15 @@ class Pro450Client(CloseLoop):
         Returns:
             1 - success, 0 - failed
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, gripper_angle=gripper_angle)
-        return self._write_and_check(gripper_id, ProGripper.MODBUS_SET_ANGLE, gripper_angle)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, gripper_angle=gripper_angle
+        )
+        return self._write_and_check(
+            gripper_id, ProGripper.MODBUS_SET_ANGLE, gripper_angle
+        )
 
     def get_pro_gripper_angle(self, gripper_id=14):
-        """ Get the gripper angle
+        """Get the gripper angle
 
         Args:
             gripper_id (int): 1 ~ 254, defaults to 14
@@ -574,7 +645,7 @@ class Pro450Client(CloseLoop):
         return self._read_register(gripper_id, ProGripper.MODBUS_GET_ANGLE)
 
     def set_pro_gripper_open(self, gripper_id=14):
-        """ Open the gripper
+        """Open the gripper
 
         Args:
             gripper_id (int): 1 ~ 254, defaults to 14
@@ -585,7 +656,7 @@ class Pro450Client(CloseLoop):
         return self.set_pro_gripper_angle(100, gripper_id)
 
     def set_pro_gripper_close(self, gripper_id=14):
-        """ Close the gripper
+        """Close the gripper
 
         Args:
             gripper_id (int): 1 ~ 254, defaults to 14
@@ -596,7 +667,7 @@ class Pro450Client(CloseLoop):
         return self.set_pro_gripper_angle(0, gripper_id)
 
     def set_pro_gripper_calibration(self, gripper_id=14):
-        """ Set the gripper zero position
+        """Set the gripper zero position
 
         Args:
             gripper_id (int): 1 ~ 254, defaults to 14
@@ -604,10 +675,12 @@ class Pro450Client(CloseLoop):
         Returns:
             1 - success, 0 - failed
         """
-        return self._write_and_check(gripper_id, ProGripper.MODBUS_SET_CALIBRATION, 0)
+        return self._write_and_check(
+            gripper_id, ProGripper.MODBUS_SET_CALIBRATION, 0
+        )
 
     def get_pro_gripper_status(self, gripper_id=14):
-        """ Get the gripper status
+        """Get the gripper status
 
         Args:
             gripper_id (int): 1 ~ 254, defaults to 14
@@ -621,7 +694,7 @@ class Pro450Client(CloseLoop):
         return self._read_register(gripper_id, ProGripper.MODBUS_GET_STATUS)
 
     def set_pro_gripper_enabled(self, state, gripper_id=14):
-        """ Set the gripper enable state
+        """Set the gripper enable state
 
         Args:
             state (bool): 0 or 1, 0 - Disable 1 - Enable
@@ -630,11 +703,15 @@ class Pro450Client(CloseLoop):
         Returns:
             1 - success, 0 - failed
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, state=state)
-        return self._write_and_check(gripper_id, ProGripper.MODBUS_SET_ENABLED, state)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, state=state
+        )
+        return self._write_and_check(
+            gripper_id, ProGripper.MODBUS_SET_ENABLED, state
+        )
 
     def set_pro_gripper_torque(self, gripper_torque, gripper_id=14):
-        """ Set the gripper torque
+        """Set the gripper torque
 
         Args:
             gripper_torque (int): 0 ~ 100
@@ -643,11 +720,15 @@ class Pro450Client(CloseLoop):
         Returns:
             1 - success, 0 - failed
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, gripper_torque=gripper_torque)
-        return self._write_and_check(gripper_id, ProGripper.MODBUS_SET_TORQUE, gripper_torque)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, gripper_torque=gripper_torque
+        )
+        return self._write_and_check(
+            gripper_id, ProGripper.MODBUS_SET_TORQUE, gripper_torque
+        )
 
     def get_pro_gripper_torque(self, gripper_id=14):
-        """ Set the gripper torque
+        """Set the gripper torque
 
         Args:
             gripper_id (int): 1 ~ 254, defaults to 14
@@ -658,7 +739,7 @@ class Pro450Client(CloseLoop):
         return self._read_register(gripper_id, ProGripper.MODBUS_GET_TORQUE)
 
     def set_pro_gripper_speed(self, speed, gripper_id=14):
-        """ Set the gripper torque
+        """Set the gripper torque
 
         Args:
             speed (int): 1 ~ 100
@@ -667,11 +748,15 @@ class Pro450Client(CloseLoop):
         Returns:
             1 - success, 0 - failed
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, speed=speed)
-        return self._write_and_check(gripper_id, ProGripper.MODBUS_SET_SPEED, speed)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, speed=speed
+        )
+        return self._write_and_check(
+            gripper_id, ProGripper.MODBUS_SET_SPEED, speed
+        )
 
     def get_pro_gripper_speed(self, gripper_id=14):
-        """ Get the gripper speed
+        """Get the gripper speed
 
         Args:
             gripper_id (int): 1 ~ 254, defaults to 14
@@ -682,17 +767,21 @@ class Pro450Client(CloseLoop):
         return self._read_register(gripper_id, ProGripper.MODBUS_GET_SPEED)
 
     def set_pro_gripper_abs_angle(self, gripper_angle, gripper_id=14):
-        """ Set the gripper absolute angle
+        """Set the gripper absolute angle
 
         Args:
             gripper_angle (int): 0 ~ 100
             gripper_id (int): 1 ~ 254, defaults to 14
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, gripper_angle=gripper_angle)
-        return self._write_and_check(gripper_id, ProGripper.MODBUS_SET_ABS_ANGLE, gripper_angle)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, gripper_angle=gripper_angle
+        )
+        return self._write_and_check(
+            gripper_id, ProGripper.MODBUS_SET_ABS_ANGLE, gripper_angle
+        )
 
     def set_pro_gripper_io_open_angle(self, gripper_angle, gripper_id=14):
-        """ Set the gripper IO open angle
+        """Set the gripper IO open angle
 
         Args:
             gripper_angle (int): 0 ~ 100
@@ -701,11 +790,15 @@ class Pro450Client(CloseLoop):
         Returns:
             1 - success, 0 - failed
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, gripper_angle=gripper_angle)
-        return self._write_and_check(gripper_id, ProGripper.MODBUS_SET_IO_OPEN_ANGLE, gripper_angle)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, gripper_angle=gripper_angle
+        )
+        return self._write_and_check(
+            gripper_id, ProGripper.MODBUS_SET_IO_OPEN_ANGLE, gripper_angle
+        )
 
     def get_pro_gripper_io_open_angle(self, gripper_id=14):
-        """ Get the gripper IO open angle
+        """Get the gripper IO open angle
 
         Args:
             gripper_id (int): 1 ~ 254, defaults to 14
@@ -713,10 +806,12 @@ class Pro450Client(CloseLoop):
         Returns:
             angle (int): 0 ~ 100
         """
-        return self._read_register(gripper_id, ProGripper.MODBUS_GET_IO_OPEN_ANGLE)
+        return self._read_register(
+            gripper_id, ProGripper.MODBUS_GET_IO_OPEN_ANGLE
+        )
 
     def set_pro_gripper_io_close_angle(self, gripper_angle, gripper_id=14):
-        """ Set the gripper IO close angle
+        """Set the gripper IO close angle
 
         Args:
             gripper_angle (int): 0 ~ 100
@@ -725,11 +820,15 @@ class Pro450Client(CloseLoop):
         Returns:
             1 - success, 0 - failed
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, gripper_angle=gripper_angle)
-        return self._write_and_check(gripper_id, ProGripper.MODBUS_SET_IO_CLOSE_ANGLE, gripper_angle)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, gripper_angle=gripper_angle
+        )
+        return self._write_and_check(
+            gripper_id, ProGripper.MODBUS_SET_IO_CLOSE_ANGLE, gripper_angle
+        )
 
     def get_pro_gripper_io_close_angle(self, gripper_id=14):
-        """ Get the gripper IO close angle
+        """Get the gripper IO close angle
 
         Args:
             gripper_id (int): 1 ~ 254, defaults to 14
@@ -737,10 +836,12 @@ class Pro450Client(CloseLoop):
         Returns:
             angle (int): 0 ~ 100
         """
-        return self._read_register(gripper_id, ProGripper.MODBUS_GET_IO_CLOSE_ANGLE)
+        return self._read_register(
+            gripper_id, ProGripper.MODBUS_GET_IO_CLOSE_ANGLE
+        )
 
     def set_pro_gripper_mini_pressure(self, pressure_value, gripper_id=14):
-        """ Set the gripper mini pressure
+        """Set the gripper mini pressure
 
         Args:
             pressure_value (int): 0 ~ 254
@@ -749,11 +850,15 @@ class Pro450Client(CloseLoop):
         Returns:
             1 - success, 0 - failed
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, pressure_value=pressure_value)
-        return self._write_and_check(gripper_id, ProGripper.MODBUS_SET_MINI_PRESSURE, pressure_value)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, pressure_value=pressure_value
+        )
+        return self._write_and_check(
+            gripper_id, ProGripper.MODBUS_SET_MINI_PRESSURE, pressure_value
+        )
 
     def get_pro_gripper_mini_pressure(self, gripper_id=14):
-        """ Get the gripper mini pressure
+        """Get the gripper mini pressure
 
         Args:
             gripper_id (int): 1 ~ 254, defaults to 14
@@ -761,10 +866,12 @@ class Pro450Client(CloseLoop):
         Returns:
             mini pressure (int): 0 ~ 254
         """
-        return self._read_register(gripper_id, ProGripper.MODBUS_GET_MINI_PRESSURE)
+        return self._read_register(
+            gripper_id, ProGripper.MODBUS_GET_MINI_PRESSURE
+        )
 
     def set_pro_gripper_protection_current(self, current_value, gripper_id=14):
-        """ Set the gripper protection current
+        """Set the gripper protection current
 
         Args:
             current_value (int): 100 ~ 300
@@ -773,11 +880,15 @@ class Pro450Client(CloseLoop):
         Returns:
             1 - success, 0 - failed
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, current_value=current_value)
-        return self._write_and_check(gripper_id, ProGripper.MODBUS_SET_PROTECTION_CURRENT, current_value)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, current_value=current_value
+        )
+        return self._write_and_check(
+            gripper_id, ProGripper.MODBUS_SET_PROTECTION_CURRENT, current_value
+        )
 
     def get_pro_gripper_protection_current(self, gripper_id=14):
-        """ Get the gripper protection current
+        """Get the gripper protection current
 
         Args:
             gripper_id (int): 1 ~ 254, defaults to 14
@@ -785,7 +896,9 @@ class Pro450Client(CloseLoop):
         Returns:
             current_value (int): 100 ~ 300
         """
-        return self._read_register(gripper_id, ProGripper.MODBUS_GET_PROTECTION_CURRENT)
+        return self._read_register(
+            gripper_id, ProGripper.MODBUS_GET_PROTECTION_CURRENT
+        )
 
     def set_fresh_mode(self, mode):
         """Set command refresh mode
@@ -795,7 +908,9 @@ class Pro450Client(CloseLoop):
                 1 - Always execute the latest command first.
                 0 - Execute instructions sequentially in the form of a queue.
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, mode=mode)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, mode=mode
+        )
         return self._mesg(ProtocolCode.SET_FRESH_MODE, mode)
 
     def get_fresh_mode(self):
@@ -813,7 +928,11 @@ class Pro450Client(CloseLoop):
             pin_no: pin port number. range 1 ~ 12
             pin_signal: 0 - low. 1 - high.
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, pin_no_base=pin_no, pin_signal=pin_signal)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__,
+            pin_no_base=pin_no,
+            pin_signal=pin_signal,
+        )
         return self._mesg(ProtocolCode.SET_BASIC_OUTPUT, pin_no, pin_signal)
 
     def get_base_io_input(self, pin_no):
@@ -822,7 +941,9 @@ class Pro450Client(CloseLoop):
         Args:
             pin_no: (int) pin port number. range 1 ~ 12
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, pin_no_base=pin_no)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, pin_no_base=pin_no
+        )
         return self._mesg(ProtocolCode.GET_BASIC_INPUT, pin_no)
 
     def servo_restore(self, joint_id):
@@ -845,7 +966,8 @@ class Pro450Client(CloseLoop):
             joint_id (int): 1 ~ 6.
         """
         self.calibration_parameters(
-            class_name=self.__class__.__name__, joint_id=joint_id)
+            class_name=self.__class__.__name__, joint_id=joint_id
+        )
         return self._mesg(ProtocolCode.COBOTX_GET_ANGLE, joint_id)
 
     def send_angles(self, angles, speed, _async=False):
@@ -856,9 +978,16 @@ class Pro450Client(CloseLoop):
             speed : (int) 1 ~ 100
         """
         self.calibration_parameters(
-            class_name=self.__class__.__name__, angles=angles, speed=speed)
+            class_name=self.__class__.__name__, angles=angles, speed=speed
+        )
         angles = [self._angle2int(angle) for angle in angles]
-        return self._mesg(ProtocolCode.SEND_ANGLES, angles, speed, has_reply=True, _async=_async)
+        return self._mesg(
+            ProtocolCode.SEND_ANGLES,
+            angles,
+            speed,
+            has_reply=True,
+            _async=_async,
+        )
 
     def send_angle(self, joint_id, angle, speed, _async=False):
         """Send one angle of joint to robot arm.
@@ -869,9 +998,19 @@ class Pro450Client(CloseLoop):
             speed : (int) 1 ~ 100
         """
         self.calibration_parameters(
-            class_name=self.__class__.__name__, joint_id=joint_id, angle=angle, speed=speed)
-        return self._mesg(ProtocolCode.SEND_ANGLE, joint_id, [self._angle2int(angle)], speed, has_reply=True,
-                          _async=_async)
+            class_name=self.__class__.__name__,
+            joint_id=joint_id,
+            angle=angle,
+            speed=speed,
+        )
+        return self._mesg(
+            ProtocolCode.SEND_ANGLE,
+            joint_id,
+            [self._angle2int(angle)],
+            speed,
+            has_reply=True,
+            _async=_async,
+        )
 
     def send_coord(self, coord_id, coord, speed, _async=False):
         """Send one coord to robot arm.
@@ -889,10 +1028,22 @@ class Pro450Client(CloseLoop):
         """
 
         self.calibration_parameters(
-            class_name=self.__class__.__name__, coord_id=coord_id, coord=coord, speed=speed)
-        value = self._coord2int(
-            coord) if coord_id <= 3 else self._angle2int(coord)
-        return self._mesg(ProtocolCode.SEND_COORD, coord_id, [value], speed, has_reply=True, _async=_async)
+            class_name=self.__class__.__name__,
+            coord_id=coord_id,
+            coord=coord,
+            speed=speed,
+        )
+        value = (
+            self._coord2int(coord) if coord_id <= 3 else self._angle2int(coord)
+        )
+        return self._mesg(
+            ProtocolCode.SEND_COORD,
+            coord_id,
+            [value],
+            speed,
+            has_reply=True,
+            _async=_async,
+        )
 
     def send_coords(self, coords, speed, _async=False):
         """Send all coords to robot arm.
@@ -908,13 +1059,20 @@ class Pro450Client(CloseLoop):
             speed : (int) 1 ~ 100
         """
         self.calibration_parameters(
-            class_name=self.__class__.__name__, coords=coords, speed=speed)
+            class_name=self.__class__.__name__, coords=coords, speed=speed
+        )
         coord_list = []
         for idx in range(3):
             coord_list.append(self._coord2int(coords[idx]))
         for angle in coords[3:]:
             coord_list.append(self._angle2int(angle))
-        return self._mesg(ProtocolCode.SEND_COORDS, coord_list, speed, has_reply=True, _async=_async)
+        return self._mesg(
+            ProtocolCode.SEND_COORDS,
+            coord_list,
+            speed,
+            has_reply=True,
+            _async=_async,
+        )
 
     def get_joint_min_angle(self, joint_id):
         """Gets the minimum movement angle of the specified joint
@@ -926,7 +1084,8 @@ class Pro450Client(CloseLoop):
             angle value(float)
         """
         self.calibration_parameters(
-            class_name=self.__class__.__name__, joint_id=joint_id)
+            class_name=self.__class__.__name__, joint_id=joint_id
+        )
         return self._mesg(ProtocolCode.GET_JOINT_MIN_ANGLE, joint_id)
 
     def get_joint_max_angle(self, joint_id):
@@ -939,7 +1098,8 @@ class Pro450Client(CloseLoop):
             angle value(float)
         """
         self.calibration_parameters(
-            class_name=self.__class__.__name__, joint_id=joint_id)
+            class_name=self.__class__.__name__, joint_id=joint_id
+        )
         return self._mesg(ProtocolCode.GET_JOINT_MAX_ANGLE, joint_id)
 
     def set_joint_max_angle(self, joint_id, degree):
@@ -953,7 +1113,10 @@ class Pro450Client(CloseLoop):
             1 - success
         """
         self.calibration_parameters(
-            class_name=self.__class__.__name__, joint_id=joint_id, degree=degree)
+            class_name=self.__class__.__name__,
+            joint_id=joint_id,
+            degree=degree,
+        )
         return self._mesg(ProtocolCode.SET_JOINT_MAX, joint_id, degree)
 
     def set_joint_min_angle(self, joint_id, degree):
@@ -967,7 +1130,10 @@ class Pro450Client(CloseLoop):
             1 - success
         """
         self.calibration_parameters(
-            class_name=self.__class__.__name__, joint_id=joint_id, degree=degree)
+            class_name=self.__class__.__name__,
+            joint_id=joint_id,
+            degree=degree,
+        )
         return self._mesg(ProtocolCode.SET_JOINT_MIN, joint_id, degree)
 
     def set_debug_state(self, log_state):
@@ -988,7 +1154,9 @@ class Pro450Client(CloseLoop):
         Returns:
             int: 1-success, 0-failure, -1-error
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, log_state=log_state)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, log_state=log_state
+        )
         return self._mesg(ProtocolCode.SET_DEBUG_LOG_MODE, log_state)
 
     def get_debug_state(self):
@@ -1018,8 +1186,19 @@ class Pro450Client(CloseLoop):
             _async (bool, optional): Whether to execute asynchronous control. Defaults to True.
         """
         self.calibration_parameters(
-            class_name=self.__class__.__name__, joint_id=joint_id, direction=direction, speed=speed)
-        return self._mesg(ProtocolCode.JOG_ANGLE, joint_id, direction, speed, _async=_async, has_reply=True)
+            class_name=self.__class__.__name__,
+            joint_id=joint_id,
+            direction=direction,
+            speed=speed,
+        )
+        return self._mesg(
+            ProtocolCode.JOG_ANGLE,
+            joint_id,
+            direction,
+            speed,
+            _async=_async,
+            has_reply=True,
+        )
 
     def set_fusion_parameters(self, rank_mode, value):
         """Set speed fusion planning parameters
@@ -1033,8 +1212,13 @@ class Pro450Client(CloseLoop):
             value: 0 ~ 10000
         """
         self.calibration_parameters(
-            class_name=self.__class__.__name__, rank_mode=rank_mode, rank_mode_value=value)
-        return self._mesg(ProtocolCode.SET_FUSION_PARAMETERS, rank_mode, [value])
+            class_name=self.__class__.__name__,
+            rank_mode=rank_mode,
+            rank_mode_value=value,
+        )
+        return self._mesg(
+            ProtocolCode.SET_FUSION_PARAMETERS, rank_mode, [value]
+        )
 
     def set_max_acc(self, mode, max_acc):
         """Set maximum acceleration
@@ -1044,7 +1228,8 @@ class Pro450Client(CloseLoop):
             max_acc (int): maximum acceleration value. Angular acceleration range is 1 ~ 200°/s. Coordinate acceleration range is 1 ~ 400mm/s
         """
         self.calibration_parameters(
-            class_name=self.__class__.__name__, mode=mode, max_acc=max_acc)
+            class_name=self.__class__.__name__, mode=mode, max_acc=max_acc
+        )
         return self._mesg(ProtocolCode.SET_MAX_ACC, mode, [max_acc])
 
     def jog_increment_angle(self, joint_id, increment, speed, _async=False):
@@ -1056,10 +1241,21 @@ class Pro450Client(CloseLoop):
             speed: int (1 - 100)
         """
         self.calibration_parameters(
-            class_name=self.__class__.__name__, joint_id=joint_id, increment_angle=increment, speed=speed)
+            class_name=self.__class__.__name__,
+            joint_id=joint_id,
+            increment_angle=increment,
+            speed=speed,
+        )
         scaled_increment = self._angle2int(increment)
         scaled_increment = max(min(scaled_increment, 32767), -32768)
-        return self._mesg(ProtocolCode.JOG_INCREMENT, joint_id, [scaled_increment], speed, has_reply=True, _async=_async)
+        return self._mesg(
+            ProtocolCode.JOG_INCREMENT,
+            joint_id,
+            [scaled_increment],
+            speed,
+            has_reply=True,
+            _async=_async,
+        )
 
     def jog_increment_coord(self, coord_id, increment, speed, _async=False):
         """Single coordinate incremental motion control.
@@ -1071,13 +1267,24 @@ class Pro450Client(CloseLoop):
             speed: int (1 - 100)
         """
         self.calibration_parameters(
-            class_name=self.__class__.__name__, coord_id=coord_id, increment_coord=increment, speed=speed)
+            class_name=self.__class__.__name__,
+            coord_id=coord_id,
+            increment_coord=increment,
+            speed=speed,
+        )
         if coord_id <= 3:
             value = self._coord2int(increment)
         else:
             scaled_increment = self._angle2int(increment)
             value = max(min(scaled_increment, 32767), -32768)
-        return self._mesg(ProtocolCode.JOG_INCREMENT_COORD, coord_id, [value], speed, has_reply=True, _async=_async)
+        return self._mesg(
+            ProtocolCode.JOG_INCREMENT_COORD,
+            coord_id,
+            [value],
+            speed,
+            has_reply=True,
+            _async=_async,
+        )
 
     def set_communication_mode(self, communication_mode, protocol_mode=None):
         """Set communication mode
@@ -1092,12 +1299,23 @@ class Pro450Client(CloseLoop):
         """
         if protocol_mode is not None:
             self.calibration_parameters(
-                class_name=self.__class__.__name__, communication_mode=communication_mode, protocol_mode=protocol_mode)
-            return self._mesg(ProtocolCode.SET_COMMUNICATION_MODE, communication_mode, protocol_mode)
+                class_name=self.__class__.__name__,
+                communication_mode=communication_mode,
+                protocol_mode=protocol_mode,
+            )
+            return self._mesg(
+                ProtocolCode.SET_COMMUNICATION_MODE,
+                communication_mode,
+                protocol_mode,
+            )
         else:
             self.calibration_parameters(
-                class_name=self.__class__.__name__, communication_mode=communication_mode)
-            return self._mesg(ProtocolCode.SET_COMMUNICATION_MODE, communication_mode)
+                class_name=self.__class__.__name__,
+                communication_mode=communication_mode,
+            )
+            return self._mesg(
+                ProtocolCode.SET_COMMUNICATION_MODE, communication_mode
+            )
 
     def get_communication_mode(self):
         """Get communication mode
@@ -1120,12 +1338,16 @@ class Pro450Client(CloseLoop):
             timeout (int): Timeout ms
 
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, communicate_mode=communicate_mode,
-                                    baud_rate=baud_rate, timeout=timeout)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__,
+            communicate_mode=communicate_mode,
+            baud_rate=baud_rate,
+            timeout=timeout,
+        )
         data = bytearray()
-        data += communicate_mode.to_bytes(1, 'big')
-        data += baud_rate.to_bytes(4, 'big')
-        data += timeout.to_bytes(4, 'big')
+        data += communicate_mode.to_bytes(1, "big")
+        data += baud_rate.to_bytes(4, "big")
+        data += timeout.to_bytes(4, "big")
         return self._mesg(ProtocolCode.SET_BASE_EXTERNAL_CONFIG, *data)
 
     def get_base_external_config(self):
@@ -1146,7 +1368,9 @@ class Pro450Client(CloseLoop):
             joint_id (int): joint ID, 1 ~ 6.
             direction (int): 1 - forward, 0 - backward
         """
-        return self._mesg(ProtocolCode.SET_MODEL_DIRECTION, joint_id, direction)
+        return self._mesg(
+            ProtocolCode.SET_MODEL_DIRECTION, joint_id, direction
+        )
 
     def set_control_mode(self, mode=0):
         """Set robot motion mode
@@ -1156,7 +1380,8 @@ class Pro450Client(CloseLoop):
 
         """
         self.calibration_parameters(
-            class_name=self.__class__.__name__, mode=mode)
+            class_name=self.__class__.__name__, mode=mode
+        )
         return self._mesg(ProtocolCode.SET_CONTROL_MODE, mode)
 
     def base_external_can_control(self, can_id, can_data):
@@ -1167,9 +1392,15 @@ class Pro450Client(CloseLoop):
             can_data (list): The maximum length is 64
 
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, can_id=can_id, can_data=can_data)
-        can_id_bytes = can_id.to_bytes(4, 'big')
-        return self._mesg(ProtocolCode.SET_BASE_EXTERNAL_CONTROL, *can_id_bytes, *can_data)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__,
+            can_id=can_id,
+            can_data=can_data,
+        )
+        can_id_bytes = can_id.to_bytes(4, "big")
+        return self._mesg(
+            ProtocolCode.SET_BASE_EXTERNAL_CONTROL, *can_id_bytes, *can_data
+        )
 
     def base_external_485_control(self, data):
         """Bottom external device 485 control
@@ -1178,7 +1409,9 @@ class Pro450Client(CloseLoop):
             data (list): The maximum length is 64
 
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, data_485=data)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, data_485=data
+        )
         return self._mesg(ProtocolCode.SET_BASE_EXTERNAL_CONTROL, *data)
 
     def get_error_information(self):
@@ -1206,7 +1439,8 @@ class Pro450Client(CloseLoop):
 
         """
         self.calibration_parameters(
-            class_name=self.__class__.__name__, rgb=[r, g, b])
+            class_name=self.__class__.__name__, rgb=[r, g, b]
+        )
         return self._mesg(ProtocolCode.SET_COLOR_PRO450, r, g, b)
 
     def parameter_identify(self):
@@ -1220,7 +1454,8 @@ class Pro450Client(CloseLoop):
             trajectory (int): 0 ~ 1
         """
         self.calibration_parameters(
-            class_name=self.__class__.__name__, trajectory=trajectory)
+            class_name=self.__class__.__name__, trajectory=trajectory
+        )
         return self._mesg(ProtocolCode.FOURIER_TRAJECTORIES, trajectory)
 
     def set_world_reference(self, coords):
@@ -1229,7 +1464,9 @@ class Pro450Client(CloseLoop):
         Args:
             coords: a list of coords value(List[float]). [x(mm), y, z, rx(angle), ry, rz]
         """
-        self.calibration_parameters(class_name = self.__class__.__name__, world_coords=coords)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, world_coords=coords
+        )
         coord_list = []
         for idx in range(3):
             coord_list.append(self._coord2int(coords[idx]))
@@ -1243,7 +1480,9 @@ class Pro450Client(CloseLoop):
         Args:
             coords: a list of coords value(List[float])
         """
-        self.calibration_parameters(class_name = self.__class__.__name__, tool_coords=coords)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, tool_coords=coords
+        )
         coord_list = []
         for idx in range(3):
             coord_list.append(self._coord2int(coords[idx]))
@@ -1261,4 +1500,3 @@ class Pro450Client(CloseLoop):
             0 : failed.
         """
         return self.send_angles([0, 0, 0, 0, 0, 0], speed, _async=_async)
-

@@ -8,13 +8,17 @@ from pymycobot import MyArmM
 
 
 class Config:
-    host = "127.0.0.1"              # C650 server host.
-    port = 8001                     # C650 server port.
-    angle_conversion = False        # Whether to roll back the angles of the robotic arm.
-    execution_speed: int = 50       # The speed of the robotic arm.
+    host = "127.0.0.1"  # C650 server host.
+    port = 8001  # C650 server port.
+    angle_conversion = (
+        False  # Whether to roll back the angles of the robotic arm.
+    )
+    execution_speed: int = 50  # The speed of the robotic arm.
 
 
-gripper_angular_transformation_equations = lambda x: round((x - 0.08) / (-95.27 - 0.08) * (-123.13 + 1.23) - 1.23)
+gripper_angular_transformation_equations = lambda x: round(
+    (x - 0.08) / (-95.27 - 0.08) * (-123.13 + 1.23) - 1.23
+)
 
 
 M750_limit_info = [
@@ -24,7 +28,7 @@ M750_limit_info = [
     (-155, 153),
     (-91, 88),
     (-153, 153),
-    (-118, 2)
+    (-118, 2),
 ]
 
 
@@ -66,15 +70,19 @@ def setup_robotic_connect(comport: str) -> T.Optional[MyArmM]:
     except SerialException as serial_error:
         for error in serial_error.args:
             if error.startswith("could not open port"):
-                print(f" # (Error) Serial port 【{comport}】 is not available.")
+                print(
+                    f" # (Error) Serial port 【{comport}】 is not available."
+                )
             else:
-                print(f" # (Error) Error while connecting robotic: {serial_error}")
+                print(
+                    f" # (Error) Error while connecting robotic: {serial_error}"
+                )
     return robotic_api
 
 
 def processing_data(data):
-    data = data.split('\n')[-1]
-    angles = list(map(float, data[1:-1].split(',')))
+    data = data.split("\n")[-1]
+    angles = list(map(float, data[1:-1].split(",")))
     return angles
 
 
@@ -84,7 +92,11 @@ def main(host: str = Config.host, port: int = Config.port):
         print(" # (Warn) No serial ports found. exit")
         return
 
-    serial_comport = utils.select("# (Info) Please select a serial port to connect robotic arm:", serial_ports, 1)
+    serial_comport = utils.select(
+        "# (Info) Please select a serial port to connect robotic arm:",
+        serial_ports,
+        1,
+    )
 
     print(f" # (Info) Selected {serial_comport} to connect robotic arm")
 
@@ -100,16 +112,22 @@ def main(host: str = Config.host, port: int = Config.port):
         socket_api = setup_socket_connect(host, port)
         if socket_api is not None:
             break
-        print(f" # (Error) Can't connect to {host}:{port}, connection retrying...")
+        print(
+            f" # (Error) Can't connect to {host}:{port}, connection retrying..."
+        )
 
     print(f" # (Info) Connected to {host}:{port}")
-    print(f" # (Info) Start listening for changes in the angle of the robotic arm")
+    print(
+        f" # (Info) Start listening for changes in the angle of the robotic arm"
+    )
     print(f" # (Info) Press 【Ctrl+C】 to exit")
     while True:
         try:
             data = socket_api.recv(1024)
-            angles = processing_data(data.decode('utf-8'))
-            angles = flexible_parameters(angles, rollback=Config.angle_conversion)
+            angles = processing_data(data.decode("utf-8"))
+            angles = flexible_parameters(
+                angles, rollback=Config.angle_conversion
+            )
 
             arm_angles: list = robotic_api.get_joints_angle() or []
             for joint_id, angle in enumerate(arm_angles, start=1):
@@ -121,7 +139,9 @@ def main(host: str = Config.host, port: int = Config.port):
                     break
             else:
                 print(f" # (Info) Recv angles: {angles}")
-                robotic_api.set_joints_angle(angles=angles, speed=Config.execution_speed)
+                robotic_api.set_joints_angle(
+                    angles=angles, speed=Config.execution_speed
+                )
 
         except KeyboardInterrupt:
             robotic_api.clear_recv_queue()

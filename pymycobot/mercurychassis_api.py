@@ -16,7 +16,6 @@ class ProtocolCode(object):
 
 
 class ChassisControl:
-
     def __init__(self, port, baudrate=115200, timeout=0.1, debug=False):
         """
         Args:
@@ -48,7 +47,9 @@ class ChassisControl:
         hex_data = " ".join(f"{value:02X}" for value in data)
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         if self.debug:
-            print(f"\n***** Debug Info *****\n{current_time} send command: {hex_data}")
+            print(
+                f"\n***** Debug Info *****\n{current_time} send command: {hex_data}"
+            )
 
     def close(self):
         self._serial_port.close()
@@ -62,17 +63,18 @@ class ChassisControl:
         :param flag: Data type parameter variable
         :return:
         """
-        expected_lengths_map = {
-            "voltage": 26,
-            "ultrasonic": 19,
-            "version": 26
-        }
+        expected_lengths_map = {"voltage": 26, "ultrasonic": 19, "version": 26}
         expected_lengths = expected_lengths_map.get(flag, None)
         for _ in range(3):
             receive_all_data = self._read()
             receive_all_data = [byte for byte in receive_all_data]
             if flag == "voltage":
-                receive_data = self._extract_frame(receive_all_data, ProtocolCode.header, ProtocolCode.footer, expected_lengths)
+                receive_data = self._extract_frame(
+                    receive_all_data,
+                    ProtocolCode.header,
+                    ProtocolCode.footer,
+                    expected_lengths,
+                )
                 # print(receive_data, len(receive_data))
                 if receive_data:
                     self._debug(receive_data)
@@ -84,15 +86,29 @@ class ChassisControl:
                     return return_data
 
             elif flag == "ultrasonic":
-                receive_data = self._extract_frame(receive_all_data, ProtocolCode.ultrasound_header, ProtocolCode.ultrasound_footer, expected_lengths)
+                receive_data = self._extract_frame(
+                    receive_all_data,
+                    ProtocolCode.ultrasound_header,
+                    ProtocolCode.ultrasound_footer,
+                    expected_lengths,
+                )
                 # print(receive_data, len(receive_data))
                 if receive_data:
                     self._debug(receive_data)
-                    return_data = [receive_data[1] * 256 + receive_data[2], receive_data[3] * 256 + receive_data[4], receive_data[5] * 256 + receive_data[6]]
+                    return_data = [
+                        receive_data[1] * 256 + receive_data[2],
+                        receive_data[3] * 256 + receive_data[4],
+                        receive_data[5] * 256 + receive_data[6],
+                    ]
                     return return_data
 
             elif flag == "version":
-                receive_data = self._extract_frame(receive_all_data, ProtocolCode.header, ProtocolCode.footer, expected_lengths)
+                receive_data = self._extract_frame(
+                    receive_all_data,
+                    ProtocolCode.header,
+                    ProtocolCode.footer,
+                    expected_lengths,
+                )
                 # print(receive_data, len(receive_data))
                 if receive_data:
                     self._debug(receive_data)
@@ -105,7 +121,9 @@ class ChassisControl:
 
         return None
 
-    def _extract_frame(self, data, frame_header, frame_tail, expected_length=None):
+    def _extract_frame(
+        self, data, frame_header, frame_tail, expected_length=None
+    ):
         """
         Extract the corresponding data
         :param data: Get all data
@@ -120,9 +138,11 @@ class ChassisControl:
             # Find the end of the frame, starting from the frame header
             end_index = data.index(frame_tail, start_index)
             # Extracting dataframe
-            frame = data[start_index:end_index + 1]
+            frame = data[start_index : end_index + 1]
             if expected_length is not None and len(frame) != expected_length:
-                print(f"Error in frame length: expected {expected_length}, actual {len(frame)}, content: {frame}")
+                print(
+                    f"Error in frame length: expected {expected_length}, actual {len(frame)}, content: {frame}"
+                )
                 return []
             return frame
         except ValueError:
@@ -160,14 +180,14 @@ class ChassisControl:
         Get ultrasonic value
         :return: A list of length 3,Unit: mm
         """
-        return self._request('ultrasonic')
+        return self._request("ultrasonic")
 
     def get_base_version(self):
         """
         Get base version
         :return: A string representing the firmware version in the format 'vX.X' (e.g., 'v1.1').
         """
-        return self._request('version')
+        return self._request("version")
 
     def go_straight(self, speed=0.2):
         """
@@ -176,7 +196,11 @@ class ChassisControl:
         :return: None
         """
         if speed < 0 or speed > 0.5:
-            raise Exception("The movement speed range is 0~0.5, but the received value is {}".format(speed))
+            raise Exception(
+                "The movement speed range is 0~0.5, but the received value is {}".format(
+                    speed
+                )
+            )
         self.Send_Data[0] = ProtocolCode.header
         self.Send_Data[1] = 0
         self.Send_Data[2] = 0
@@ -200,7 +224,7 @@ class ChassisControl:
             self._debug(self.Send_Data)
         except serial.SerialException as e:
             e = traceback.format_exc()
-            print('Unable to send data through serial port: {}'.format(e))
+            print("Unable to send data through serial port: {}".format(e))
 
     def go_back(self, speed=-0.2):
         """
@@ -209,7 +233,11 @@ class ChassisControl:
         :return: None
         """
         if not -0.5 <= speed <= 0:
-            raise Exception("The movement speed range is -0.5~0, but the received value is {}".format(speed))
+            raise Exception(
+                "The movement speed range is -0.5~0, but the received value is {}".format(
+                    speed
+                )
+            )
         self.Send_Data = [0] * 11
         self.Send_Data[0] = ProtocolCode.header
         self.Send_Data[1] = 0
@@ -236,7 +264,7 @@ class ChassisControl:
             self._debug(self.Send_Data)
         except serial.SerialException as e:
             e = traceback.format_exc()
-            print('Unable to send data through serial port: {}'.format(e))
+            print("Unable to send data through serial port: {}".format(e))
 
     def turn_left(self, speed=0.2):
         """
@@ -246,7 +274,11 @@ class ChassisControl:
         """
 
         if speed < 0 or speed > 0.5:
-            raise Exception("The movement speed range is 0~5, but the received value is {}".format(speed))
+            raise Exception(
+                "The movement speed range is 0~5, but the received value is {}".format(
+                    speed
+                )
+            )
         self.Send_Data = [0] * 11
         self.Send_Data[0] = ProtocolCode.header
         self.Send_Data[1] = 0
@@ -271,7 +303,7 @@ class ChassisControl:
             self._debug(self.Send_Data)
         except serial.SerialException as e:
             e = traceback.format_exc()
-            print('Unable to send data through serial port: {}'.format(e))
+            print("Unable to send data through serial port: {}".format(e))
 
     def turn_right(self, speed=-0.2):
         """
@@ -280,7 +312,11 @@ class ChassisControl:
         :return: None
         """
         if not -0.5 <= speed <= 0:
-            raise Exception("The movement speed range is -0.5~0, but the received value is {}".format(speed))
+            raise Exception(
+                "The movement speed range is -0.5~0, but the received value is {}".format(
+                    speed
+                )
+            )
         self.Send_Data = [0] * 11
 
         self.Send_Data[0] = ProtocolCode.header
@@ -308,7 +344,7 @@ class ChassisControl:
             self._debug(self.Send_Data)
         except serial.SerialException as e:
             e = traceback.format_exc()
-            print('Unable to send data through serial port: {}'.format(e))
+            print("Unable to send data through serial port: {}".format(e))
 
     def stop(self):
         """
@@ -338,7 +374,7 @@ class ChassisControl:
             self._debug(self.Send_Data)
         except serial.SerialException as e:
             e = traceback.format_exc()
-            print('Unable to send data through serial port: {}'.format(e))
+            print("Unable to send data through serial port: {}".format(e))
 
     def set_color(self, r=0, g=0, b=0):
         """
@@ -348,7 +384,9 @@ class ChassisControl:
         :param b: (int): 0 ~ 255
         :return: None
         """
-        if not (isinstance(r, int) and isinstance(g, int) and isinstance(b, int)):
+        if not (
+            isinstance(r, int) and isinstance(g, int) and isinstance(b, int)
+        ):
             raise ValueError("r, g, and b must be integers.")
         if not (0 <= r <= 255 and 0 <= g <= 255 and 0 <= b <= 255):
             raise ValueError("r, g, and b must be in the range 0-255.")
@@ -373,4 +411,4 @@ class ChassisControl:
             self._debug(self.Send_Data)
         except serial.SerialException as e:
             e = traceback.format_exc()
-            print('Unable to send data through serial port: {}'.format(e))
+            print("Unable to send data through serial port: {}".format(e))

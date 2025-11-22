@@ -38,10 +38,11 @@ class GPIOProtocolCode:
 
 
 class MyCobot280RDKX5Api(DataProcessor):
-
     def __init__(self, debug=False, thread_lock=True):
         super(MyCobot280RDKX5Api, self).__init__(debug)
-        self.calibration_parameters = functools.partial(self.parametric_verification, class_name="MyCobot280")
+        self.calibration_parameters = functools.partial(
+            self.parametric_verification, class_name="MyCobot280"
+        )
         self.thread_lock = thread_lock
         self.lock = threading.Lock()
 
@@ -62,7 +63,9 @@ class MyCobot280RDKX5Api(DataProcessor):
             **kwargs: support `has_reply`
                 has_reply: Whether there is a return value to accept.
         """
-        real_command, has_reply, _ = super(MyCobot280RDKX5Api, self)._mesg(genre, *args, **kwargs)
+        real_command, has_reply, _ = super(MyCobot280RDKX5Api, self)._mesg(
+            genre, *args, **kwargs
+        )
         if self.thread_lock:
             with self.lock:
                 return self._res(real_command, has_reply, genre)
@@ -70,7 +73,10 @@ class MyCobot280RDKX5Api(DataProcessor):
             return self._res(real_command, has_reply, genre)
 
     def _res(self, real_command, has_reply, genre):
-        if genre == ProtocolCode.SET_SSID_PWD or genre == ProtocolCode.GET_SSID_PWD:
+        if (
+            genre == ProtocolCode.SET_SSID_PWD
+            or genre == ProtocolCode.GET_SSID_PWD
+        ):
             self._write(self._flatten(real_command))
             data = self._read(genre)
         else:
@@ -78,7 +84,7 @@ class MyCobot280RDKX5Api(DataProcessor):
             while try_count < 3:
                 self._write(self._flatten(real_command))
                 data = self._read(genre)
-                if data is not None and data != b'':
+                if data is not None and data != b"":
                     break
                 try_count += 1
             else:
@@ -92,10 +98,19 @@ class MyCobot280RDKX5Api(DataProcessor):
             return -1
         if genre in [ProtocolCode.SET_BASIC_OUTPUT]:
             return 1
-        if res is not None and isinstance(res, list) and len(res) == 1 and genre not in [
-            ProtocolCode.GET_BASIC_VERSION, ProtocolCode.GET_JOINT_MIN_ANGLE, ProtocolCode.GET_JOINT_MAX_ANGLE,
-            ProtocolCode.SOFTWARE_VERSION, ProtocolCode.GET_ATOM_VERSION
-        ]:
+        if (
+            res is not None
+            and isinstance(res, list)
+            and len(res) == 1
+            and genre
+            not in [
+                ProtocolCode.GET_BASIC_VERSION,
+                ProtocolCode.GET_JOINT_MIN_ANGLE,
+                ProtocolCode.GET_JOINT_MAX_ANGLE,
+                ProtocolCode.SOFTWARE_VERSION,
+                ProtocolCode.GET_ATOM_VERSION,
+            ]
+        ):
             return res[0]
 
         if genre in [
@@ -126,12 +141,19 @@ class MyCobot280RDKX5Api(DataProcessor):
             ProtocolCode.GetHTSGripperTorque,
             ProtocolCode.GetGripperProtectCurrent,
             ProtocolCode.InitGripper,
-            ProtocolCode.SET_FOUR_PIECES_ZERO
+            ProtocolCode.SET_FOUR_PIECES_ZERO,
         ]:
             return self._process_single(res)
-        elif genre in [ProtocolCode.GET_ANGLES, ProtocolCode.SOLVE_INV_KINEMATICS]:
+        elif genre in [
+            ProtocolCode.GET_ANGLES,
+            ProtocolCode.SOLVE_INV_KINEMATICS,
+        ]:
             return [self._int2angle(angle) for angle in res]
-        elif genre in [ProtocolCode.GET_COORDS, ProtocolCode.GET_TOOL_REFERENCE, ProtocolCode.GET_WORLD_REFERENCE]:
+        elif genre in [
+            ProtocolCode.GET_COORDS,
+            ProtocolCode.GET_TOOL_REFERENCE,
+            ProtocolCode.GET_WORLD_REFERENCE,
+        ]:
             if res:
                 r = []
                 for idx in range(3):
@@ -143,15 +165,20 @@ class MyCobot280RDKX5Api(DataProcessor):
                 return res
         elif genre in [ProtocolCode.GET_SERVO_VOLTAGES]:
             return [self._int2coord(angle) for angle in res]
-        elif genre in [ProtocolCode.GET_JOINT_MAX_ANGLE, ProtocolCode.GET_JOINT_MIN_ANGLE]:
+        elif genre in [
+            ProtocolCode.GET_JOINT_MAX_ANGLE,
+            ProtocolCode.GET_JOINT_MIN_ANGLE,
+        ]:
             return self._int2coord(res[0])
         elif genre in [
-            ProtocolCode.GET_BASIC_VERSION, ProtocolCode.SOFTWARE_VERSION, ProtocolCode.GET_ATOM_VERSION
+            ProtocolCode.GET_BASIC_VERSION,
+            ProtocolCode.SOFTWARE_VERSION,
+            ProtocolCode.GET_ATOM_VERSION,
         ]:
             return self._int2coord(self._process_single(res))
         elif genre in [ProtocolCode.GET_REBOOT_COUNT]:
             return self._process_high_low_bytes(res)
-        elif genre in (ProtocolCode.GET_ANGLES_COORDS, ):
+        elif genre in (ProtocolCode.GET_ANGLES_COORDS,):
             r = []
             for index, el in enumerate(res):
                 if index < 6:
@@ -172,7 +199,6 @@ class MyCobot280RDKX5Api(DataProcessor):
 
 
 class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
-
     # Overall Status
     def get_modify_version(self):
         """get modify version"""
@@ -299,7 +325,7 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
 
     # Motion interface
     def get_angles(self):
-        """ Get the angle of all joints.
+        """Get the angle of all joints.
 
         Return:
             list: A float list of all angle.
@@ -315,8 +341,17 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
             speed : (int) 1 ~ 100
             _async: (default False) Whether to execute asynchronously, Currently invalid
         """
-        self.calibration_parameters(joint_id=joint_id, angle=angle, speed=speed)
-        return self._mesg(ProtocolCode.SEND_ANGLE, joint_id, [self._angle2int(angle)], speed, has_reply=True, _async=_async)
+        self.calibration_parameters(
+            joint_id=joint_id, angle=angle, speed=speed
+        )
+        return self._mesg(
+            ProtocolCode.SEND_ANGLE,
+            joint_id,
+            [self._angle2int(angle)],
+            speed,
+            has_reply=True,
+            _async=_async,
+        )
 
     def send_angles(self, angles, speed, _async=False):
         """Send the angles of all joints to robot arm.
@@ -328,7 +363,13 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
         """
         self.calibration_parameters(angles=angles, speed=speed)
         angles = [self._angle2int(angle) for angle in angles]
-        return self._mesg(ProtocolCode.SEND_ANGLES, angles, speed, has_reply=True, _async=_async)
+        return self._mesg(
+            ProtocolCode.SEND_ANGLES,
+            angles,
+            speed,
+            has_reply=True,
+            _async=_async,
+        )
 
     def get_coords(self):
         """Get the coords from robot arm, coordinate system based on base.
@@ -339,7 +380,7 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
         return self._mesg(ProtocolCode.GET_COORDS, has_reply=True)
 
     def angles_to_coords(self, angles):
-        """ Convert angles to coordinates
+        """Convert angles to coordinates
 
         Args:
             angles : A float list of all angle.
@@ -360,9 +401,20 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
             speed(int) : 1 ~ 100
             _async: (default False) Whether to execute asynchronously, Currently invalid
         """
-        self.calibration_parameters(coord_id=coord_id, coord=coord, speed=speed)
-        value = self._coord2int(coord) if coord_id <= 3 else self._angle2int(coord)
-        return self._mesg(ProtocolCode.SEND_COORD, coord_id, [value], speed, has_reply=True, _async=_async)
+        self.calibration_parameters(
+            coord_id=coord_id, coord=coord, speed=speed
+        )
+        value = (
+            self._coord2int(coord) if coord_id <= 3 else self._angle2int(coord)
+        )
+        return self._mesg(
+            ProtocolCode.SEND_COORD,
+            coord_id,
+            [value],
+            speed,
+            has_reply=True,
+            _async=_async,
+        )
 
     def send_coords(self, coords, speed, coord_mode=None, _async=False):
         """Send all coords to robot arm.
@@ -373,16 +425,30 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
             coord_mode : (int) 0 - angluar, 1 - linear
             _async: (default False) Whether to execute asynchronously, Currently invalid
         """
-        self.calibration_parameters(coords=coords, speed=speed, coord_mode=coord_mode)
+        self.calibration_parameters(
+            coords=coords, speed=speed, coord_mode=coord_mode
+        )
         coord_list = []
         for idx in range(3):
             coord_list.append(self._coord2int(coords[idx]))
         for angle in coords[3:]:
             coord_list.append(self._angle2int(angle))
         if coord_mode is not None:
-            return self._mesg(ProtocolCode.SEND_COORDS, coord_list, speed, coord_mode, _async=_async)
+            return self._mesg(
+                ProtocolCode.SEND_COORDS,
+                coord_list,
+                speed,
+                coord_mode,
+                _async=_async,
+            )
         else:
-            return self._mesg(ProtocolCode.SEND_COORDS, coord_list, speed, has_reply=True, _async=_async)
+            return self._mesg(
+                ProtocolCode.SEND_COORDS,
+                coord_list,
+                speed,
+                has_reply=True,
+                _async=_async,
+            )
 
     def sync_send_angles(self, degrees, speed, timeout=15):
         """Send the angle in synchronous state and return when the target point is reached
@@ -465,7 +531,9 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
         else:
             raise Exception("mode is not right, please input 0 or 1")
 
-        return self._mesg(ProtocolCode.IS_IN_POSITION, data_list, id, has_reply=True)
+        return self._mesg(
+            ProtocolCode.IS_IN_POSITION, data_list, id, has_reply=True
+        )
 
     def is_moving(self):
         """Detect if the robot is moving
@@ -486,7 +554,9 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
             direction: 0 - decrease, 1 - increase
             speed: int (0 - 100)
         """
-        self.calibration_parameters(joint_id=joint_id, direction=direction, speed=speed)
+        self.calibration_parameters(
+            joint_id=joint_id, direction=direction, speed=speed
+        )
         return self._mesg(ProtocolCode.JOG_ANGLE, joint_id, direction, speed)
 
     def jog_rpy(self, end_direction, direction, speed):
@@ -498,7 +568,9 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
             speed (int): 1 ~ 100
         """
         self.calibration_parameters(end_direction=end_direction, speed=speed)
-        return self._mesg(ProtocolCode.JOG_ABSOLUTE, end_direction, direction, speed)
+        return self._mesg(
+            ProtocolCode.JOG_ABSOLUTE, end_direction, direction, speed
+        )
 
     def jog_coord(self, coord_id, direction, speed):
         """Jog control coord.
@@ -508,11 +580,13 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
             direction: 0 - decrease, 1 - increase
             speed: int (1 - 100)
         """
-        self.calibration_parameters(coord_id=coord_id, direction=direction, speed=speed)
+        self.calibration_parameters(
+            coord_id=coord_id, direction=direction, speed=speed
+        )
         return self._mesg(ProtocolCode.JOG_COORD, coord_id, direction, speed)
 
     def jog_increment_angle(self, joint_id, increment, speed):
-        """ angle step mode
+        """angle step mode
 
         Args:
             joint_id: int 1-6.
@@ -520,7 +594,12 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
             speed: int (1 - 100)
         """
         self.calibration_parameters(id=joint_id, speed=speed, angle=increment)
-        return self._mesg(ProtocolCode.JOG_INCREMENT, joint_id, [self._angle2int(increment)], speed)
+        return self._mesg(
+            ProtocolCode.JOG_INCREMENT,
+            joint_id,
+            [self._angle2int(increment)],
+            speed,
+        )
 
     def jog_increment_coord(self, coord_id, increment, speed):
         """coord step mode
@@ -530,9 +609,17 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
             increment: Coord increment value
             speed: int (1 - 100)
         """
-        self.calibration_parameters(coord_id=coord_id, speed=speed, coord=increment)
-        value = self._coord2int(increment) if coord_id <= 3 else self._angle2int(increment)
-        return self._mesg(ProtocolCode.JOG_INCREMENT_COORD, coord_id, [value], speed)
+        self.calibration_parameters(
+            coord_id=coord_id, speed=speed, coord=increment
+        )
+        value = (
+            self._coord2int(increment)
+            if coord_id <= 3
+            else self._angle2int(increment)
+        )
+        return self._mesg(
+            ProtocolCode.JOG_INCREMENT_COORD, coord_id, [value], speed
+        )
 
     def set_HTS_gripper_torque(self, gripper_torque):
         """Set new adaptive gripper torque
@@ -545,7 +632,9 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
             1: Set successful
         """
         self.calibration_parameters(gripper_torque=gripper_torque)
-        return self._mesg(ProtocolCode.SetHTSGripperTorque, [gripper_torque], has_reply=True)
+        return self._mesg(
+            ProtocolCode.SetHTSGripperTorque, [gripper_torque], has_reply=True
+        )
 
     def get_HTS_gripper_torque(self):
         """Get gripper torque
@@ -561,7 +650,9 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
         Returns:
             int: 1 ~ 500
         """
-        return self._mesg(ProtocolCode.GetGripperProtectCurrent, has_reply=True)
+        return self._mesg(
+            ProtocolCode.GetGripperProtectCurrent, has_reply=True
+        )
 
     def init_gripper(self):
         """Initialize gripper
@@ -579,7 +670,9 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
         """
         self.calibration_parameters(protect_current=protect_current)
 
-        return self._mesg(ProtocolCode.SetGripperProtectCurrent, [protect_current])
+        return self._mesg(
+            ProtocolCode.SetGripperProtectCurrent, [protect_current]
+        )
 
     def set_encoder(self, servo_id, encoder, speed):
         """Set a single joint rotation to the specified potential value.
@@ -589,7 +682,9 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
             encoder: The value of the set encoder.
             speed : 1 - 100
         """
-        self.calibration_parameters(servo_id=servo_id, encoder=encoder, speed=speed)
+        self.calibration_parameters(
+            servo_id=servo_id, encoder=encoder, speed=speed
+        )
         return self._mesg(ProtocolCode.SET_ENCODER, servo_id, [encoder], speed)
 
     def get_encoder(self, servo_id):
@@ -632,7 +727,9 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
             angle value(float)
         """
         self.calibration_parameters(joint_id=joint_id)
-        return self._mesg(ProtocolCode.GET_JOINT_MIN_ANGLE, joint_id, has_reply=True)
+        return self._mesg(
+            ProtocolCode.GET_JOINT_MIN_ANGLE, joint_id, has_reply=True
+        )
 
     def get_joint_max_angle(self, joint_id):
         """Gets the maximum movement angle of the specified joint
@@ -644,7 +741,9 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
             angle value(float)
         """
         self.calibration_parameters(joint_id=joint_id)
-        return self._mesg(ProtocolCode.GET_JOINT_MAX_ANGLE, joint_id, has_reply=True)
+        return self._mesg(
+            ProtocolCode.GET_JOINT_MAX_ANGLE, joint_id, has_reply=True
+        )
 
     def set_joint_max(self, joint_id, angle):
         """Set the joint maximum angle
@@ -682,7 +781,9 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
             -1 - error
         """
         self.calibration_parameters(servo_id=servo_id)
-        return self._mesg(ProtocolCode.IS_SERVO_ENABLE, servo_id, has_reply=True)
+        return self._mesg(
+            ProtocolCode.IS_SERVO_ENABLE, servo_id, has_reply=True
+        )
 
     def is_all_servo_enable(self):
         """Detect the connection status of all joints
@@ -706,14 +807,24 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
 
         unique_address = (0, 1, 2, 3, 4)
         if value in unique_address:
-            raise ValueError(f"The address not right, Invalid address, address {unique_address} cannot be modified.")
+            raise ValueError(
+                f"The address not right, Invalid address, address {unique_address} cannot be modified."
+            )
 
         if mode is None:
-            self.calibration_parameters(servo_id=servo_id, address=address, value=value)
-            return self._mesg(ProtocolCode.SET_SERVO_DATA, servo_id, address, value)
+            self.calibration_parameters(
+                servo_id=servo_id, address=address, value=value
+            )
+            return self._mesg(
+                ProtocolCode.SET_SERVO_DATA, servo_id, address, value
+            )
         else:
-            self.calibration_parameters(servo_id=servo_id, address=address, value=value, mode=mode)
-            return self._mesg(ProtocolCode.SET_SERVO_DATA, servo_id, address, [value], mode)
+            self.calibration_parameters(
+                servo_id=servo_id, address=address, value=value, mode=mode
+            )
+            return self._mesg(
+                ProtocolCode.SET_SERVO_DATA, servo_id, address, [value], mode
+            )
 
     def get_servo_data(self, servo_id, address, mode=None):
         """Read the data parameter of the specified address of the steering gear.
@@ -727,10 +838,20 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
             values 0 - 4096
         """
         if mode is not None:
-            self.calibration_parameters(servo_id=servo_id, address=address, mode=mode)
-            return self._mesg(ProtocolCode.GET_SERVO_DATA, servo_id, address, mode, has_reply=True)
+            self.calibration_parameters(
+                servo_id=servo_id, address=address, mode=mode
+            )
+            return self._mesg(
+                ProtocolCode.GET_SERVO_DATA,
+                servo_id,
+                address,
+                mode,
+                has_reply=True,
+            )
         self.calibration_parameters(servo_id=servo_id, address=address)
-        return self._mesg(ProtocolCode.GET_SERVO_DATA, servo_id, address, has_reply=True)
+        return self._mesg(
+            ProtocolCode.GET_SERVO_DATA, servo_id, address, has_reply=True
+        )
 
     def set_servo_calibration(self, servo_id):
         """The current position of the calibration joint actuator is the angle zero point,
@@ -783,9 +904,13 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
             gripper value (int)
         """
         self.calibration_parameters(gripper_type=gripper_type)
-        return self._mesg(ProtocolCode.GET_GRIPPER_VALUE, gripper_type, has_reply=True)
+        return self._mesg(
+            ProtocolCode.GET_GRIPPER_VALUE, gripper_type, has_reply=True
+        )
 
-    def set_gripper_state(self, gripper_state, gripper_speed, gripper_type=None, is_torque=None):
+    def set_gripper_state(
+        self, gripper_state, gripper_speed, gripper_type=None, is_torque=None
+    ):
         """Set gripper switch state
 
         Args:
@@ -801,7 +926,10 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
                 0: Non-force control
         """
         self.calibration_parameters(
-            gripper_state=gripper_state, gripper_speed=gripper_speed, gripper_type=gripper_type, is_torque=is_torque
+            gripper_state=gripper_state,
+            gripper_speed=gripper_speed,
+            gripper_type=gripper_type,
+            is_torque=is_torque,
         )
         args = [gripper_state, gripper_speed]
         if gripper_type is not None:
@@ -810,7 +938,9 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
             args.append(is_torque)
         return self._mesg(ProtocolCode.SET_GRIPPER_STATE, *args)
 
-    def set_gripper_value(self, gripper_value, gripper_speed, gripper_type=None, is_torque=None):
+    def set_gripper_value(
+        self, gripper_value, gripper_speed, gripper_type=None, is_torque=None
+    ):
         """Set gripper value
 
         Args:
@@ -828,14 +958,16 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
             gripper_value=gripper_value,
             speed=gripper_speed,
             gripper_type=gripper_type,
-            is_torque=is_torque
+            is_torque=is_torque,
         )
         args = [gripper_value, gripper_speed]
         if gripper_type is not None:
             args.append(gripper_type)
         if is_torque is not None:
             args.append(is_torque)
-        return self._mesg(ProtocolCode.SET_GRIPPER_VALUE, *args, has_reply=True)
+        return self._mesg(
+            ProtocolCode.SET_GRIPPER_VALUE, *args, has_reply=True
+        )
 
     def set_gripper_calibration(self):
         """Set the current position to zero, set current position value is `2048`."""
@@ -882,7 +1014,9 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
 
     def is_tool_button_click(self):
         """Check whether the button on the end is pressed"""
-        return self._mesg(ProtocolCode.IS_CONTROLLER_BUTTON_PRESSED, has_reply=True)
+        return self._mesg(
+            ProtocolCode.IS_CONTROLLER_BUTTON_PRESSED, has_reply=True
+        )
 
     def set_digital_output(self, pin_no, pin_signal):
         """Set the terminal atom io status
@@ -895,7 +1029,9 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
         if pin_no not in (1, 2):
             raise ValueError("pin_no must be 1 or 2")
 
-        self.calibration_parameters(class_name=self.__class__.__name__, pin_signal=pin_signal)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, pin_signal=pin_signal
+        )
         return self._mesg(ProtocolCode.SET_DIGITAL_OUTPUT, pin_no, pin_signal)
 
     def get_digital_input(self, pin_no):
@@ -907,11 +1043,13 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
         if pin_no not in (1, 2):
             raise ValueError("pin_no must be 1 or 2")
 
-        return self._mesg(ProtocolCode.GET_DIGITAL_INPUT, pin_no, has_reply=True)
+        return self._mesg(
+            ProtocolCode.GET_DIGITAL_INPUT, pin_no, has_reply=True
+        )
 
     # Kinematic algorithm interface api
     def solve_inv_kinematics(self, target_coords, current_angles):
-        """ Convert target coordinates to angles
+        """Convert target coordinates to angles
 
         Args:
             target_coords: A float list of all coordinates.
@@ -920,14 +1058,21 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
         Return:
             list: A float list of all angle.
         """
-        self.calibration_parameters(coords=target_coords, angles=current_angles)
+        self.calibration_parameters(
+            coords=target_coords, angles=current_angles
+        )
         angles = [self._angle2int(angle) for angle in current_angles]
         coord_list = []
         for idx in range(3):
             coord_list.append(self._coord2int(target_coords[idx]))
         for angle in target_coords[3:]:
             coord_list.append(self._angle2int(angle))
-        return self._mesg(ProtocolCode.SOLVE_INV_KINEMATICS, coord_list, angles, has_reply=True)
+        return self._mesg(
+            ProtocolCode.SOLVE_INV_KINEMATICS,
+            coord_list,
+            angles,
+            has_reply=True,
+        )
 
     # Coordinate transformation
     def set_tool_reference(self, coords):
@@ -946,7 +1091,7 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
         return self._mesg(ProtocolCode.SET_TOOL_REFERENCE, coord_list)
 
     def get_tool_reference(self):
-        """Get tool coordinate system """
+        """Get tool coordinate system"""
         return self._mesg(ProtocolCode.GET_TOOL_REFERENCE, has_reply=True)
 
     def set_world_reference(self, coords):
@@ -975,7 +1120,9 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
             reference_frame_type: 0 - base 1 - tool.
         """
         self.calibration_parameters(reference_frame_type=reference_frame_type)
-        return self._mesg(ProtocolCode.SET_REFERENCE_FRAME, reference_frame_type)
+        return self._mesg(
+            ProtocolCode.SET_REFERENCE_FRAME, reference_frame_type
+        )
 
     def get_reference_frame(self):
         """Get the base coordinate system
@@ -1022,8 +1169,7 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
 
     # 9G Servo backgammon
     def move_round(self):
-        """Drive the 9g steering gear clockwise for one revolution
-        """
+        """Drive the 9g steering gear clockwise for one revolution"""
         return self._mesg(ProtocolCode.move_round)
 
     def set_four_pieces_zero(self):
@@ -1130,8 +1276,14 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
 
 
 class MyCobot280RDKX5(MyCobot280RDKX5CommandGenerator):
-
-    def __init__(self, port, baudrate=100_0000, timeout=0.1, debug=False, thread_lock=True):
+    def __init__(
+        self,
+        port,
+        baudrate=100_0000,
+        timeout=0.1,
+        debug=False,
+        thread_lock=True,
+    ):
         """
         Args:
             port     : port string
@@ -1140,7 +1292,9 @@ class MyCobot280RDKX5(MyCobot280RDKX5CommandGenerator):
             debug    : whether show debug info
         """
         super().__init__(debug, thread_lock)
-        self._serial_port = setup_serial_port(port=port, baudrate=baudrate, timeout=timeout)
+        self._serial_port = setup_serial_port(
+            port=port, baudrate=baudrate, timeout=timeout
+        )
         self._write = functools.partial(write, self)
         self._read = functools.partial(read, self)
 
@@ -1156,7 +1310,10 @@ class MyCobot280RDKX5Socket(MyCobot280RDKX5CommandGenerator):
 
     server file: https://github.com/elephantrobotics/pymycobot/demo/Server_280_RDK_X5.py
     """
-    def __init__(self, ip, port=30002, timeout=0.1, debug=False, thread_lock=True):
+
+    def __init__(
+        self, ip, port=30002, timeout=0.1, debug=False, thread_lock=True
+    ):
         super().__init__(debug, thread_lock)
         self.sock = setup_socket_connect(ip, port, timeout)
         self._write = functools.partial(write, self, method="socket")
@@ -1189,7 +1346,9 @@ class MyCobot280RDKX5Socket(MyCobot280RDKX5CommandGenerator):
         if initial not in (0, 1):
             raise ValueError("initial must be 0 or 1")
 
-        return self._mesg(GPIOProtocolCode.SETUP_GPIO_STATE, pin_no, mode, initial)
+        return self._mesg(
+            GPIOProtocolCode.SETUP_GPIO_STATE, pin_no, mode, initial
+        )
 
     def set_gpio_output(self, pin_no, state):
         """Set the pin to high or low level
@@ -1208,7 +1367,9 @@ class MyCobot280RDKX5Socket(MyCobot280RDKX5CommandGenerator):
         Returns:
             (int) 0 - low, 1 - high, 255 - error
         """
-        return self._mesg(GPIOProtocolCode.GET_GPIO_INPUT, pin_no, has_reply=True)
+        return self._mesg(
+            GPIOProtocolCode.GET_GPIO_INPUT, pin_no, has_reply=True
+        )
 
     def close(self):
         self.sock.close()
@@ -1231,5 +1392,5 @@ def main():
     # print(mc_sock.get_gpio_input(5))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

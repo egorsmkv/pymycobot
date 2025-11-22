@@ -3,12 +3,12 @@ import os
 import time
 from pymycobot.mybuddy import MyBuddy
 import threading
-from threading import Lock,Thread
+from threading import Lock, Thread
 import cv2 as cv
 
 
 # Establish serial connection
-mc = MyBuddy('/dev/ttyACM0', 115200)
+mc = MyBuddy("/dev/ttyACM0", 115200)
 
 
 # Release the arms and record the points passed
@@ -17,7 +17,7 @@ def read():
     t = time.time()
     record_list = []
     print(1)
-    while time.time() - t <20:
+    while time.time() - t < 20:
         angles_1 = mc.get_encoders(1)
         angles_2 = mc.get_encoders(2)
         if angles_1 and angles_2:
@@ -33,7 +33,14 @@ def read():
 def write():
     time.sleep(1.5)
     # The file here uses the saved txt file
-    data = list(filter(None,open(os.path.join(os.getcwd(),'data_musician.txt')).read().splitlines()))
+    data = list(
+        filter(
+            None,
+            open(os.path.join(os.getcwd(), "data_musician.txt"))
+            .read()
+            .splitlines(),
+        )
+    )
     # infinite loop
     while True:
         for angles in data:
@@ -42,6 +49,7 @@ def write():
             time.sleep(0.03)
             mc.set_encoders(2, eval(angles)[1], 100)
             time.sleep(0.2)
+
 
 # show emoji
 def smile():
@@ -56,11 +64,11 @@ def smile():
         if frame is not None:
             print(1)
             cv.imshow(out_win, frame)
-        if cv.waitKey(1) & 0xFF == ord('q') or ret == False:
+        if cv.waitKey(1) & 0xFF == ord("q") or ret == False:
             cap = cv.VideoCapture("/home/ubuntu/emo/look_happy.mp4")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # run with multithreading
     t1 = threading.Thread(target=write)
     t2 = threading.Thread(target=smile)

@@ -22,7 +22,9 @@ class MycobotTest(object):
 
         self.win = tkinter.Tk()
         self.win.title("树莓派版 Mycobot 测试工具")
-        self.win.geometry("918x511+10+10")  # 290 160为窗口大小，+10 +10 定义窗口弹出时的默认展示位置
+        self.win.geometry(
+            "918x511+10+10"
+        )  # 290 160为窗口大小，+10 +10 定义窗口弹出时的默认展示位置
 
         self.port_label = tkinter.Label(self.win, text="选择串口：")
         self.port_label.grid(row=0)
@@ -43,7 +45,9 @@ class MycobotTest(object):
         # Connect
         self.connect_label = tkinter.Label(self.win, text="连接mycobot：")
         self.connect_label.grid(row=2)
-        self.connect = tkinter.Button(self.win, text="连接", command=self.connect_mycobot)
+        self.connect = tkinter.Button(
+            self.win, text="连接", command=self.connect_mycobot
+        )
         self.disconnect = tkinter.Button(
             self.win, text="断开", command=self.disconnect_mycobot
         )
@@ -146,9 +150,7 @@ class MycobotTest(object):
                 \r=================================================
                 {}
                 \r=================================================
-            """.format(
-                e
-            )
+            """.format(e)
             self.write_log_to_Text(err_log)
 
     def disconnect_mycobot(self):
@@ -406,9 +408,13 @@ class MycobotTest(object):
         )
 
         os.system(
-            'echo "' + aging_test_content_py + '" >> /home/pi/Desktop/aging_test.py'
+            'echo "'
+            + aging_test_content_py
+            + '" >> /home/pi/Desktop/aging_test.py'
         )
-        os.system('echo "' + aging_test_content_sh + '" >> /home/pi/aging_test.sh')
+        os.system(
+            'echo "' + aging_test_content_sh + '" >> /home/pi/aging_test.sh'
+        )
         os.system("sudo chmod +x /home/pi/aging_test.sh")
         os.system(
             'echo "'
@@ -434,7 +440,8 @@ class MycobotTest(object):
 
     def get_serial_port_list(self):
         plist = [
-            str(x).split(" - ")[0].strip() for x in serial.tools.list_ports.comports()
+            str(x).split(" - ")[0].strip()
+            for x in serial.tools.list_ports.comports()
         ]
         print(plist)
         self.port_list["value"] = plist
@@ -442,7 +449,9 @@ class MycobotTest(object):
 
     def get_current_time(self):
         """Get current time with format."""
-        current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
+        current_time = time.strftime(
+            "%Y-%m-%d %H:%M:%S", time.localtime(time.time())
+        )
         return current_time
 
     def write_log_to_Text(self, logmsg: str):

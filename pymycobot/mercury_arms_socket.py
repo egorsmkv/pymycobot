@@ -48,7 +48,9 @@ class MercuryArmsSocket(MercuryCommandGenerator):
         self.SERVER_PORT = netport
         self.sock = self.connect_socket()
 
-        self.read_threading = threading.Thread(target=self.read_thread, args=("socket",))
+        self.read_threading = threading.Thread(
+            target=self.read_thread, args=("socket",)
+        )
         self.read_threading.daemon = True
         self.read_threading.start()
         self.get_limit_switch()
@@ -88,9 +90,9 @@ class MercuryArmsSocket(MercuryCommandGenerator):
 
     def __format(self, command: str) -> bytes:
         send_data = {"command": command, "arm": self.arm}
-        data_byter = json.dumps(send_data).encode('utf-8')
-        date_length = struct.pack('!I', len(data_byter))
-        return b''.join([date_length, data_byter])
+        data_byter = json.dumps(send_data).encode("utf-8")
+        date_length = struct.pack("!I", len(data_byter))
+        return b"".join([date_length, data_byter])
 
     def _write(self, command, method=None):
         self.log.debug("_write: {}".format(format_hex_log(command)))
@@ -101,8 +103,10 @@ class MercuryArmsSocket(MercuryCommandGenerator):
         self._write(self._flatten(real_command), method="socket")
 
 
-if __name__ == '__main__':
-    mercury_socket = MercuryArmsSocket("left_arm", ip="192.168.1.216", debug=True)
+if __name__ == "__main__":
+    mercury_socket = MercuryArmsSocket(
+        "left_arm", ip="192.168.1.216", debug=True
+    )
     mercury_socket.send_angle(1, 20, 10)
     # while True:
     #     print(mercury_socket.get_angles())

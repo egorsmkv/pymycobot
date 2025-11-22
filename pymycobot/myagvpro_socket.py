@@ -15,7 +15,7 @@ class MyAGVProSocket(MyAGVProCommandApi):
     def __init__(self, host, port, debug=False, save_serial_log=False):
         super().__init__(debug=debug, save_serial_log=save_serial_log)
         self._socket = setup_socket_connect(host=host, port=port)
-        self._serial_filename = 'agvpro_socket_serial.log'
+        self._serial_filename = "agvpro_socket_serial.log"
         self._communication_mode = 1
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -31,7 +31,7 @@ class MyAGVProSocket(MyAGVProCommandApi):
         try:
             return self._socket.recv(size)
         except socket.timeout:
-            return b''
+            return b""
 
     def close(self):
         self._socket.close()

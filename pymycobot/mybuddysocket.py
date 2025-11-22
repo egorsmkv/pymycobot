@@ -13,6 +13,7 @@ from pymycobot.common import ProtocolCode, write, read
 from pymycobot.error import calibration_parameters
 # from pymycobot.sms import sms_sts
 
+
 class MyBuddySocket(MyBuddyCommandGenerator):
     """MyCobot Python API Serial communication class.
 
@@ -46,6 +47,7 @@ class MyBuddySocket(MyBuddyCommandGenerator):
         # Other
             wait() *
     """
+
     _write = write
     _read = read
 
@@ -63,14 +65,16 @@ class MyBuddySocket(MyBuddyCommandGenerator):
         self.sock = self.connect_socket()
         self.lock = threading.Lock()
         # super(sms_sts, self).__init__(self._serial_port, 0)
-        
-    def connect(self, serialport="/dev/ttyAMA0", baudrate="1000000", timeout='0.1'):
+
+    def connect(
+        self, serialport="/dev/ttyAMA0", baudrate="1000000", timeout="0.1"
+    ):
         """Connect the robot arm through the serial port and baud rate
         Args:
             serialport: (str) default /dev/ttyAMA0
             baudrate: default 1000000
             timeout: default 0.1
-        
+
         """
         self.rasp = True
         self._write(serialport, "socket")
@@ -94,12 +98,13 @@ class MyBuddySocket(MyBuddyCommandGenerator):
             **kwargs: support `has_reply`
                 has_reply: Whether there is a return value to accept.
         """
-        real_command, has_reply = super(
-            MyBuddySocket, self)._mesg(genre, *args, **kwargs)
+        real_command, has_reply = super(MyBuddySocket, self)._mesg(
+            genre, *args, **kwargs
+        )
         with self.lock:
             self._write(self._flatten(real_command), "socket")
             if has_reply:
-                data = self._read(genre, 'socket')
+                data = self._read(genre, "socket")
                 res = self._process_received(data, genre, arm=12)
                 if res is None:
                     return None
@@ -128,7 +133,7 @@ class MyBuddySocket(MyBuddyCommandGenerator):
                     ProtocolCode.GetHTSGripperTorque,
                     ProtocolCode.GetGripperProtectCurrent,
                     ProtocolCode.InitGripper,
-                    ProtocolCode.SET_FOUR_PIECES_ZERO
+                    ProtocolCode.SET_FOUR_PIECES_ZERO,
                     # ProtocolCode.GET_SERVO_CURRENTS
                 ]:
                     return self._process_single(res)
@@ -143,9 +148,17 @@ class MyBuddySocket(MyBuddyCommandGenerator):
                         return self._int2coord(res[0]) if res else None
                     else:
                         return self._int2angle(res[0]) if res else None
-                elif genre in [ProtocolCode.GET_ALL_BASE_COORDS, ProtocolCode.GET_COORDS, ProtocolCode.GET_TOOL_REFERENCE, ProtocolCode.GET_WORLD_REFERENCE, ProtocolCode.GET_BASE_COORDS, ProtocolCode.GET_BASE_COORD, ProtocolCode.BASE_TO_SINGLE_COORDS]:
+                elif genre in [
+                    ProtocolCode.GET_ALL_BASE_COORDS,
+                    ProtocolCode.GET_COORDS,
+                    ProtocolCode.GET_TOOL_REFERENCE,
+                    ProtocolCode.GET_WORLD_REFERENCE,
+                    ProtocolCode.GET_BASE_COORDS,
+                    ProtocolCode.GET_BASE_COORD,
+                    ProtocolCode.BASE_TO_SINGLE_COORDS,
+                ]:
                     if res:
-                        r = [] 
+                        r = []
                         for idx in range(3):
                             r.append(self._int2coord(res[idx]))
                         for idx in range(3, 6):
@@ -160,9 +173,15 @@ class MyBuddySocket(MyBuddyCommandGenerator):
                         return r
                     else:
                         return res
-                elif genre in [ProtocolCode.GET_JOINT_MAX_ANGLE, ProtocolCode.GET_JOINT_MIN_ANGLE]:
+                elif genre in [
+                    ProtocolCode.GET_JOINT_MAX_ANGLE,
+                    ProtocolCode.GET_JOINT_MIN_ANGLE,
+                ]:
                     return self._int2coord(res[0])
-                elif genre in [ProtocolCode.GET_SERVO_VOLTAGES, ProtocolCode.COLLISION]:
+                elif genre in [
+                    ProtocolCode.GET_SERVO_VOLTAGES,
+                    ProtocolCode.COLLISION,
+                ]:
                     return [self._int2coord(angle) for angle in res]
                 else:
                     return res
@@ -171,9 +190,9 @@ class MyBuddySocket(MyBuddyCommandGenerator):
     def get_radians(self, id):
         """Get the radians of all joints
 
-        Args: 
+        Args:
             id: 1/2 (L/R)
-            
+
         Return:
             list: A list of float radians [radian1, ...]
         """
@@ -189,14 +208,15 @@ class MyBuddySocket(MyBuddyCommandGenerator):
             speed: (int )0 ~ 100
         """
         # calibration_parameters(len6=radians, speed=speed)
-        degrees = [self._angle2int(radian * (180 / math.pi))
-                   for radian in radians]
+        degrees = [
+            self._angle2int(radian * (180 / math.pi)) for radian in radians
+        ]
         return self._mesg(ProtocolCode.SEND_ANGLES, id, degrees, speed)
 
     def set_gpio_mode(self, mode):
         """Set pin coding method
         Args:
-            mode: (str) BCM or BOARD 
+            mode: (str) BCM or BOARD
         """
         self.calibration_parameters(gpiomode=mode)
         if mode == "BCM":
@@ -234,13 +254,13 @@ class MyBuddySocket(MyBuddyCommandGenerator):
     def wait(self, t):
         time.sleep(t)
         return self
-    
+
     def close(self):
         self.sock.close()
-        
+
     def sync_send_angles(self, id, degrees, speed, timeout=15):
         """Send the angle in synchronous state and return when the target point is reached
-            
+
         Args:
             degrees: a list of degree values(List[float]), length 6.
             speed: (int) 0 ~ 100
@@ -257,7 +277,7 @@ class MyBuddySocket(MyBuddyCommandGenerator):
 
     def sync_send_coords(self, id, coords, speed, mode=0, timeout=15):
         """Send the coord in synchronous state and return when the target point is reached
-            
+
         Args:
             coords: a list of coord values(List[float])
             speed: (int) 0 ~ 100

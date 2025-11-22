@@ -3,7 +3,7 @@ import time
 import serial
 import serial.tools.list_ports
 
-#以上需写在代码开头，意为导入项目包
+# 以上需写在代码开头，意为导入项目包
 
 # ultraArmP340 类初始化需要两个参数：串口和波特率
 #   第一个是串口字符串， 如：

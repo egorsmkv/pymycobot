@@ -11,6 +11,7 @@ from pymycobot.error import calibration_parameters
 class DualMercury(CommandGenerator):
     _write = write
     _read = read
+
     def __init__(self, port, baudrate="115200", timeout=0.1, debug=False):
         """
         Args:
@@ -30,7 +31,6 @@ class DualMercury(CommandGenerator):
         self._serial_port.rts = False
         self._serial_port.open()
         self.lock = threading.Lock()
-        
 
     def _mesg(self, genre, *args, **kwargs):
         """
@@ -44,7 +44,9 @@ class DualMercury(CommandGenerator):
             **kwargs: support `has_reply`
                 has_reply: Whether there is a return value to accept.
         """
-        real_command, has_reply = super(Mercury, self)._mesg(genre, *args, **kwargs)
+        real_command, has_reply = super(Mercury, self)._mesg(
+            genre, *args, **kwargs
+        )
         with self.lock:
             self._write(self._flatten(real_command))
 
@@ -98,7 +100,11 @@ class DualMercury(CommandGenerator):
                         return res
                 elif genre in [ProtocolCode.GET_SERVO_VOLTAGES]:
                     return [self._int2coord(angle) for angle in res]
-                elif genre in [ProtocolCode.GET_BASIC_VERSION, ProtocolCode.SOFTWARE_VERSION, ProtocolCode.GET_ATOM_VERSION]:
+                elif genre in [
+                    ProtocolCode.GET_BASIC_VERSION,
+                    ProtocolCode.SOFTWARE_VERSION,
+                    ProtocolCode.GET_ATOM_VERSION,
+                ]:
                     return self._int2coord(self._process_single(res))
                 elif genre in [
                     ProtocolCode.GET_JOINT_MAX_ANGLE,
@@ -124,8 +130,11 @@ class DualMercury(CommandGenerator):
                             if res[i] == 1:
                                 r.append(i)
                     return r
-                elif genre in [ProtocolCode.COBOTX_GET_ANGLE, ProtocolCode.GET_SOLUTION_ANGLES]:
-                        return self._int2angle(res[0])
+                elif genre in [
+                    ProtocolCode.COBOTX_GET_ANGLE,
+                    ProtocolCode.GET_SOLUTION_ANGLES,
+                ]:
+                    return self._int2angle(res[0])
                 else:
                     return res
             return None
@@ -138,15 +147,21 @@ class DualMercury(CommandGenerator):
             speed: 1 - 100.
         """
         self.calibration_parameters(
-            class_name=self.__class__.__name__, speed=speed, solution_angle=angle
+            class_name=self.__class__.__name__,
+            speed=speed,
+            solution_angle=angle,
         )
         return self._mesg(
-            ProtocolCode.COBOTX_SET_SOLUTION_ANGLES, [self._angle2int(angle)], speed
+            ProtocolCode.COBOTX_SET_SOLUTION_ANGLES,
+            [self._angle2int(angle)],
+            speed,
         )
 
     def get_solution_angles(self):
         """Get zero space deflection angle value"""
-        return self._mesg(ProtocolCode.COBOTX_GET_SOLUTION_ANGLES, has_reply=True)
+        return self._mesg(
+            ProtocolCode.COBOTX_GET_SOLUTION_ANGLES, has_reply=True
+        )
 
     def write_move_c(self, transpoint, endpoint, speed):
         """_summary_
@@ -173,7 +188,7 @@ class DualMercury(CommandGenerator):
 
     def go_zero(self):
         """Control the machine to return to the zero position.
-        
+
         Return:
             1 : All motors return to zero position.
             list : Motor with corresponding ID failed to return to zero.
@@ -186,8 +201,12 @@ class DualMercury(CommandGenerator):
         Args:
             joint_id (int): 1 ~ 7 or 11 ~ 13.
         """
-        self.calibration_parameters(class_name=self.__class__.__name__, id=joint_id)
-        return self._mesg(ProtocolCode.COBOTX_GET_ANGLE, joint_id, has_reply=True)
+        self.calibration_parameters(
+            class_name=self.__class__.__name__, id=joint_id
+        )
+        return self._mesg(
+            ProtocolCode.COBOTX_GET_ANGLE, joint_id, has_reply=True
+        )
 
     def is_gone_zero(self):
         """Check if it has returned to zero
@@ -210,14 +229,13 @@ class DualMercury(CommandGenerator):
         #     class_name=self.__class__.__name__, id=joint_id, encoder=encoder
         # )
         return self._mesg(ProtocolCode.SET_ENCODER, joint_id, [encoder])
-    
 
     def servo_restore(self, joint_id):
         """Abnormal recovery of joints
 
         Args:
             joint_id (int): Joint ID.
-                arm : 1 ~ 7 
+                arm : 1 ~ 7
                 waist : 13
                 All joints: 254
         """
@@ -228,13 +246,13 @@ class DualMercury(CommandGenerator):
 
     def close(self):
         self._serial_port.close()
-        
+
     def open(self):
         self._serial_port.open()
 
     def sync_send_angles(self, degrees, speed, timeout=15):
         """Send the angle in synchronous state and return when the target point is reached
-            
+
         Args:
             degrees: a list of degree values(List[float]), length 6.
             speed: (int) 0 ~ 100
@@ -251,7 +269,7 @@ class DualMercury(CommandGenerator):
 
     def sync_send_coords(self, coords, speed, mode=None, timeout=15):
         """Send the coord in synchronous state and return when the target point is reached
-            
+
         Args:
             coords: a list of coord values(List[float])
             speed: (int) 0 ~ 100
