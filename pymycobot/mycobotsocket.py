@@ -1,4 +1,3 @@
-
 import time
 import math
 import socket
@@ -260,7 +259,7 @@ class MyCobotSocket(CommandGenerator):
         self.sock.close()
 
     def open(self):
-        # 关闭之后需要重新连接
+        # Need to reconnect after closing
         self.sock = self.connect_socket()
         # self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # print("====open=",self.sock)

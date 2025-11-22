@@ -1,4 +1,4 @@
-# myarm_m接收角度并执行
+# myarm_m receives angles and executes them
 from pymycobot.error import MyArmDataException
 from pymycobot import MyArmC, MyArmM
 import serial.tools.list_ports
@@ -7,12 +7,12 @@ import socket
 from pymycobot.robot_info import RobotLimit
 
 
-def get_port():  # 获取所有串口号
+def get_port():  # Get all serial port numbers
     port_list = serial.tools.list_ports.comports()
     i = 1
     res = {}
     for port in port_list:
-        print("{} - {}".format(i, port.device))
+        print(f"{i} - {port.device}")
         res[str(i)] = port.device
         i += 1
     return res
@@ -47,11 +47,11 @@ def main():
 
     print("Server start at: %s:%s" % (HOST, PORT))
     print("wait for connection...")
-    # 接收客户端请求
+    # Receive client requests
 
     while True:
         conn, addr = server.accept()
-        # 客户端IP
+        # Client IP
         print("Connected by ", addr)
         while True:
             try:

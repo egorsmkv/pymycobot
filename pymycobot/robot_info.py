@@ -1,5 +1,3 @@
-
-
 class Robot320Info:
     error_info = {
         "zh_CN": {
@@ -83,7 +81,7 @@ class Robot320Info:
 
 
 def _interpret_status_code(language, status_code):
-    # 将状态码映射到易懂的提示信息
+    # Map status codes to easy-to-understand messages
     status_messages = {
         "zh_CN": {
             0: "",

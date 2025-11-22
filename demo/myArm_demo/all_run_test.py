@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding:utf-8 -*-
 # @File    : all_run_test.py
 # @Author  : Wang Weijian
 # @Time    :  2023/07/11 15:38:45
@@ -32,12 +31,11 @@ init_angles = [
 low_speed = 10
 medium_speed = 50
 high_speed = 100
-timet = int(3)
+timet = 3
 
 
 def main():
-    """
-    体现myarm三种不同速度的多种运动姿态
+    """体现myarm三种不同速度的多种运动姿态
     :return: None
     """
     mc.send_angles(init_angles[0], medium_speed)

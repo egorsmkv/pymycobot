@@ -12,7 +12,7 @@ def gripper_test(mc):
     # print()
 
     flag = mc.is_gripper_moving()
-    print("Is gripper moving: {}".format(flag))
+    print(f"Is gripper moving: {flag}")
     time.sleep(1)
 
     # Set the current position to (2048).

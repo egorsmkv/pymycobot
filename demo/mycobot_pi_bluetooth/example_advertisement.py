@@ -176,7 +176,7 @@ def find_adapter(bus):
 
 
 def shutdown(timeout):
-    print("Advertising for {} seconds...".format(timeout))
+    print(f"Advertising for {timeout} seconds...")
     time.sleep(timeout)
     mainloop.quit()
 

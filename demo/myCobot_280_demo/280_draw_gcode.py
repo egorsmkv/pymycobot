@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding:utf-8 -*-
 # This code is suitable for using the mycobot 280 M5 device to draw simple patterns
 # such as triangles, squares, and five-pointed stars.
 # It controls the movement of the robotic arm by parsing instructions in a gcode file to implement drawing operations.
@@ -43,15 +42,14 @@ draw_speed = 100
 
 
 def process_gcode(file_path):
-    """
-    Parse the contents of the gcode file, extract the XYZ coordinate values, and save the coordinate data into a list
+    """Parse the contents of the gcode file, extract the XYZ coordinate values, and save the coordinate data into a list
     :param file_path: Gcode file path
     :return: A coordinate list
     """
     # The last valid coordinate, using the rx, ry, rz values
     # in the current coordinates of the robot arm as the starting attitude
     last_coords = [0.0, 0.0, 0.0, get_coords[3], get_coords[4], get_coords[5]]
-    with open(file_path, "r") as file:
+    with open(file_path) as file:
         # Line-by-line processing instructions
         for line in file:
             command = line.strip()  # Remove newline characters and other whitespace characters at the end of the line

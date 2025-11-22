@@ -1,4 +1,3 @@
-# coding=utf8
 import time
 from pymycobot.mybuddy import MyBuddy
 import threading

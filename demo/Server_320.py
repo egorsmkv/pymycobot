@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# coding:utf-8
 import socket
 import serial
 import time
@@ -9,7 +8,7 @@ import re
 import fcntl
 import struct
 import traceback
-import RPi.GPIO as GPIO
+from RPi import GPIO
 
 """
 Instructions for use:
@@ -110,7 +109,7 @@ def get_logger(name):
     return logger
 
 
-class MyCobot320Server(object):
+class MyCobot320Server:
     def __init__(self, host, port, serial_num="/dev/ttyAMA0", baud=115200):
         """Server class
 
@@ -155,9 +154,7 @@ class MyCobot320Server(object):
                             self.mc.open()
                         else:
                             self.logger.info(
-                                "get command: {}".format(
-                                    [hex(v) for v in command]
-                                )
+                                f"get command: {[hex(v) for v in command]}"
                             )
                             # command = self.re_data_2(command)
                             if command[3] == 170:
@@ -181,9 +178,7 @@ class MyCobot320Server(object):
                             # if command[3] in has_return:
                             res = self.read(command)
                             self.logger.info(
-                                "return datas: {}".format(
-                                    [hex(v) for v in res]
-                                )
+                                f"return datas: {[hex(v) for v in res]}"
                             )
 
                             conn.sendall(res)
@@ -229,12 +224,11 @@ class MyCobot320Server(object):
                 if datas == b"":
                     datas += data
                     pre = k
+                elif k - 1 == pre:
+                    datas += data
                 else:
-                    if k - 1 == pre:
-                        datas += data
-                    else:
-                        datas = b"\xfe"
-                        pre = k
+                    datas = b"\xfe"
+                    pre = k
         else:
             datas = b""
         return datas
@@ -258,5 +252,5 @@ if __name__ == "__main__":
         )[20:24]
     )
     PORT = 9000
-    print("ip: {} port: {}".format(HOST, PORT))
+    print(f"ip: {HOST} port: {PORT}")
     MyCobot320Server(HOST, PORT, "/dev/ttyAMA0", 115200)

@@ -22,7 +22,7 @@ mb: MyBuddy
 ports = []
 
 
-def setup():  # 机械臂检测函数，选择正确的串口
+def setup():  # Robot detection function, choose the correct serial port
     global mb
     # auto select system port
     if platform.system() == "Windows":
@@ -68,7 +68,7 @@ def change():
                     )
 
 
-if __name__ == "__main__":  # 主函数
+if __name__ == "__main__":  # Main function
     setup()
     try:
         change()

@@ -2,15 +2,15 @@ from pymycobot.ultraArmP340 import ultraArmP340
 import time
 import serial
 import serial.tools.list_ports
-# 输入以上代码导入工程所需要的包
+# The imports above bring in the packages needed for the project
 
-# ultraArmP340 类初始化需要两个参数：
-#   第一个是串口字符串， 如：
-#       linux： "/dev/ttyUSB0"
+# ultraArmP340 initialization requires two arguments:
+#   The first is the serial port string, for example:
+#       linux: "/dev/ttyUSB0"
 #       windows: "COM3"
-#   第二个是波特率: 115200
+#   The second is the baud rate: 115200
 #
-#   如:
+#   For example:
 #         linux:
 #              ua = ultraArmP340("/dev/USB0", 115200)
 #           windows:
@@ -21,22 +21,22 @@ plist = [
     str(x).split(" - ")[0].strip() for x in serial.tools.list_ports.comports()
 ]
 
-# 初始化一个ultraArmP340对象
-# 下面为 windows版本创建对象代码
+# Initialize an ultraArmP340 object
+# The code below is for creating the object on Windows
 ua = ultraArmP340(plist[0], 115200)
 
-# ultraArmP340进行坐标运动/角度运动之前必须进行回零，否则无法获取到正确的角度/坐标
+# ultraArmP340 must home before coordinate or angle motion to get correct values
 ua.go_zero()
 time.sleep(0.5)
 
-# 开启吸泵
+# Turn on the pump
 ua.set_gpio_state(0)
 
-# 等待2 秒
+# Wait 2 seconds
 time.sleep(3)
 
 
-# 关闭吸泵
+# Turn off the pump
 ua.set_gpio_state(1)
 
 time.sleep(2)

@@ -273,7 +273,7 @@ def public_check(
                 )
         elif parameter in ["account", "password"]:
             check_value_type(parameter, value_type, exception_class, str)
-        # TODO 280/320共用MyCobot，无法进行数据限位
+        # TODO MyCobot is shared by 280/320, so data limiting is not possible here
         # elif parameter == 'coords':
         #     check_coords(value, robot_limit, class_name, exception_class)
         elif parameter in [

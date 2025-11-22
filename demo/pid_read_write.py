@@ -21,9 +21,9 @@ mc = MyCobot280("COM66", 115200)
 # mc = MyCobot320('COM66', 115200)
 # mc = MyCobot320('/dev/ttyUSB0',115200)
 
-# 参数对应地址
+# Parameter address mapping
 data_id = [7, 21, 22, 23, 24, 26, 27]
-# 修改后的参数
+# Updated parameters
 data = [0, 32, 8, 0, 0, 3, 3]
 
 
@@ -51,7 +51,7 @@ def write():
 if __name__ == "__main__":
     mc.power_on()
     time.sleep(2)
-    # 写入参数（第一次使用先读取再进行修改）
+    # Write parameters (read them first before modifying on initial use)
     write()
-    # 读取参数
+    # Read parameters
     read()

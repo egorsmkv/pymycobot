@@ -1,6 +1,4 @@
-# -*- coding:utf-8 -*-
-"""
-File    : space_arm_angle.py
+"""File    : space_arm_angle.py
 Time    : 2023/11/16
 Function: The function of this script is to make the robot arm move with zero space deflection angle.
 Atom Version: V1.1

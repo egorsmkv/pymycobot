@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import _thread
 import socket
 import json
@@ -49,7 +48,7 @@ def get_send_TCP(sock_rvs):
     print("***tcp_receive data***%s" % time.asctime())
     data = sock_rvs.recv(socket_buf_len)
     print(data)
-    if data == "ROBOT_TCP".encode("utf-8"):
+    if data == b"ROBOT_TCP":
         print("***receive ROBOT_TCP***\n")
         return True, robot_TCP
     else:
@@ -71,7 +70,7 @@ if __name__ == "__main__":
     erobot.start_client()
     rvs_ip = "localhost"
     rvs_port = 2013
-    conSuc_rvs, sock_rvs = connectRvsServer(rvs_ip, rvs_port)  # 连接RVS
+    conSuc_rvs, sock_rvs = connectRvsServer(rvs_ip, rvs_port)  # Connect to RVS
 
     cal_joint = [-10.01, -112.825, 104.148, -82.116, -89.213, -28.698]
     J1 = cal_joint[0]
@@ -82,7 +81,7 @@ if __name__ == "__main__":
     J6 = cal_joint[5]
 
     point = []
-    # home位 p0
+    # Home position p0
     point.append([J1, J2, J3, J4, J5, J6])
 
     # p1
@@ -127,7 +126,7 @@ if __name__ == "__main__":
     point.append([J1 + 3, J2 + 2, J3, J4 - 1, J5 - 3, J6 + 2])
 
     socket_buf_len = 256
-    exec_index = 0  # 拍照次数
+    exec_index = 0  # Photo capture count
     robot_speed = 1000
 
     if erobot.state_check() == False:
@@ -137,7 +136,7 @@ if __name__ == "__main__":
         exec_index = exec_index + 1
         print("第 %d 次拍照" % exec_index)
         print("移动到拍照位")
-        # 移动
+        # Move
         erobot.write_angles(point[exec_index - 1], robot_speed)
         time.sleep(3)
         wait_done()

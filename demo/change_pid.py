@@ -1,4 +1,3 @@
-# coding: utf-8
 import time
 from turtle import goto
 from pymycobot.mycobot280 import MyCobot280
@@ -9,14 +8,14 @@ mc = []
 ports = []
 
 
-def setup():  # 机械臂检测函数，选择正确的串口
+def setup():  # Robot detection function, choose the correct serial port
     global mc
     print("")
 
     plist = list(serial.tools.list_ports.comports())
     idx = 0
     for port in plist:
-        print("{} : {}".format(idx, port))
+        print(f"{idx} : {port}")
         idx += 1
     if idx == 0:
         print(
@@ -24,9 +23,7 @@ def setup():  # 机械臂检测函数，选择正确的串口
         )
         exit(1)
     _in = input(
-        "\nPlease input 0 - {} to choice, you can choice many like: '2,1,3':".format(
-            idx
-        )
+        f"\nPlease input 0 - {idx} to choice, you can choice many like: '2,1,3':"
     )
     idxes = _in.split(",")
     try:
@@ -112,7 +109,7 @@ def change():
                     )
 
 
-if __name__ == "__main__":  # 主函数
+if __name__ == "__main__":  # Main function
     setup()
     print(mc)
     try:

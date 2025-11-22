@@ -16,7 +16,7 @@ from pymycobot import PI_PORT, PI_BAUD
 LOG_NUM = 0
 
 
-class MycobotTest(object):
+class MycobotTest:
     def __init__(self):
         self.mycobot = None
 
@@ -24,14 +24,14 @@ class MycobotTest(object):
         self.win.title("树莓派版 Mycobot 测试工具")
         self.win.geometry(
             "918x511+10+10"
-        )  # 290 160为窗口大小，+10 +10 定义窗口弹出时的默认展示位置
+        )  # 290x160 as window size; +10 +10 sets the default popup location
 
         self.port_label = tkinter.Label(self.win, text="选择串口：")
         self.port_label.grid(row=0)
         self.port_list = ttk.Combobox(
             self.win, width=15, postcommand=self.get_serial_port_list
-        )  # #创建下拉菜单
-        self.get_serial_port_list()  # #给下拉菜单设定值
+        )  # Create a dropdown menu
+        self.get_serial_port_list()  # Populate dropdown values
         self.port_list.current(0)
         self.port_list.grid(row=0, column=1)
 
@@ -145,12 +145,12 @@ class MycobotTest(object):
             # self.mycobot = MyCobot("/dev/cu.usbserial-0213245D", 115200)
             self.write_log_to_Text("连接成功 !")
         except Exception as e:
-            err_log = """\
+            err_log = f"""\
                 \r连接失败 !!!
                 \r=================================================
-                {}
+                {e}
                 \r=================================================
-            """.format(e)
+            """
             self.write_log_to_Text(err_log)
 
     def disconnect_mycobot(self):
@@ -195,7 +195,7 @@ class MycobotTest(object):
             time.sleep(0.1)
 
         if res:
-            self.write_log_to_Text("关节 {} 无法通信！！！".format(res))
+            self.write_log_to_Text(f"关节 {res} 无法通信！！！")
         else:
             self.write_log_to_Text("所有关节连接正常。")
 
@@ -235,7 +235,7 @@ class MycobotTest(object):
             "blue": [0, 0, 255],
         }
         self.mycobot.set_color(*color_dict[color])
-        self.write_log_to_Text("发送颜色: {}.".format(color))
+        self.write_log_to_Text(f"发送颜色: {color}.")
 
     def start_aging_test(self):
         if not self.has_mycobot():
@@ -272,12 +272,7 @@ class MycobotTest(object):
         time.sleep(0.1)
         for i in range(1, 7):
             self.write_log_to_Text(
-                "Read servo {} pid data, 24:{}, 26:{}, 27:{}.".format(
-                    i,
-                    self.mycobot.get_servo_data(i, 24),
-                    self.mycobot.get_servo_data(i, 26),
-                    self.mycobot.get_servo_data(i, 27),
-                )
+                f"Read servo {i} pid data, 24:{self.mycobot.get_servo_data(i, 24)}, 26:{self.mycobot.get_servo_data(i, 26)}, 27:{self.mycobot.get_servo_data(i, 27)}."
             )
             time.sleep(0.1)
 
@@ -292,12 +287,11 @@ class MycobotTest(object):
         return True
 
     def _aging_test(self):
-        """
-        Aging test thread target.
+        """Aging test thread target.
         By using in `start_aging_test()` and `stop_aging_test()`.
         """
         # if socket.gethostname() != "pi":
-        #     self.write_log_to_Text("老化测试支持 Raspberry OS.")
+        #     self.write_log_to_Text("Aging test supports Raspberry OS.")
         #     return
 
         aging_test_content_py = textwrap.dedent(
@@ -457,7 +451,7 @@ class MycobotTest(object):
     def write_log_to_Text(self, logmsg: str):
         global LOG_NUM
         current_time = self.get_current_time()
-        logmsg_in = str(current_time) + " " + str(logmsg) + "\n"  # 换行
+        logmsg_in = str(current_time) + " " + str(logmsg) + "\n"  # New line
 
         if LOG_NUM <= 18:
             self.log_data_Text.insert(tkinter.END, logmsg_in)

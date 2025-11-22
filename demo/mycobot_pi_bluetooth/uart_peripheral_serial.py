@@ -73,20 +73,18 @@ def read():
             if datas == b"":
                 datas += data
                 pre = k
+            elif k - 1 == pre:
+                datas += data
             else:
-                if k - 1 == pre:
-                    datas += data
-                else:
-                    datas = b"\xfe"
-                    pre = k
+                datas = b"\xfe"
+                pre = k
     else:
         datas = b""
     return datas
 
 
 class PlayCharacteristic(Characteristic):
-    """
-    The characteristic is used for the play page of the app.
+    """The characteristic is used for the play page of the app.
     """
 
     def __init__(self, bus, index, service):
@@ -100,17 +98,15 @@ class PlayCharacteristic(Characteristic):
         )
 
     def WriteValue(self, value, options):
-        """
-        Let client to write data to here.
+        """Let client to write data to here.
         Receive notify type data to change the notify type.
         Receive command to enable and disable the control mode.
         Receive action command to control MarsCat.
         """
-        print("[PLAY]recive type: {}".format(bytearray(value)))
+        print(f"[PLAY]recive type: {bytearray(value)}")
 
     def ReadValue(self, options):
-        """
-        Let client to read data from here.
+        """Let client to read data from here.
         """
         global get_app_command
         print("[PLAY]send type:", get_app_command)
@@ -146,8 +142,7 @@ class PlayCharacteristic(Characteristic):
 
 
 class BasicsCharacteristic(Characteristic):
-    """
-    The characteristic is used for the Basic page of the app.
+    """The characteristic is used for the Basic page of the app.
     Read basic information and modify basic setting.
     """
 
@@ -162,13 +157,12 @@ class BasicsCharacteristic(Characteristic):
         )
 
     def WriteValue(self, value, options):
-        """
-        Rewrite the modified value to the file of the cat's setting.
+        """Rewrite the modified value to the file of the cat's setting.
         """
         # logger.debug('[BASICS]>>>>>>> Basic Characteristic [write]')
         global get_app_command
         get_app_command = bytes(value)
-        print("[BASICS]remote: {}".format(get_app_command))
+        print(f"[BASICS]remote: {get_app_command}")
 
         if get_app_command not in [b"\xfe\xfe\x02 \xfa", b"\xfe\xfe\x02#\xfa"]:
             serial_obj.write(get_app_command)
@@ -178,8 +172,7 @@ class BasicsCharacteristic(Characteristic):
         # logger.debug('[BASICS]modify over')
 
     def ReadValue(self, options):
-        """
-        Read cat's basic info from local file.
+        """Read cat's basic info from local file.
         the personality value to one decimal place.
         """
         v = [10, 10, 10, 10, 10, 10]

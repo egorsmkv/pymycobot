@@ -6,8 +6,7 @@ time.sleep(0.1)
 
 
 def main():
-    """
-    模仿myarm与人类下棋输赢状态的动作
+    """模仿myarm与人类下棋输赢状态的动作
     :return: None
     """
     init_angles = [

@@ -41,7 +41,7 @@ BindingCallbackT = T.Callable[[int], None]
 HotkeyT = T.Union[Hotkey, int]
 
 
-class InputJoystick(object):
+class InputJoystick:
     """InputJoystick"""
 
     hotkey_map = {
@@ -68,17 +68,17 @@ class InputJoystick(object):
 
     def __init__(
         self,
-        device: T.Optional[GamePad] = None,
-        ignore_types: T.List[str] = None,
+        device: GamePad | None = None,
+        ignore_types: list[str] = None,
         raw_mapping: bool = True,
     ):
         self._device = device
         self._raw_mapping = raw_mapping
         self._ignore_types = ignore_types or ["Sync", "Misc"]
-        self._bindings: T.Dict[HotkeyT, BindingCallbackT] = {}
-        self._value_filter_table: T.Dict[HotkeyT, T.Callable[[int], bool]] = {}
+        self._bindings: dict[HotkeyT, BindingCallbackT] = {}
+        self._value_filter_table: dict[HotkeyT, T.Callable[[int], bool]] = {}
         self._logger = logging.getLogger("joystick")
-        self._caller: T.Optional[object] = None
+        self._caller: object | None = None
 
     def __repr__(self) -> str:
         return f"InputJoystick({self._device.name})"
@@ -112,12 +112,12 @@ class InputJoystick(object):
 
         return wrapper
 
-    # 添加调用者
+    # Inject the caller
     def inject_caller(self, caller: object) -> None:
         self._logger.debug(f"Inject caller {caller.__class__.__name__}")
         self._caller = caller
 
-    def read(self) -> T.Iterator[T.Tuple[HotkeyT, int]]:
+    def read(self) -> T.Iterator[tuple[HotkeyT, int]]:
         for event in self._device.read():
             if event.ev_type in self._ignore_types:
                 continue
@@ -193,7 +193,7 @@ class InputJoystick(object):
     @staticmethod
     def get_gamepad(
         index: int = 0, _filter: T.Callable[[GamePad], bool] = None
-    ) -> T.Optional[GamePad]:
+    ) -> GamePad | None:
         device_manager = DeviceManager()
         gamepads = device_manager.gamepads
         if _filter is not None:
@@ -207,7 +207,7 @@ class InputJoystick(object):
     def create_by_index(
         cls,
         index: int,
-        ignore_types: T.List[str] = None,
+        ignore_types: list[str] = None,
         raw_mapping: bool = True,
     ) -> "InputJoystick":
         ignore_types = ignore_types or []
@@ -222,7 +222,7 @@ class InputJoystick(object):
     def create_by_name(
         cls,
         name: str,
-        ignore_types: T.List[str] = None,
+        ignore_types: list[str] = None,
         raw_mapping: bool = True,
     ) -> "InputJoystick":
         joystick = cls.get_gamepad(_filter=lambda j: j.name == name)

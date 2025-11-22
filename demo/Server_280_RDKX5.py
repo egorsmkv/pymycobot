@@ -6,7 +6,7 @@ import traceback
 import socket
 import struct
 import serial
-import Hobot.GPIO as GPIO
+from Hobot import GPIO
 
 GPIO.setwarnings(False)
 
@@ -40,7 +40,7 @@ def get_local_host(name: str):
 localhost = get_local_host("wlan0")
 
 
-class SocketTransport(object):
+class SocketTransport:
     def __init__(self, host="0.0.0.0", port=30002):
         self.port = port
         self.host = host
@@ -75,7 +75,7 @@ class SocketTransport(object):
         self.socket.close()
 
 
-class SerialTransport(object):
+class SerialTransport:
     def __init__(self, comport="/dev/ttyS1", baudrate=100_0000, timeout=None):
         self.serial = serial.Serial(
             port=comport, baudrate=baudrate, timeout=timeout
@@ -106,9 +106,8 @@ class SerialTransport(object):
             self.serial.open()
 
 
-class MyCobot280RDKX5Server(object):
-    """
-    Server for 280 RDK-X5
+class MyCobot280RDKX5Server:
+    """Server for 280 RDK-X5
 
     1. System GPIO operating protocol adheres to protocol MyCobot 280 RDK X5.
     2. This server only does the work of forwarding protocol and does not participate in the analysis of instructions.

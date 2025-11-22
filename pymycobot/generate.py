@@ -1,4 +1,3 @@
-
 import sys
 import logging
 import time
@@ -655,7 +654,7 @@ class CommandGenerator(DataProcessor):
 
     def get_digital_input(self, pin_no):
         """Singal value"""
-        # TODO pin_no范围未知
+        # TODO pin_no range is unknown
         self.calibration_parameters(
             class_name=self.__class__.__name__, pin_no=pin_no
         )
@@ -766,8 +765,9 @@ class CommandGenerator(DataProcessor):
             account=account,
             password=password,
         )
-
-        self._mesg(ProtocolCode.SET_SSID_PWD)  # 先发指令，再发设置的账号密码
+        self._mesg(
+            ProtocolCode.SET_SSID_PWD
+        )  # Send the command first, then send the SSID and password
         time.sleep(0.02)
         return self._mesg(
             ProtocolCode.SET_SSID_PWD, account, password, has_reply=True

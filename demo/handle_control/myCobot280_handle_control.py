@@ -1,4 +1,3 @@
-# coding:utf-8
 import pygame
 import sys
 import time
@@ -11,7 +10,7 @@ IS_LINUX = "linux" in platform.platform().lower()
 IS_WINDOWS = platform.system() == "Windows"
 
 if IS_LINUX:
-    import RPi.GPIO as GPIO
+    from RPi import GPIO
 
     # Set GPIO mode
     GPIO.setmode(GPIO.BCM)
@@ -66,7 +65,7 @@ BUTTON_MAP = {
 
 # Function to turn on the vacuum pump (electromagnetic valve)
 def pump_on():
-    # 打开电磁阀
+    # Open the solenoid valve
     if IS_LINUX:
         GPIO.output(20, 0)
     else:
@@ -141,11 +140,10 @@ def joy_handler():
             elif axis == POWER_AXIS and value == 1.00:
                 mc.power_on()
                 time.sleep(0.03)
-        else:
-            if previous_state[axis] != 0:
-                # mc.stop()
-                threading.Thread(target=safe_stop).start()
-                previous_state[axis] = 0
+        elif previous_state[axis] != 0:
+            # mc.stop()
+            threading.Thread(target=safe_stop).start()
+            previous_state[axis] = 0
     # Joystick button pressed
     elif event.type == pygame.JOYBUTTONDOWN:
         if joystick.get_button(BUTTON_MAP["gripper_open"]):
@@ -175,11 +173,10 @@ def joy_handler():
             mc.jog_coord(5, 0, 50)
         if hat_value != (0, 0):
             hat_pressed = True
-        else:
-            if hat_pressed:
-                # mc.stop()
-                threading.Thread(target=safe_stop).start()
-                hat_pressed = False
+        elif hat_pressed:
+            # mc.stop()
+            threading.Thread(target=safe_stop).start()
+            hat_pressed = False
 
 
 # Initialize joystick if detected

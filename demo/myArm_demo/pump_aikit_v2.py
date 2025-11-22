@@ -1,12 +1,12 @@
 import time
 from pymycobot.myarm import MyArm
-import RPi.GPIO as GPIO
+from RPi import GPIO
 
 mc = MyArm("/dev/ttyAMA0")
 
-# 初始化
+# Initialization
 GPIO.setmode(GPIO.BCM)
-# 引脚20/21分别控制电磁阀和泄气阀门
+# Pins 20/21 control the solenoid valve and exhaust valve respectively
 GPIO.setup(20, GPIO.OUT)
 GPIO.setup(21, GPIO.OUT)
 
@@ -23,18 +23,18 @@ box_angles = [
 ]
 
 
-# 开启吸泵
+# Turn on the pump
 def pump_on():
-    # 打开电磁阀
+    # Open the solenoid valve
     GPIO.output(20, 0)
 
 
-# 停止吸泵
+# Stop the pump
 def pump_off():
-    # 关闭电磁阀
+    # Close the solenoid valve
     GPIO.output(20, 1)
     time.sleep(0.05)
-    # 打开泄气阀门
+    # Open the exhaust valve
     GPIO.output(21, 0)
     time.sleep(1)
     GPIO.output(21, 1)
@@ -42,8 +42,7 @@ def pump_off():
 
 
 def move():
-    """
-    myarm使用吸泵模拟aikitV2套装抓取木块
+    """myarm使用吸泵模拟aikitV2套装抓取木块
     """
     # mc.send_angles(init_angles[0], 50)
     # time.sleep(3)

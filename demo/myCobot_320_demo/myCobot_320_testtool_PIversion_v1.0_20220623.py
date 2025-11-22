@@ -20,7 +20,7 @@ from pymycobot import PI_PORT, PI_BAUD
 LOG_NUM = 0
 
 
-class MycobotTest(object):
+class MycobotTest:
     def __init__(self):
         self.mycobot = None
 
@@ -28,14 +28,14 @@ class MycobotTest(object):
         self.win.title("树莓派版 Mycobot 测试工具")
         self.win.geometry(
             "918x600+10+10"
-        )  # 290 160为窗口大小，+10 +10 定义窗口弹出时的默认展示位置
+        )  # 290x160 as window size; +10 +10 sets the default popup location
 
         self.port_label = tkinter.Label(self.win, text="选择串口：")
         self.port_label.grid(row=0)
         self.port_list = ttk.Combobox(
             self.win, width=15, postcommand=self.get_serial_port_list
-        )  # #创建下拉菜单
-        self.get_serial_port_list()  # #给下拉菜单设定值
+        )  # Create a dropdown menu
+        self.get_serial_port_list()  # Populate dropdown values
         self.port_list.current(0)
         self.port_list.grid(row=0, column=1)
 
@@ -114,7 +114,7 @@ class MycobotTest(object):
 
         # rectify
         # self.rectify_btn = tkinter.Button(
-        #     self.win, text="校准pid", command=self.rectify_mycobot
+        #     self.win, text="Calibrate PID", command=self.rectify_mycobot
         # )
         # self.rectify_btn.grid(row=10, column=1)
 
@@ -170,12 +170,12 @@ class MycobotTest(object):
             # self.mycobot = MyCobot("/dev/cu.usbserial-0213245D", 115200)
             self.write_log_to_Text("连接成功 !")
         except Exception as e:
-            err_log = """\
+            err_log = f"""\
                 \r连接失败 !!!
                 \r=================================================
-                {}
+                {e}
                 \r=================================================
-            """.format(e)
+            """
             self.write_log_to_Text(err_log)
 
     def disconnect_mycobot(self):
@@ -233,7 +233,7 @@ class MycobotTest(object):
             if _data != i:
                 res.append(i)
         if res:
-            self.write_log_to_Text("关节 {} 无法通信！！！".format(res))
+            self.write_log_to_Text(f"关节 {res} 无法通信！！！")
         else:
             self.write_log_to_Text("所有关节连接正常。")
 
@@ -276,7 +276,7 @@ class MycobotTest(object):
             "blue": [0, 0, 255],
         }
         self.mycobot.set_color(*color_dict[color])
-        self.write_log_to_Text("发送颜色: {}.".format(color))
+        self.write_log_to_Text(f"发送颜色: {color}.")
 
     def start_aging_test(self):
         if not self.has_mycobot():
@@ -393,12 +393,11 @@ class MycobotTest(object):
         return True
 
     def _aging_test(self):
-        """
-        Aging test thread target.
+        """Aging test thread target.
         By using in `start_aging_test()` and `stop_aging_test()`.
         """
         # if socket.gethostname() != "pi":
-        #     self.write_log_to_Text("老化测试支持 Raspberry OS.")
+        #     self.write_log_to_Text("Aging test supports Raspberry OS.")
         #     return
 
         aging_test_content_py = textwrap.dedent(
@@ -422,7 +421,7 @@ class MycobotTest(object):
             
                 mycobot.wait(1).send_angles([0, 0, 0, 0, 0, 0], speed[1])
 
-                # 单关节运动
+                # Single-joint motion
                 for a in range(1):
                     for j in joint:
                         for sp in speed:
@@ -437,7 +436,7 @@ class MycobotTest(object):
                             mycobot.wait(t).send_angle(j, angle[0], sp)
 
                 
-                # 多关节运动
+                # Multi-joint motion
                 for b in range(2):
                     for sp in speed:
                         if sp == 10:
@@ -453,7 +452,7 @@ class MycobotTest(object):
                 
                 mycobot.wait(5).send_angles([0, 0, 0, 0, 0, 0], speed[1])
 
-                # 笛卡尔运动
+                # Cartesian motion
                 mycobot.wait(5).send_angles([0, -25, -115, 45, -80, 0], speed[1])
                 time.sleep(2)
                 
@@ -487,7 +486,7 @@ class MycobotTest(object):
                 
                 mycobot.wait(5).send_angles([0, 0, 0, 0, 0, 0], speed[1])
                 
-                # 典型动作（抓取）
+                # Typical action (grasping)
                 for d in range(2):
                     for sp in speed:
                         if sp == 10:
@@ -594,7 +593,7 @@ class MycobotTest(object):
     def write_log_to_Text(self, logmsg: str):
         global LOG_NUM
         current_time = self.get_current_time()
-        logmsg_in = str(current_time) + " " + str(logmsg) + "\n"  # 换行
+        logmsg_in = str(current_time) + " " + str(logmsg) + "\n"  # New line
 
         if LOG_NUM <= 18:
             self.log_data_Text.insert(tkinter.END, logmsg_in)

@@ -48,8 +48,7 @@ class FailedException(dbus.exceptions.DBusException):
 
 
 class Application(dbus.service.Object):
-    """
-    org.bluez.GattApplication1 interface implementation
+    """org.bluez.GattApplication1 interface implementation
     """
 
     def __init__(self, bus):
@@ -84,8 +83,7 @@ class Application(dbus.service.Object):
 
 
 class Service(dbus.service.Object):
-    """
-    org.bluez.GattService1 interface implementation
+    """org.bluez.GattService1 interface implementation
     """
 
     PATH_BASE = "/org/bluez/example/service"
@@ -135,8 +133,7 @@ class Service(dbus.service.Object):
 
 
 class Characteristic(dbus.service.Object):
-    """
-    org.bluez.GattCharacteristic1 interface implementation
+    """org.bluez.GattCharacteristic1 interface implementation
     """
 
     def __init__(self, bus, index, uuid, flags, service):
@@ -212,8 +209,7 @@ class Characteristic(dbus.service.Object):
 
 
 class Descriptor(dbus.service.Object):
-    """
-    org.bluez.GattDescriptor1 interface implementation
+    """org.bluez.GattDescriptor1 interface implementation
     """
 
     def __init__(self, bus, index, uuid, flags, characteristic):
@@ -259,8 +255,7 @@ class Descriptor(dbus.service.Object):
 
 
 class HeartRateService(Service):
-    """
-    Fake Heart Rate Service that simulates a fake heart beat and control point
+    """Fake Heart Rate Service that simulates a fake heart beat and control point
     behavior.
 
     """
@@ -370,8 +365,7 @@ class HeartRateControlPointChrc(Characteristic):
 
 
 class BatteryService(Service):
-    """
-    Fake Battery service that emulates a draining battery.
+    """Fake Battery service that emulates a draining battery.
 
     """
 
@@ -383,8 +377,7 @@ class BatteryService(Service):
 
 
 class BatteryLevelCharacteristic(Characteristic):
-    """
-    Fake Battery Level characteristic. The battery level is drained by 2 points
+    """Fake Battery Level characteristic. The battery level is drained by 2 points
     every 5 seconds.
 
     """
@@ -414,8 +407,7 @@ class BatteryLevelCharacteristic(Characteristic):
     def drain_battery(self):
         if self.battery_lvl > 0:
             self.battery_lvl -= 2
-            if self.battery_lvl < 0:
-                self.battery_lvl = 0
+            self.battery_lvl = max(self.battery_lvl, 0)
         print("Battery Level drained: " + repr(self.battery_lvl))
         self.notify_battery_level()
         return True
@@ -441,8 +433,7 @@ class BatteryLevelCharacteristic(Characteristic):
 
 
 class TestService(Service):
-    """
-    Dummy test service that provides characteristics and descriptors that
+    """Dummy test service that provides characteristics and descriptors that
     exercise various API functionality.
 
     """
@@ -457,8 +448,7 @@ class TestService(Service):
 
 
 class TestCharacteristic(Characteristic):
-    """
-    Dummy test characteristic. Allows writing arbitrary bytes to its value, and
+    """Dummy test characteristic. Allows writing arbitrary bytes to its value, and
     contains "extended properties", as well as a test descriptor.
 
     """
@@ -490,8 +480,7 @@ class TestCharacteristic(Characteristic):
 
 
 class TestDescriptor(Descriptor):
-    """
-    Dummy test descriptor. Returns a static value.
+    """Dummy test descriptor. Returns a static value.
 
     """
 
@@ -512,8 +501,7 @@ class TestDescriptor(Descriptor):
 
 
 class CharacteristicUserDescriptionDescriptor(Descriptor):
-    """
-    Writable CUD descriptor.
+    """Writable CUD descriptor.
 
     """
 
@@ -537,8 +525,7 @@ class CharacteristicUserDescriptionDescriptor(Descriptor):
 
 
 class TestEncryptCharacteristic(Characteristic):
-    """
-    Dummy test characteristic requiring encryption.
+    """Dummy test characteristic requiring encryption.
 
     """
 
@@ -569,8 +556,7 @@ class TestEncryptCharacteristic(Characteristic):
 
 
 class TestEncryptDescriptor(Descriptor):
-    """
-    Dummy test descriptor requiring encryption. Returns a static value.
+    """Dummy test descriptor requiring encryption. Returns a static value.
 
     """
 
@@ -591,8 +577,7 @@ class TestEncryptDescriptor(Descriptor):
 
 
 class TestSecureCharacteristic(Characteristic):
-    """
-    Dummy test characteristic requiring secure connection.
+    """Dummy test characteristic requiring secure connection.
 
     """
 
@@ -623,8 +608,7 @@ class TestSecureCharacteristic(Characteristic):
 
 
 class TestSecureDescriptor(Descriptor):
-    """
-    Dummy test descriptor requiring secure connection. Returns a static value.
+    """Dummy test descriptor requiring secure connection. Returns a static value.
 
     """
 

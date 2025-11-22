@@ -7,8 +7,7 @@ time.sleep(0.1)
 
 
 def main():
-    """
-    展示MyArm各个关节的运动状态
+    """展示MyArm各个关节的运动状态
     :return: None
     """
     angles_list = [

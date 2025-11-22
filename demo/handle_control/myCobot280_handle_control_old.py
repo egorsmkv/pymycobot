@@ -8,11 +8,11 @@ import typing as T
 import platform
 
 if "linux" in platform.platform().lower():
-    import RPi.GPIO as GPIO
+    from RPi import GPIO
 
-    # 初始化
+    # Initialization
     GPIO.setmode(GPIO.BCM)
-    # 引脚20/21分别控制电磁阀和泄气阀门
+    # Pins 20/21 control the solenoid valve and exhaust valve respectively
     GPIO.setup(20, GPIO.OUT)
     GPIO.setup(21, GPIO.OUT)
 
@@ -87,18 +87,18 @@ def Integrated_pump_off():
     mc.set_digital_output(33, 1)
 
 
-# 开启吸泵
+# Turn on the pump
 def pump_on():
-    # 打开电磁阀
+    # Open the solenoid valve
     GPIO.output(20, 0)
 
 
-# 停止吸泵
+# Stop the pump
 def pump_off():
-    # 关闭电磁阀
+    # Close the solenoid valve
     GPIO.output(20, 1)
     time.sleep(0.05)
-    # 打开泄气阀门
+    # Open the exhaust valve
     GPIO.output(21, 0)
     time.sleep(1)
     GPIO.output(21, 1)
@@ -154,7 +154,7 @@ def get_joystick():
 
 
 def dispatch_key_action(
-    key: T.Union[JoyStickKey, JoyStickContinous], value: float
+    key: JoyStickKey | JoyStickContinous, value: float
 ):
     global mc, arm_angle_table, global_states
     # print(f"key : {key} value : {value}")
@@ -196,7 +196,7 @@ def dispatch_key_action(
     if not global_states["enable"] or not global_states["initialized"]:
         return
 
-    # 坐标移动
+    # Coordinate movement
     if key in [
         JoyStickContinous.LeftXAxis,
         JoyStickContinous.LeftYAxis,
@@ -232,7 +232,7 @@ def dispatch_key_action(
             global_states["move_key_states"][JoyStickKey.ArrowLeft] = 0
             global_states["move_key_states"][JoyStickKey.ArrowRight] = 0
 
-    # 功能性
+    # Functional controls
     if key == JoyStickContinous.L2 and not_zero(value):
         mc.release_all_servos()
         time.sleep(0.03)
@@ -243,7 +243,7 @@ def dispatch_key_action(
         mc.send_angles([0, 0, 0, 0, 0, 0], 50)
         time.sleep(3)
 
-    # 工具
+    # Tool controls
     if key == JoyStickKey.RLeftKey:
         pump_on()  # V2.0 pump
         Integrated_pump_on()  # Integrated pump

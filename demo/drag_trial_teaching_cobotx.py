@@ -22,10 +22,10 @@ def setup():
     plist = list(serial.tools.list_ports.comports())
     idx = 1
     for port in plist:
-        print("{} : {}".format(idx, port))
+        print(f"{idx} : {port}")
         idx += 1
 
-    _in = input("\nPlease input 1 - {} to choice:".format(idx - 1))
+    _in = input(f"\nPlease input 1 - {idx - 1} to choice:")
     port = str(plist[int(_in) - 1]).split(" - ")[0].strip()
     print(port)
     print("")
@@ -47,7 +47,7 @@ def setup():
     mc = CobotX(port, baud, debug=DEBUG)
 
 
-class Raw(object):
+class Raw:
     """Set raw input mode for device"""
 
     def __init__(self, stream):
@@ -62,13 +62,13 @@ class Raw(object):
         termios.tcsetattr(self.stream, termios.TCSANOW, self.original_stty)
 
 
-class Helper(object):
+class Helper:
     def __init__(self) -> None:
         self.w, self.h = os.get_terminal_size()
 
     def echo(self, msg):
         print("\r{}".format(" " * self.w), end="")
-        print("\r{}".format(msg), end="")
+        print(f"\r{msg}", end="")
 
 
 class TeachingTest(Helper):
@@ -98,7 +98,7 @@ class TeachingTest(Helper):
                 if angles:
                     self.record_list.append([angles, speeds, 0, interval_time])
                     # time.sleep(0.1)
-                    print("\r {}".format(time.time() - start_t), end="")
+                    print(f"\r {time.time() - start_t}", end="")
 
         self.echo("Start recording.")
         self.record_t = threading.Thread(target=_record, daemon=True)
@@ -155,10 +155,10 @@ class TeachingTest(Helper):
             return
         with open(self.path, "w") as f:
             json.dump(self.record_list, f, indent=2)
-            self.echo("save dir:  {}\n".format(self.path))
+            self.echo(f"save dir:  {self.path}\n")
 
     def load_from_local(self):
-        with open(self.path, "r") as f:
+        with open(self.path) as f:
             try:
                 data = json.load(f)
                 self.record_list = data

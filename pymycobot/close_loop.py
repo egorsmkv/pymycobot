@@ -161,7 +161,7 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
                                 if v in self.read_command:
                                     self.read_command.remove(v)
                             continue
-                        # print("到位反馈", flush=True)
+                        # print("In-position feedback", flush=True)
                         is_get_return = True
                         need_break = True
                         data = read_data
@@ -176,21 +176,21 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
                         and read_data[2] == 5
                         and read_data[4] == 0xFF
                     ):
-                        # 通信闭环
+                        # Communication closed loop
                         # print(-2)
-                        # print("闭环", flush=True)
+                        # print("Closed loop", flush=True)
                         is_get_return = True
                         with self.lock:
                             if v in self.read_command:
                                 self.read_command.remove(v)
                         if has_reply == False or self.sync_mode == False:
                             # print(-3)
-                            # print("仅闭环退出", flush=True)
+                            # print("Exit for closed loop only", flush=True)
                             need_break = True
                             data = read_data
                     elif genre == read_data[3]:
                         # print(-4)
-                        # print("正常读取", flush=True)
+                        # print("Normal read", flush=True)
                         need_break = True
                         data = read_data
                         with self.lock:
@@ -204,27 +204,27 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
                 and not is_get_return
                 and time.time() - t > timeout
             ):
-                # 发送指令以后，超时0.5S没有收到第一次反馈，并且是运动指令，并且超时时间是正常指令
+                # After sending a motion command, no first feedback for 0.5s while using the normal timeout
                 t = time.time()
                 moving = self.is_moving()
                 if isinstance(moving, int):
                     if moving != 0:
                         continue
-                # 运动指令丢失，重发
-                # print("运动指令丢失，重发", flush=True)
+                # Motion command lost, resend
+                # print("Motion command lost, resend", flush=True)
                 lost_times += 1
-                # print("运动指令丢失，重发")
+                # print("Motion command lost, resend")
                 with self.lock:
                     self._send_command(genre, real_command)
             if need_break:
-                # print("正常退出", flush=True)
+                # print("Exited normally", flush=True)
                 break
             if lost_times > 2:
-                # 重传3次失败，返回-1
-                # print("重传3次失败，返回-1", flush=True)
+                # Retransmission failed three times, return -1
+                # print("Retransmission failed three times, return -1", flush=True)
                 return -1
             # if t < self.is_stop and genre != ProtocolCode.STOP:
-            #     # 打断除了stop指令外的其他指令的等待
+            #     # Interrupt waiting for commands other than stop
             #     self.is_stop = 0
             #     break
             if (
@@ -235,12 +235,12 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
                 interval_time = time.time()
                 moving = self.is_moving()
                 # if isinstance(moving, int) and moving == 0:
-                #     print("停止运动，退出")
+                #     print("Motion stopped, exiting")
                 #     is_moving += 1
-                #     # 由于is_moving接口比到位反馈更快，所以第一次收到停止运动后，将下一次的检测时间更改为0.25s，防止此处先退出，返回-2
+                #     # Because the is_moving interface is faster than the in-position feedback, change the next check to 0.25s after the first stop to avoid exiting early with -2
                 #     check_is_moving_t = 0.25
                 #     if is_moving > 1:
-                #         # 累计两次才退出
+                #         # Only exit after detecting twice
                 #         with self.lock:
                 #             if genre in self.write_command:
                 #                 self.write_command.remove(genre)
@@ -248,20 +248,20 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
                 if isinstance(moving, int) and moving == 0:
                     is_moving += 1
                     if is_moving == 1:
-                        # 第一次检测到停止，只是标记，不退出
+                        # First stop detection is only marked, do not exit
                         check_is_moving_t = 0.25
                     elif is_moving > 1:
-                        # 第二次检测到停止才真正退出
+                        # Actually exit after the second stop detection
                         with self.lock:
                             if genre in self.write_command:
                                 self.write_command.remove(genre)
                         return -2
             time.sleep(0.001)
         else:
-            # print("ERROR: ---超时---")
+            # print("ERROR: ---timeout---")
             pass
         if data is None:
-            # print("未拿到数据")
+            # print("No data received")
             return data
         data = bytearray(data)
         data_len = data[2] - 3
@@ -284,7 +284,7 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
             data_len -= 1
             data_pos += 1
             if data[2] == 5:
-                # print("握手成功")
+                # print("Handshake succeeded")
                 return data[5]
             elif data[2] == 4:
                 res = self._status_explain(data[4])
@@ -327,17 +327,13 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
                                     command_log = ""
                                     for d in match:
                                         command_log += hex(ord(d))[2:] + " "
-                                    self.log.debug(
-                                        f"_read : {command_log}"
-                                    )
+                                    self.log.debug(f"_read : {command_log}")
                                     # self.log.debug("_read: {}".format([hex(ord(d)) for d in data]))
                                 else:
                                     command_log = ""
                                     for d in match:
                                         command_log += hex(d)[2:] + " "
-                                    self.log.debug(
-                                        f"_read : {command_log}"
-                                    )
+                                    self.log.debug(f"_read : {command_log}")
                                 res = self._process_received(match)
                                 if res != []:
                                     with self.lock:
@@ -345,9 +341,7 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
                                             [res, time.time()]
                                         )
                         elif isinstance(data, bytes):
-                            command_log = " ".join(
-                                f"{b:02X}" for b in data
-                            )
+                            command_log = " ".join(f"{b:02X}" for b in data)
                             self.log.debug(f"_read : {command_log}")
                             res = self._process_received(data)
                             if res != []:
@@ -464,11 +458,11 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
                             # print("res is empty")
                             continue
                         # if datas[3] == 0x5b:
-                        #     print("等待加入到读取队列")
+                        #     print("Waiting to enter the read queue")
                         with self.lock:
                             self.read_command.append([res, time.time()])
                             # if datas[3] == 0x5b:
-                            # print("加入到读取队列成功")
+                            # print("Added to read queue successfully")
 
             except Exception as e:
                 # self.log.error("read error: {}".format(traceback.format_exc()))

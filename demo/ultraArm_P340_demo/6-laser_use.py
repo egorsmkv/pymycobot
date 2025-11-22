@@ -3,14 +3,14 @@ import time
 import serial
 import serial.tools.list_ports
 
-# 以上需写在代码开头，意为导入项目包
+# Put the imports above at the top of the file to bring in the project package
 
-# ultraArmP340 类初始化需要两个参数：串口和波特率
-#   第一个是串口字符串， 如：
-#       linux： "/dev/ttyUSB0"
+# ultraArmP340 initialization requires two arguments: serial port and baud rate
+#   The first is the serial port string, for example:
+#       linux: "/dev/ttyUSB0"
 #       windows: "COM3"
-#   第二个是波特率：115200
-#   以下为如:
+#   The second is the baud rate: 115200
+#   Examples:
 #           linux:
 #              ua = ultraArmP340("/dev/USB0", 115200)
 #           windows:
@@ -21,8 +21,8 @@ plist = [
     str(x).split(" - ")[0].strip() for x in serial.tools.list_ports.comports()
 ]
 
-# 初始化一个ultraArmP340对象
-# 下面为 windows版本创建对象代码
+# Initialize an ultraArmP340 object
+# The code below is for creating the object on Windows
 ua = ultraArmP340(plist[0], 115200)
 ua.go_zero()
 

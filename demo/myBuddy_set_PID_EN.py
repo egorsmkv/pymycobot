@@ -1,4 +1,3 @@
-# coding=utf8
 import time
 from pymycobot.mybuddy import MyBuddy
 
@@ -8,7 +7,7 @@ mb = MyBuddy(port)
 pid = [21, 22, 23]
 
 
-# 出厂
+# Factory defaults
 def set_pid_factory():
     pid_data = [25, 25, 1]
     for i in range(1, 3):  # left and right arms
@@ -22,7 +21,7 @@ def set_pid_factory():
         time.sleep(0.02)
 
 
-# 拖动示教
+# Drag teaching
 def set_pid_drag():
     pid_data = [10, 0, 1]
     for i in range(1, 3):  # left and right arms
@@ -31,12 +30,12 @@ def set_pid_drag():
                 mb.set_servo_data(i, j, pid[p], pid_data[p])
                 time.sleep(0.02)
 
-    for p in range(3):  # 腰部pid
+    for p in range(3):  # waist pid
         mb.set_servo_data(3, 1, pid[p], pid_data[p])
         time.sleep(0.02)
 
 
-# 高精度
+# High precision
 def set_pid_precision():
     pid_data = [32, 8, 0]
     for i in range(1, 3):  # left and right arms

@@ -16,7 +16,7 @@ def setup_logging(name: str = __name__, debug: bool = False) -> logging.Logger:
     stream_handler.setFormatter(debug_formatter)
     if debug is True:
         logger.addHandler(stream_handler)
-        logger.setLevel(logging.INFO)  # 100M日志
+        logger.setLevel(logging.INFO)  # 100 MB log file
         file_handler = logging.handlers.RotatingFileHandler(
             filename="python_debug.log",
             maxBytes=100 * 1024 * 1024,

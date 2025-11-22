@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# coding:utf-8
 import socket
 import serial
 import time
@@ -24,7 +23,7 @@ Please change the parameters passed in the last line of the Server.py file, Merc
 """
 
 
-class ProtocolCode(object):
+class ProtocolCode:
     # BASIC
     HEADER = 0xFE
     FOOTER = 0xFA
@@ -379,7 +378,7 @@ def get_logger(name):
     return logger
 
 
-class MercuryServer(object):
+class MercuryServer:
     def __init__(self, host, port, serial_num="/dev/ttyAMA1", baud=115200):
         """Server class
 
@@ -433,9 +432,7 @@ class MercuryServer(object):
                             self.mc.open()
                         else:
                             self.logger.info(
-                                "get command: {}".format(
-                                    [hex(v) for v in command]
-                                )
+                                f"get command: {[hex(v) for v in command]}"
                             )
                             self.write(command)
                     except ConnectionResetError:
@@ -508,9 +505,7 @@ class MercuryServer(object):
                                 datas += crc
                                 if self.conn is not None:
                                     self.logger.info(
-                                        "return datas: {}".format(
-                                            [hex(v) for v in datas]
-                                        )
+                                        f"return datas: {[hex(v) for v in datas]}"
                                     )
                                     datas = b"###" + datas + b"###"
                                     self.conn.sendall(datas)
@@ -534,12 +529,11 @@ class MercuryServer(object):
                             if datas == b"":
                                 datas += data
                                 pre = k
+                            elif k - 1 == pre:
+                                datas += data
                             else:
-                                if k - 1 == pre:
-                                    datas += data
-                                else:
-                                    datas = b"\xfe"
-                                    pre = k
+                                datas = b"\xfe"
+                                pre = k
                     else:
                         # print(".",end="",flush=True)
                         time.sleep(0.001)
@@ -575,5 +569,5 @@ if __name__ == "__main__":
             break
         except:
             pass
-    print("ip: {} port: {}".format(HOST, PORT))
+    print(f"ip: {HOST} port: {PORT}")
     MercuryServer(HOST, PORT, "/dev/ttyAMA1", 115200)

@@ -1,4 +1,3 @@
-# coding:utf-8
 import pygame
 import time
 from pymycobot import MyArm
@@ -162,51 +161,50 @@ def control():
                     action = 0
             else:
                 pass
-        else:
-            # print(action)
-            if action == 7:
-                # is_enable = True
-                statue = 0
-                for _ in range(3):
-                    statue = mc.is_all_servo_enable()
-                    if statue:
-                        break
-                    time.sleep(0.1)
-                if statue in [0, -1]:
-                    mc.set_color(0, 0, 0)
-                    time.sleep(0.5)
-                    mc.set_color(255, 0, 0)
-                    time.sleep(0.5)
-                    mc.set_color(0, 0, 0)
-                    time.sleep(0.5)
-                    mc.set_color(255, 0, 0)
-                    time.sleep(0.5)
-                    mc.set_color(0, 0, 0)
-                    time.sleep(0.5)
-                    mc.set_color(255, 0, 0)
-                    is_enable = False
-                else:
-                    mc.set_color(0, 0, 0)
-                    time.sleep(0.5)
-                    mc.set_color(0, 255, 0)
-                    time.sleep(0.5)
-                    mc.set_color(0, 0, 0)
-                    time.sleep(0.5)
-                    mc.set_color(0, 255, 0)
-                    time.sleep(0.5)
-                    mc.set_color(0, 0, 0)
-                    time.sleep(0.5)
-                    mc.set_color(0, 255, 0)
-                    mc.power_on()
-                    is_enable = True
+        # print(action)
+        elif action == 7:
+            # is_enable = True
+            statue = 0
+            for _ in range(3):
+                statue = mc.is_all_servo_enable()
+                if statue:
+                    break
+                time.sleep(0.1)
+            if statue in [0, -1]:
+                mc.set_color(0, 0, 0)
+                time.sleep(0.5)
+                mc.set_color(255, 0, 0)
+                time.sleep(0.5)
+                mc.set_color(0, 0, 0)
+                time.sleep(0.5)
+                mc.set_color(255, 0, 0)
+                time.sleep(0.5)
+                mc.set_color(0, 0, 0)
+                time.sleep(0.5)
+                mc.set_color(255, 0, 0)
+                is_enable = False
+            else:
+                mc.set_color(0, 0, 0)
+                time.sleep(0.5)
+                mc.set_color(0, 255, 0)
+                time.sleep(0.5)
+                mc.set_color(0, 0, 0)
+                time.sleep(0.5)
+                mc.set_color(0, 255, 0)
+                time.sleep(0.5)
+                mc.set_color(0, 0, 0)
+                time.sleep(0.5)
+                mc.set_color(0, 255, 0)
+                mc.power_on()
+                is_enable = True
+            action = 0
+        elif action == 21:
+            time.sleep(2)
+            if action == 21:
+                mc.send_coords(zero, 20)
+                command = zero.copy()
                 action = 0
-            elif action == 21:
-                time.sleep(2)
-                if action == 21:
-                    mc.send_coords(zero, 20)
-                    command = zero.copy()
-                    action = 0
-                    is_zero = True
+                is_zero = True
         time.sleep(0.05)
 
 
@@ -229,14 +227,14 @@ def main():
         for event_ in pygame.event.get():
             if event_.type == pygame.QUIT:
                 done = True
-            # 按键按下或弹起事件
+            # Button press or release event
             elif (
                 event_.type == pygame.JOYBUTTONDOWN
                 or event_.type == pygame.JOYBUTTONUP
             ):
                 buttons = joystick.get_numbuttons()
                 # print('total:', buttons)
-                # 获取所有按键状态信息
+                # Get status of all buttons
                 for i in range(buttons):
                     button = joystick.get_button(i)
                     print("i value:", i)
@@ -296,14 +294,14 @@ def main():
                                 action = 0
                     print("button " + str(i) + ": " + str(button))
                     print("action--->", action)
-            # 轴转动事件
+            # Axis movement event
             elif event_.type == pygame.JOYAXISMOTION:
                 axes = joystick.get_numaxes()
-                # 获取所有轴状态信息
+                # Get status of all axes
                 # while True:
                 for i in range(axes):
                     axis = joystick.get_axis(i)
-                    print("i value: {}  axis value: {}".format(i, axis))
+                    print(f"i value: {i}  axis value: {axis}")
                     # res[i] = axis
                     if i == 1:
                         if axis < -3.0517578125e-05:
@@ -366,10 +364,10 @@ def main():
                                 start_time = 0
                                 action = 0
                     print("axis " + str(i) + ": " + str(axis))
-            # 方向键改变事件
+            # D-pad change event
             elif event_.type == pygame.JOYHATMOTION:
                 # hats = joystick.get_numhats()
-                # 获取所有方向键状态信息
+                # Get status of all D-pad directions
                 # for i in range(hats):
                 hat = joystick.get_hat(0)
                 # print("hat " + str(i) +": " + str(hat))

@@ -1,4 +1,3 @@
-
 import time
 import struct
 import logging
@@ -553,7 +552,7 @@ class DataProcessor:
             genre, self.__class__.__name__, args
         )
         if genre == 178:
-            # 修改wifi端口
+            # Modify Wi-Fi port
             command_data = self._encode_int16(command_data)
 
         elif genre in [76, 77]:
@@ -728,7 +727,7 @@ class DataProcessor:
         elif not data:
             return None
         elif data == b"\xfe\xfe\x04[\x01\r\x87":
-            # 水星到位反馈
+            # Mercury in-position feedback
             return 1
         data = bytearray(data)
         data_len = len(data)
@@ -841,7 +840,7 @@ class DataProcessor:
                 #             if data_bin[data_bin_len - 1 - j] != 0:
                 #                 error_list.append(j)
                 #                 if locale_lang == "zh_CN":
-                #                     print("错误: 关节{} - {}".format(i + 1, robot_320_info[locale_lang][error_key].get(j, 255)))
+                #                     print("Error: Joint{} - {}".format(i + 1, robot_320_info[locale_lang][error_key].get(j, 255)))
                 #                 else:
                 #                     print("Error: Joint{} - {}".format(i + 1, robot_320_info[locale_lang][error_key].get(j, 255)))
                 #         res[i] = error_list
@@ -1082,7 +1081,7 @@ class DataProcessor:
             return combined_value
 
     def _parse_bytes_to_int(self, data):
-        """将多个字节组合为一个整数（大端）"""
+        """Combine multiple bytes into a big-endian integer."""
         value = 0
         for byte in data:
             value = (value << 8) | byte
@@ -1091,8 +1090,8 @@ class DataProcessor:
     def _split_joint_and_speed(self, data):
         if all(x == 0 for x in data):
             return -1
-        joints = data[::2]  # 偶数索引：关节角度
-        speeds = data[1::2]  # 奇数索引：对应速度
+        joints = data[::2]  # Even indices: joint angles
+        speeds = data[1::2]  # Odd indices: corresponding speeds
         return [joints, speeds]
 
     @staticmethod
@@ -1120,7 +1119,7 @@ def write(self, command, method=None):
 
         py_version = DataProcessor.check_python_version()
         if py_version == 2:
-            # 检查套接字是否有效
+            # Check whether the socket is valid
             if not self.sock or self.sock.fileno() == -1:
                 return
 
@@ -1155,7 +1154,7 @@ def write(self, command, method=None):
                 command_log += data + " "
         self.log.debug(f"_write: {command_log}")
         try:
-            # 检查串口是否打开
+            # Check whether the serial port is open
             if not self._serial_port.isOpen():
                 return
 

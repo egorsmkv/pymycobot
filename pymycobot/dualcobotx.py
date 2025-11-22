@@ -1,4 +1,3 @@
-
 import time
 import threading
 
@@ -220,7 +219,7 @@ class DualMercury(CommandGenerator):
             joint_id (int): Joint id 1 - 7.
             encoder: The value of the set encoder.
         """
-        # TODO Mercury此接口待定
+        # TODO Mercury: this interface is to be determined
         # self.calibration_parameters(
         #     class_name=self.__class__.__name__, id=joint_id, encoder=encoder
         # )

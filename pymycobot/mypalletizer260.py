@@ -1,4 +1,3 @@
-
 import threading
 import math
 import time
@@ -466,8 +465,7 @@ class MyPalletizer260(CommandGenerator):
 
     # Running Status and Settings
     def get_speed(self):
-        """Get speed
-        """
+        """Get speed"""
         return self._mesg(ProtocolCode.GET_SPEED, has_reply=True)
 
     def set_speed(self, speed):

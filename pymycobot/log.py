@@ -1,4 +1,3 @@
-
 import logging
 import logging.handlers
 
@@ -18,7 +17,7 @@ def setup_logging(debug=False):
     logger_handle.setFormatter(debug_fomatter)
     if debug:
         logger_handle.setLevel(logging.DEBUG)
-        # 100M日志
+        # 100 MB log file
         save = logging.handlers.RotatingFileHandler(
             "python_debug.log", maxBytes=100 * 1024 * 1024, backupCount=1
         )

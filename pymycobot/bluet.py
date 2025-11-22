@@ -40,9 +40,7 @@ class BluetoothConnection:
                 for addr, name in target_address:
                     device_info += f"{i} >>> {addr} - {name} \n"
                 sys.stdout.write(device_info)
-                choose_device = input(
-                    f"please enter 1-{len(target_address)}:"
-                )
+                choose_device = input(f"please enter 1-{len(target_address)}:")
                 target_address = target_address[int(choose_device) - 1][0]
             sock = self.bluetooth.BluetoothSocket(self.bluetooth.RFCOMM)
             try:

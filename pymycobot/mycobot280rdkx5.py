@@ -247,8 +247,7 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
         return self._mesg(ProtocolCode.SET_MONITOR_STATE, monitor_state)
 
     def get_monitor_state(self):
-        """Get the monitoring state
-        """
+        """Get the monitoring state"""
         return self._mesg(ProtocolCode.GET_MONITOR_STATE, has_reply=True)
 
     def get_reboot_count(self):
@@ -884,7 +883,7 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
         self.calibration_parameters(servo_id=servo_id)
         return self._mesg(ProtocolCode.FOCUS_SERVO, servo_id)
 
-    # 夹爪控制
+    # Gripper control
     def get_gripper_value(self, gripper_type=1):
         """Get the value of gripper.
 
@@ -979,13 +978,11 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
 
     # Atom IO
     def get_tool_system_version(self):
-        """Read the terminal primary and minor version numbers
-        """
+        """Read the terminal primary and minor version numbers"""
         return self._mesg(ProtocolCode.GET_ATOM_VERSION, has_reply=True)
 
     def get_tool_modify_version(self):
-        """Read the terminal modified version number
-        """
+        """Read the terminal modified version number"""
         return self._mesg(ProtocolCode.OVER_LIMIT_RETURN_ZERO, has_reply=True)
 
     def is_tool_connected(self):

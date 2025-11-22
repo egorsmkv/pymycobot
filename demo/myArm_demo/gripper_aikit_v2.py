@@ -18,21 +18,20 @@ box_angles = [
 ]
 
 
-# 开启
+# Open
 def gripper_on():
     mc.set_gripper_state(0, 100)
     time.sleep(0.5)
 
 
-# 关闭
+# Close
 def gripper_off():
     mc.set_gripper_state(1, 100)
     time.sleep(0.5)
 
 
 def move():
-    """
-    myarm使用夹爪模拟aikitV2套装抓取木块
+    """myarm使用夹爪模拟aikitV2套装抓取木块
     """
     mc.send_angles(init_angles[0], 50)
     time.sleep(3)

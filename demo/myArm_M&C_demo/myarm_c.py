@@ -15,7 +15,7 @@ class Config:
     maximum_connections = 5  # The maximum number of connections allowed
 
 
-def setup_robotic_connect(comport: str) -> T.Optional[MyArmC]:
+def setup_robotic_connect(comport: str) -> MyArmC | None:
     robotic_api = None
     try:
         robotic_api = MyArmC(comport)
@@ -73,7 +73,7 @@ class SocketTransportServer(threading.Thread):
             print(f" # (Info) {address} => {data}")
             try:
                 connection.send(data)
-            except WindowsError:
+            except OSError:
                 print(f" # (Warn) Close connection from {address}")
                 exit_addr_list.append(address)
 
@@ -127,7 +127,7 @@ def main():
                 )
                 continue
 
-            transport_server.sendall(f"\n{angles}".encode("utf-8"))
+            transport_server.sendall(f"\n{angles}".encode())
         except KeyboardInterrupt:
             print(" # (Info) Exit")
             break

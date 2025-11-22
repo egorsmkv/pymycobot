@@ -65,8 +65,7 @@ class MyArmMProcessor(DataProcessor):
 
     @classmethod
     def __is_return(cls, genre, command):
-        """Check if the command is a return command.
-        """
+        """Check if the command is a return command."""
         return len(command) == 6 and command[3] == genre
 
     def _mesg(self, genre, *args, **kwargs):

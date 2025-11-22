@@ -8,7 +8,7 @@ from core.drive import AGVDriveAPI
 from core.controller import BaseControllerApi
 
 
-class AGVProCompositeKit(object):
+class AGVProCompositeKit:
     agvHorizontalSpeed: Number = Number(0.5, 0.1, 0.1)
     agvVerticalSpeed: Number = Number(0.75, 0.15, 0.15)
     agvRotationSpeed: Number = Number(1.5, 0.2, 0.1)

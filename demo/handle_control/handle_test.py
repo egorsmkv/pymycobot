@@ -1,5 +1,4 @@
-"""
-handle_test.py
+"""handle_test.py
 This module controls the robotic arm movements.
 
 Author: Wang Weijian
@@ -46,7 +45,7 @@ go_home = [0, 0, 0, 0, 0, 0]
 
 # GPIO for Linux (Raspberry Pi)
 if IS_LINUX:
-    import RPi.GPIO as GPIO
+    from RPi import GPIO
 
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(20, GPIO.OUT)
@@ -119,10 +118,9 @@ def joy_handler():
             elif axis == POWER_AXIS and value == 1.00:
                 mc.power_on()
                 time.sleep(0.03)
-        else:
-            if previous_state[axis] != 0:
-                threading.Thread(target=safe_stop).start()
-                previous_state[axis] = 0
+        elif previous_state[axis] != 0:
+            threading.Thread(target=safe_stop).start()
+            previous_state[axis] = 0
 
     elif event.type == pygame.JOYBUTTONDOWN:
         if joystick.get_button(2):
@@ -152,10 +150,9 @@ def joy_handler():
             mc.jog_coord(5, 0, 50)
         if hat_value != (0, 0):
             hat_pressed = True
-        else:
-            if hat_pressed:
-                threading.Thread(target=safe_stop).start()
-                hat_pressed = False
+        elif hat_pressed:
+            threading.Thread(target=safe_stop).start()
+            hat_pressed = False
 
 
 # Initialize joystick

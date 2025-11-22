@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# coding:utf-8
 import socket
 import serial
 import time
@@ -9,11 +8,11 @@ import re
 import fcntl
 import struct
 import traceback
-import RPi.GPIO as GPIO
+from RPi import GPIO
 import threading
 
 
-class ProtocolCode(object):
+class ProtocolCode:
     # BASIC
     HEADER = 0xFE
     FOOTER = 0xFA
@@ -361,7 +360,7 @@ def get_logger(name):
     return logger
 
 
-class pro630Server(object):
+class pro630Server:
     def __init__(
         self, host, port, serial_num="/dev/ttyAMA0", baud=115200
     ) -> None:
@@ -419,9 +418,7 @@ class pro630Server(object):
                             self.mc.open()
                         else:
                             self.logger.info(
-                                "get command: {}".format(
-                                    [hex(v) for v in command]
-                                )
+                                f"get command: {[hex(v) for v in command]}"
                             )
                             # command = self.re_data_2(command)
                             # print(f"Type of command[3] is {type(command[3])} value = {command[3]}")
@@ -479,10 +476,10 @@ class pro630Server(object):
                             self.write(command)
                             if command[3] == ProtocolCode.SET_POS_SWITCH:
                                 if command[4] == 1:
-                                    # 开启闭环
+                                    # Enable closed-loop control
                                     self.asynchronous = False
                                 elif command[4] == 0:
-                                    # 关闭闭环
+                                    # Disable closed-loop control
                                     self.asynchronous = True
                             if command[3] in has_return or (
                                 command[3] in has_closed_loop
@@ -603,19 +600,18 @@ class pro630Server(object):
                 if datas == b"":
                     datas += data
                     pre = k
+                elif k - 1 == pre:
+                    datas += data
                 else:
-                    if k - 1 == pre:
-                        datas += data
-                    else:
-                        datas = b"\xfe"
-                        pre = k
+                    datas = b"\xfe"
+                    pre = k
             else:
                 time.sleep(0.001)
         else:
             datas = b""
         if self.conn is not None:
             self.logger.info(
-                "return datas: {}".format([hex(v) for v in datas])
+                f"return datas: {[hex(v) for v in datas]}"
             )
 
             self.conn.sendall(datas)
@@ -642,5 +638,5 @@ if __name__ == "__main__":
     )
     # HOST = "localhost"
     PORT = 9000
-    print("ip: {} port: {}".format(HOST, PORT))
+    print(f"ip: {HOST} port: {PORT}")
     pro630Server(HOST, PORT)

@@ -1,4 +1,3 @@
-
 import threading
 
 from pymycobot.Interface import MyBuddyCommandGenerator

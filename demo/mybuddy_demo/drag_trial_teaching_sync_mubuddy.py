@@ -1,5 +1,4 @@
-"""
-Drag and teach in windows version
+"""Drag and teach in windows version
 """
 
 from pickle import FALSE
@@ -43,7 +42,7 @@ def setup():
     mb = MyBuddy(port, baud, debug=True)
 
 
-class Raw(object):
+class Raw:
     """Set raw input mode for device"""
 
     def __init__(self, stream):
@@ -61,13 +60,13 @@ class Raw(object):
         termios.tcsetattr(self.stream, termios.TCSANOW, self.original_stty)
 
 
-class Helper(object):
+class Helper:
     def __init__(self) -> None:
         self.w, self.h = os.get_terminal_size()
 
     def echo(self, msg):
         print("\r{}".format(" " * self.w))
-        print("\r{}".format(msg))
+        print(f"\r{msg}")
 
 
 class TeachingTest(Helper):
@@ -164,10 +163,10 @@ class TeachingTest(Helper):
 
         with open(os.path.dirname(__file__) + "/record.txt", "w") as f:
             json.dump(self.record_list, f, indent=2)
-            self.echo("save dir:  {}".format(os.path.dirname(__file__)))
+            self.echo(f"save dir:  {os.path.dirname(__file__)}")
 
     def load_from_local(self):
-        with open(os.path.dirname(__file__) + "/record.txt", "r") as f:
+        with open(os.path.dirname(__file__) + "/record.txt") as f:
             try:
                 data = json.load(f)
                 self.record_list = data

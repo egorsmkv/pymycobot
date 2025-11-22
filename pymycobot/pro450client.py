@@ -445,7 +445,7 @@ class Pro450Client(CloseLoop):
 
             # if magnitude > self.arm_span - 10:
             #     if self.language == "zh_CN":
-            #         info += f"当前臂展为{magnitude}超出物理限位, 最大的臂展为{self.arm_span}"
+            #         info += f"Arm span is {magnitude} exceeds physical limit, max is {self.arm_span}"
             #     else:
             #         info += f"Arm span is {magnitude} exceeds physical limit, max is {self.arm_span}"
             return info

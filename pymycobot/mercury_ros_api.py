@@ -102,7 +102,7 @@ class MapNavigation:
         # rospy.loginfo("Received Initial Pose:\n%s", msg)
         return msg
 
-    # 回调函数订阅话题move_base_simple/goal_temp，填入PoseArray
+    # Callback subscribes to move_base_simple/goal_temp and fills PoseArray
     def goalCntCallback(self, goal_msg):
         self.pose_stamped.header = goal_msg.header
         self.pose_stamped.pose = goal_msg.pose
@@ -122,7 +122,7 @@ class MapNavigation:
         self.pose.pose.orientation.y = 0.0
         self.pose.pose.orientation.z = orientation_z
         self.pose.pose.orientation.w = orientation_w
-        # 发布新的点位
+        # Publish the new waypoint
         rospy.sleep(1)
         self.pub_tempPose.publish(self.pose)
         self.point_count += 1
@@ -131,7 +131,7 @@ class MapNavigation:
         )
         return self.point_count
 
-    # 重置点位
+    # Reset waypoints
     def clearPosition(self):
         self.pose_array.poses = []
         self.point_count = 0
@@ -159,9 +159,7 @@ class MapNavigation:
                 goal.header = self.pose_array.header
                 goal.pose = self.pose_array.poses[curGoalIdx_ - 1]
                 self.goal_pub.publish(goal)
-                rospy.loginfo(
-                    f"Going to {identifier} point:{goal.pose}"
-                )
+                rospy.loginfo(f"Going to {identifier} point:{goal.pose}")
 
     def setHomePosition(self, xGoal, yGoal, orientation_z, orientation_w):
         global point_HomePositionCount

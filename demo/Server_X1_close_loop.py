@@ -6,7 +6,8 @@ import struct
 import fcntl
 import threading
 import traceback
-from typing import Union, Optional, List, Generator
+from typing import Union, Optional, List
+from collections.abc import Generator
 import serial
 import socket
 import time
@@ -19,7 +20,7 @@ This is a demo server for Mercury X1 robot arm. It can be used to control the ro
 """
 
 
-def get_local_host(name: str = "eth0") -> Optional[str]:
+def get_local_host(name: str = "eth0") -> str | None:
     host = None
     dgram_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
@@ -60,7 +61,7 @@ class Client:
     address: str
     socket: socket.socket
 
-    def receive(self) -> Optional[dict]:
+    def receive(self) -> dict | None:
         message = None
         buffer_prefix = self.socket.recv(
             4
@@ -84,7 +85,7 @@ class Client:
         return "{}:{}".format(*self.address)
 
 
-class MercurySerialApi(object):
+class MercurySerialApi:
     def __init__(
         self,
         comport: str,
@@ -115,7 +116,7 @@ class MercurySerialApi(object):
         self.serial.close()
         self.log.debug(f"Close serial port {self.comport}")
 
-    def send(self, data: Union[bytes, List[int]]):
+    def send(self, data: bytes | list[int]):
         self.serial.write(data)
         self.log.info(f"[{self.comport}] write: {data}")
 
@@ -132,7 +133,7 @@ class MercurySerialApi(object):
         return res
 
     @classmethod
-    def _crc_check(cls, commands: bytes) -> Optional[List[int]]:
+    def _crc_check(cls, commands: bytes) -> list[int] | None:
         crc = 0xFFFF
         for command in commands:
             crc ^= command
@@ -178,40 +179,39 @@ class MercurySerialApi(object):
                     if datas == b"":
                         datas += data
                         pre = k
+                    elif k - 1 == pre:
+                        datas += data
                     else:
-                        if k - 1 == pre:
-                            datas += data
-                        else:
-                            datas = b"\xfe"
-                            pre = k
+                        datas = b"\xfe"
+                        pre = k
             else:
                 time.sleep(0.001)
         return datas
 
 
-class MercurySerialManager(object):
+class MercurySerialManager:
     def __init__(self):
         self.__mian_arm = Arm.RIGHT_ARM
-        self.__arm_serial_map: Union[str : Optional[MercurySerialApi]] = {}
+        self.__arm_serial_map: Union[str : MercurySerialApi | None] = {}
 
     def __setitem__(self, key: str, value: MercurySerialApi):
         self.__arm_serial_map[key] = value
 
-    def __getitem__(self, key: str) -> Optional[MercurySerialApi]:
+    def __getitem__(self, key: str) -> MercurySerialApi | None:
         return self.__arm_serial_map[key]
 
     @property
-    def arms(self) -> List[str]:
+    def arms(self) -> list[str]:
         return list(self.__arm_serial_map.keys())
 
     def add_arm(self, arm_name: str, serial_api: MercurySerialApi):
         self.__arm_serial_map[arm_name] = serial_api
 
-    def get_arm(self, arm_name: str) -> Optional[MercurySerialApi]:
+    def get_arm(self, arm_name: str) -> MercurySerialApi | None:
         return self.__arm_serial_map.get(arm_name, None)
 
     @property
-    def main_arm(self) -> Optional[MercurySerialApi]:
+    def main_arm(self) -> MercurySerialApi | None:
         return self.get_arm(self.__mian_arm)
 
     @main_arm.setter
@@ -222,7 +222,7 @@ class MercurySerialManager(object):
         self.__mian_arm = arm_name
 
 
-class MercurySocketInlet(object):
+class MercurySocketInlet:
     def __init__(self, host: str, port: int, debug: bool = False):
         level = logging.DEBUG if debug else logging.INFO
         self.host = host
@@ -242,7 +242,7 @@ class MercurySocketInlet(object):
         self.log.info(f"Close socket on {self.host}:{self.port}")
 
 
-class MercuryCommandServer(object):
+class MercuryCommandServer:
     def __init__(
         self,
         serial_manager: MercurySerialManager,
@@ -253,7 +253,7 @@ class MercuryCommandServer(object):
         self.log = init_logging("server.command", level)
         self.serial_manager = serial_manager
         self.socket_inlet = socket_inlet
-        self.connected_client_list: List[Client] = []
+        self.connected_client_list: list[Client] = []
         self.respond_client_threads = []
         self.max_thread_pool = 5
 
@@ -300,7 +300,7 @@ class MercuryCommandServer(object):
                 message = client.receive()
                 if message is not None:
                     arm = message.get("arm", Arm.UNKNOWN)
-                    commands: List[int] = message.get("command", [])
+                    commands: list[int] = message.get("command", [])
                     if client.arm == Arm.UNKNOWN and arm != Arm.UNKNOWN:
                         client.arm = arm
 

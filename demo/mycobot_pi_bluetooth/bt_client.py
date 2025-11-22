@@ -11,7 +11,7 @@ if __name__ == "__main__":
         )
     else:
         addr = sys.argv[1]
-        print("Searching for marscat_bt on {}...".format(addr))
+        print(f"Searching for marscat_bt on {addr}...")
 
     uuid = "26754beb-1bd0-4017-b341-154bed30b71a"
     service_matches = bluetooth.find_service(uuid=uuid, address=addr)
@@ -25,7 +25,7 @@ if __name__ == "__main__":
     name = first_match["name"]
     host = first_match["host"]
 
-    print('Connecting to "{}" on {}'.format(name, host))
+    print(f'Connecting to "{name}" on {host}')
 
     # Create the client socket
     sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)

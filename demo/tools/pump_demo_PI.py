@@ -15,7 +15,7 @@ from pymycobot import (
     MyCobot280,
 )  # import mycobot library,if don't have, first 'pip install pymycobot'
 import time
-import RPi.GPIO as GPIO
+from RPi import GPIO
 
 GPIO.setmode(GPIO.BCM)
 # if use Pi control

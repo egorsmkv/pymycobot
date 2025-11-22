@@ -501,7 +501,9 @@ class ElephantRobot:
             content = f.read()
         content_base64 = base64.b64encode(content).decode()
         content_sha256 = hashlib.sha256(content).hexdigest()
-        command = f"upload_file({content_base64},{remote_filename},{content_sha256})"
+        command = (
+            f"upload_file({content_base64},{remote_filename},{content_sha256})"
+        )
         res = self.send_command(command)
         return res
 
@@ -1146,7 +1148,7 @@ class ElephantRobot:
         flange_coords = toolToflange(tool_coords, self.tool_matrix)
         self.write_coords(flange_coords, speed)
 
-    # 力控#
+    # Force control #
     def force_get_firmware(self, ID):
         """Obtain the main version number of the power control system
 
@@ -1457,7 +1459,7 @@ class ElephantRobot:
         command = "froce_GetCount(" + str(ID) + ")\n"
         return int(self.send_command(command))
 
-    # 三指#
+    # Three-finger gripper #
     def hand_get_firmware(self, ID):
         """Obtain the main version number of the three fingers
 
@@ -1824,7 +1826,7 @@ class ElephantRobot:
         command = "Hand_GetModel(" + str(ID) + ")\n"
         return int(self.send_command(command))
 
-    # 末端
+    # End effector
     def get_end_firmware(self):
         """Obtain the final major version number.
 

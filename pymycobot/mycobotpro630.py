@@ -24,7 +24,7 @@ def check_python_version():
 
 def is_debian_os():
     try:
-        # 执行 lsb_release -a 命令，并捕获输出
+        # Run lsb_release -a and capture the output
         py_version = check_python_version()
         if py_version == 3:
             result = subprocess.run(
@@ -34,7 +34,7 @@ def is_debian_os():
                 check=True,
             )
 
-            # 解析输出，获取 Distributor ID 的信息
+            # Parse the output to obtain the Distributor ID
             lines = result.stdout.split("\n")
 
         elif py_version == 2:
@@ -42,7 +42,7 @@ def is_debian_os():
                 ["lsb_release", "-a"], stdout=subprocess.PIPE
             ).communicate()[0]
 
-            # 解析输出，获取 Distributor ID 的信息
+            # Parse the output to obtain the Distributor ID
             lines = result.split("\n")
 
         for line in lines:
@@ -1229,7 +1229,6 @@ class Phoenix:
     def is_in_commanded_position(self):
         """Returns machine-in-position flag. True if commanded position
         equals actual position.
-        返回机器就位标志。如果指令位置为True，等于实际位置。
 
         Returns:
             bool: machine-in-position flag
@@ -1251,7 +1250,7 @@ class Phoenix:
         Args:
             joint (Joint): Joint.J1 ~ Joint.J6
             direction (JogDirection): JogDirection.POSITIVE (1) or
-                                      JogDirection.NEGATIVE (-1) (1增大，-1减小)
+                                      JogDirection.NEGATIVE (-1) (1 increases, -1 decreases)
             speed (float): speed percentage (0 ~ 100 %)
 
         Returns:
@@ -1271,9 +1270,9 @@ class Phoenix:
         """Starts jog axis with specified direction and speed.
 
         Args:
-            axis (Axis): Axis.X ~ Axis.RZ, 对应 x ~ rz
-            direction (JogDirection): JogDirection.POSITIVE (1) 增大,
-                                      JogDirection.NEGATIVE (-1) 减小
+            axis (Axis): Axis.X ~ Axis.RZ, corresponding to x ~ rz
+            direction (JogDirection): JogDirection.POSITIVE (1) increases,
+                                      JogDirection.NEGATIVE (-1) decreases
             speed (float): speed percentage (1 ~ 100 %)
 
         Returns:
@@ -1759,7 +1758,6 @@ class Phoenix:
 
     def program_run(self, start_line):
         """Run g-code file starting from given line.
-        从给定行开始运行g-code文件
 
         Args:
             start_line (int): start line (first line is 0)
@@ -1831,7 +1829,6 @@ class Phoenix:
 
     def program_execution_status(self):
         """Returns G-Code interpreter's current state.
-        返回解释器当前状态
 
         Returns:
             int: Interpreter state: INTERP_IDLE (1),
@@ -1994,7 +1991,6 @@ class Phoenix:
 
     # def get_cmd_pos(self):
     #     """Returns trajectory position.
-    #     返回轨迹位置
 
     #     Returns:
     #         str: string of list of values

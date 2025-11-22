@@ -6,8 +6,10 @@ lock = threading.Lock()
 
 
 def hex_to_signed_decimal(hex_str, bits=16):
-    value = int(hex_str, 16)  # 先转换为无符号整数
-    if value >= 2 ** (bits - 1):  # 如果超出正数范围，转换为负数
+    value = int(hex_str, 16)  # First convert to an unsigned integer
+    if value >= 2 ** (
+        bits - 1
+    ):  # Convert to a negative number if it exceeds the positive range
         value -= 2**bits
     return value
 
@@ -45,7 +47,9 @@ class Exoskeleton:
                 int(data[32:34], 16),
             ]
         )
-        if self.dataLen == 31:  # 适配新固件带坐标信息
+        if (
+            self.dataLen == 31
+        ):  # Adapt to new firmware that includes coordinate data
             for j in range(6):
                 data_h = data[34 + j * 4 : 36 + j * 4]
                 data_l = data[36 + j * 4 : 38 + j * 4]
@@ -56,7 +60,9 @@ class Exoskeleton:
     def _parse_all_data(self, data):
         right_data = []
         left_data = []
-        if self.dataLen == 60:  # 适配新固件带坐标信息
+        if (
+            self.dataLen == 60
+        ):  # Adapt to new firmware that includes coordinate data
             for i in range(7):
                 data_h = data[0 + i * 4 : 2 + i * 4]
                 data_l = data[2 + i * 4 : 4 + i * 4]

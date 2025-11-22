@@ -2,7 +2,7 @@ from pymycobot.ultraArmP340 import ultraArmP340
 import serial
 import serial.tools.list_ports
 
-# 被搬运的木块的坐标位置
+# Coordinates of the blocks to be moved
 green_pos = [
     [74.6, 167.55, 120],
     [74.6, 167.55, 92.45],
@@ -22,58 +22,58 @@ yellow_pos = [
     [150.92, 167.61, 12.45],
 ]
 
-# 木块到达的坐标位置
+# Coordinates where the blocks should be placed
 cube_pos_g = [[200, -75, 120], [200, -75, 15], [200, -75, 55], [200, -75, 95]]
 cube_pos_r = [[150.63, -75, 15], [150.63, -75, 55], [150.63, -75, 95]]
 cube_pos_y = [[109.63, -75, 15], [109.63, -75, 55], [109.63, -75, 95]]
 
-# 被搬运的木块所在的方向
+# Approach orientation for the blocks being picked up
 block_high = [60, 5, 0]
 
-# 木块到达的位置所在方向
+# Orientation at the drop-off location
 cube_high = [-30, 10, 10]
 
-# 获取串口列表
+# Get the list of serial ports
 plist = [
     str(x).split(" - ")[0].strip() for x in serial.tools.list_ports.comports()
 ]
 
-# 连接串口
+# Connect to the serial port
 ua = ultraArmP340(plist[0], 115200)
 
-# ultraArmP340进行坐标运动/角度运动之前必须进行回零，否则无法获取到正确的角度/坐标
+# ultraArmP340 must home before coordinate or angle motion to get correct values
 ua.go_zero()
 ua.sleep(0.5)
 
 
 # Yellow
-# 搬运第一个木块
-# 移动到木块所在方向
+# Move the first block
+# Move toward the block
 ua.set_angles(block_high, 50)
 ua.sleep(0.5)
 
 ua.set_coords(yellow_pos[0], 50)
 ua.sleep(1)
 
-# 到达木块所在位置
+# Reach the block position
 ua.set_coords(yellow_pos[1], 50)
 ua.sleep(1)
-# 打开吸泵
+# Turn on the pump
 ua.set_gpio_state(0)
 ua.sleep(0.5)
 
-# 移动到需要到达的位置上方
+# Move above the target location
 ua.set_angles(cube_high, 50)
 ua.sleep(0.5)
 
-# 下降到需要到达的位置
+# Lower to the target position
 ua.set_coords(cube_pos_y[0], 50)
 ua.sleep(0.5)
-# 关闭吸泵
+# Turn off the pump
 ua.set_gpio_state(1)
 ua.sleep(0.5)
 
-# 移动到木块所在位置上方，一次搬运动作完成，后续搬运动作跟此次搬运动作一致
+# Move back above the block position; later moves follow the same pattern
 ua.set_angles(cube_high, 50)
 ua.sleep(0.5)
 

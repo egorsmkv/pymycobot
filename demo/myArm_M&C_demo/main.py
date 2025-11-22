@@ -26,7 +26,7 @@ class MyWindow(QWidget, Ui_Form):
         )
 
         self.setWindowIcon(self.icon)
-        # 设置表格列宽均分
+        # Evenly distribute column widths in the table
 
         self.tableWidget.horizontalHeader().setSectionResizeMode(
             QHeaderView.Stretch

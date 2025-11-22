@@ -9,12 +9,12 @@ _T = T.TypeVar("_T")
 
 def select(
     message: str,
-    options: T.List[_T],
+    options: list[_T],
     default: int = None,
     level: int = 1,
     echo: T.Callable = lambda msg: msg,
     start: int = 1,
-) -> T.Optional[_T]:
+) -> _T | None:
     print(f"{message}\r\n")
     p = "    " * level
     for ordinal, option in enumerate(options, start=start):
@@ -53,7 +53,7 @@ def select(
             print(f"  * Invalid input, please enter a valid number.")
 
 
-def get_local_serial_port():  # 获取所有串口号
+def get_local_serial_port():  # Get all serial port numbers
     return [comport.device for comport in list_ports.comports()]
 
 

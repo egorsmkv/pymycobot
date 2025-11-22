@@ -21,12 +21,12 @@ class BluetoothService:
     pass
 
 
-def list_devices() -> Tuple[str, str]:
+def list_devices() -> tuple[str, str]:
     nearby_devices = bluetooth.discover_devices(lookup_names=True)
     return nearby_devices
 
 
-def filter_marscat(bluetooth_devices: Tuple[str, str]) -> Tuple[str, str]:
+def filter_marscat(bluetooth_devices: tuple[str, str]) -> tuple[str, str]:
     marscats = []
     for addr, name in bluetooth_devices:
         name.encode("utf-8", "replace")
@@ -52,7 +52,7 @@ def start_marscat_bt() -> None:
         description="",
         protocols=[bluetooth.OBEX_UUID],
     )
-    print("Waiting for connection on RFCOMM channel {}".format(port))
+    print(f"Waiting for connection on RFCOMM channel {port}")
 
     client_sock, client_info = server_sock.accept()
 
@@ -69,7 +69,7 @@ def start_marscat_bt() -> None:
         if not data:
             client_sock.close()
             print("Close Client Socket")
-            print("Waiting for connection on RFCOMM channel {}".format(port))
+            print(f"Waiting for connection on RFCOMM channel {port}")
             client_sock, client_info = server_sock.accept()
             print("Accepted connection from", client_info)
             continue
@@ -145,8 +145,7 @@ def start_marscat_bt() -> None:
                     i += 1
                     file_len -= len(data)
                     print(file_len)
-                    if file_len < buffer:
-                        buffer = file_len
+                    buffer = min(buffer, file_len)
                 print("write finished")
             print("receive over")
 

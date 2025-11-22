@@ -19,7 +19,7 @@ class AutoReportMessage:
     motor_enable: bool
 
 
-class AGVDriveAPI(object):
+class AGVDriveAPI:
     __version__ = pymycobot.__version__
 
     def __init__(self, comport: str, debug: bool = False):
@@ -27,8 +27,8 @@ class AGVDriveAPI(object):
 
     def set_strip_light_color(
         self,
-        locations: T.List[int],
-        color: T.Tuple[int, int, int],
+        locations: list[int],
+        color: tuple[int, int, int],
         brightness: int = 255,
     ):
         for location in locations:
@@ -72,7 +72,7 @@ class AGVDriveAPI(object):
     def get_auto_report_state(self) -> bool:
         return self._agv_pro.get_auto_report_state() == 1
 
-    def get_auto_report_message(self) -> T.Optional[AutoReportMessage]:
+    def get_auto_report_message(self) -> AutoReportMessage | None:
         report_message = self._agv_pro.get_auto_report_message()
         if report_message is None:
             return None

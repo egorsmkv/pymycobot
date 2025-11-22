@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 ################################################################################
 ## Form generated from reading UI file 'tool.ui'
@@ -57,7 +56,7 @@ from PySide6.QtWidgets import (
 )
 
 
-class Ui_Form(object):
+class Ui_Form:
     def setupUi(self, Form):
         if not Form.objectName():
             Form.setObjectName("Form")

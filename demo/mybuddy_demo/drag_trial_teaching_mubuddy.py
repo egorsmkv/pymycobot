@@ -1,5 +1,4 @@
-"""
-Drag and teach in windows version
+"""Drag and teach in windows version
 """
 
 import time
@@ -28,10 +27,10 @@ def setup():
     plist = list(serial.tools.list_ports.comports())
     idx = 1
     for port in plist:
-        print("{} : {}".format(idx, port))
+        print(f"{idx} : {port}")
         idx += 1
 
-    _in = input("\nPlease input 1 - {} to choice:".format(idx - 1))
+    _in = input(f"\nPlease input 1 - {idx - 1} to choice:")
     port = str(plist[int(_in) - 1]).split(" - ")[0].strip()
     print(port)
     print("")
@@ -68,13 +67,13 @@ def setup():
 #         termios.tcsetattr(self.stream, termios.TCSANOW, self.original_stty)
 
 
-class Helper(object):
+class Helper:
     def __init__(self) -> None:
         self.w, self.h = os.get_terminal_size()
 
     def echo(self, msg):
         print("\r{}".format(" " * self.w))
-        print("\r{}".format(msg))
+        print(f"\r{msg}")
 
 
 class TeachingTest(Helper):
@@ -151,10 +150,10 @@ class TeachingTest(Helper):
 
         with open(os.path.dirname(__file__) + "/record.txt", "w") as f:
             json.dump(self.record_list, f, indent=2)
-            self.echo("save dir:  {}".format(os.path.dirname(__file__)))
+            self.echo(f"save dir:  {os.path.dirname(__file__)}")
 
     def load_from_local(self):
-        with open(os.path.dirname(__file__) + "/record.txt", "r") as f:
+        with open(os.path.dirname(__file__) + "/record.txt") as f:
             try:
                 data = json.load(f)
                 self.record_list = data

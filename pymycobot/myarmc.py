@@ -1,4 +1,3 @@
-
 from pymycobot.common import ProtocolCode
 from pymycobot.myarm_api import MyArmAPI
 

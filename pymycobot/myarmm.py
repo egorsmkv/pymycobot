@@ -1,4 +1,3 @@
-
 import time
 
 from pymycobot.common import ProtocolCode

@@ -8,13 +8,13 @@ em = MyBuddyEmoticon(file_path, loop=True)
 em.start()
 time.sleep(5)
 
-# 暂停
+# Pause
 em.pause()
 
 time.sleep(2)
 
-# 继续播放
+# Resume playback
 em.run()
 
-# 等待播放结束
+# Wait for playback to finish
 em.join()

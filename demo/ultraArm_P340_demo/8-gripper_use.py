@@ -8,7 +8,7 @@ plist = [
     str(x).split(" - ")[0].strip() for x in serial.tools.list_ports.comports()
 ]
 
-# 自动选择系统并连接机械臂
+# Automatically select the system and connect to the robot arm
 if platform.system() == "Windows":
     ua = ultraArmP340(plist[0], 115200)
     ua.go_zero()
@@ -16,7 +16,7 @@ elif platform.system() == "Linux":
     ua = ultraArmP340("/dev/ttyUSB0", 115200)
     ua.go_zero()
 
-# 机械臂运动的位置
+# Positions for arm movement
 angles = [
     [-81.71, 0.0, 0.0],
     [-90.53, 21.77, 47.56],
@@ -29,12 +29,12 @@ ua.set_angles(angles[0], 50)
 time.sleep(3)
 
 i = 5
-# 循环5次
+# Loop 5 times
 while i > 0:
-    # 张开夹爪
+    # Open the gripper
     ua.set_gripper_state(0)
     time.sleep(2)
-    # 闭合夹爪
+    # Close the gripper
     ua.set_gripper_state(1)
     time.sleep(2)
     i -= 1

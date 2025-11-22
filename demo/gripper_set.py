@@ -1,8 +1,7 @@
-# coding=utf-8
 from pymycobot import MyCobot280
 import time
 
-# 需要将串口号更改为电脑实际的串口号，将夹爪张开到最大，再运行此脚本
+# Update the serial port to your actual port, open the gripper fully, then run this script
 port = "com8"
 
 mc = MyCobot280(port)

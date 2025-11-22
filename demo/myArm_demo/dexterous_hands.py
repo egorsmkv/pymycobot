@@ -1,6 +1,4 @@
-# -*- coding:utf-8 -*-
-"""
-File    : dexterous_hands.py
+"""File    : dexterous_hands.py
 Time    : 2023/11/16
 Function: This script is used to control the switch of the dexterous hand of the robot arm end effector.
 Atom Version: V1.1

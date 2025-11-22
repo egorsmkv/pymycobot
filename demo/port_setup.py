@@ -10,10 +10,10 @@ def setup():
     plist = list(serial.tools.list_ports.comports())
     idx = 1
     for port in plist:
-        print("{} : {}".format(idx, port))
+        print(f"{idx} : {port}")
         idx += 1
 
-    _in = input("\nPlease input 1 - {} to choice:".format(idx - 1))
+    _in = input(f"\nPlease input 1 - {idx - 1} to choice:")
     port = str(plist[int(_in) - 1]).split(" - ")[0].strip()
     print(port)
     print("")

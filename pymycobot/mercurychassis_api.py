@@ -151,11 +151,11 @@ class ChassisControl:
         :return: A byte type
         """
         check_sum_result = 0
-        # 接收数据模式
+        # Receive data mode
         if mode == 0:
             for k in range(count_number):
                 check_sum_result ^= self.Send_Data[k]
-        # 发送数据模式
+        # Send data mode
         elif mode == 1:
             for k in range(count_number):
                 check_sum_result ^= self.Send_Data[k]

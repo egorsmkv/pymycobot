@@ -9,8 +9,7 @@ class MercuryChassisError(Exception):
 
 
 class MercuryChassis:
-    """Mercury X1 mobile chassis car socket class
-    """
+    """Mercury X1 mobile chassis car socket class"""
 
     def __init__(self, ip=None):
         self.ifname = b"wlan0"

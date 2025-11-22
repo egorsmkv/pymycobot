@@ -1,4 +1,3 @@
-# coding=utf8
 import os
 import time
 from pymycobot.mybuddy import MyBuddy

@@ -4,7 +4,7 @@ import os
 import socket
 
 
-class Number(object):
+class Number:
     def __init__(self, maximum: float, minimum: float, step: float):
         self.maximum = maximum
         self.minimum = minimum
@@ -13,14 +13,12 @@ class Number(object):
 
     def increase(self, digits: int = 2) -> float:
         self.value = round(self.value + self.step, digits)
-        if self.value > self.maximum:
-            self.value = self.maximum
+        self.value = min(self.value, self.maximum)
         return self.value
 
     def decrease(self, digits: int = 2) -> float:
         self.value = round(self.value - self.step, digits)
-        if self.value < self.minimum:
-            self.value = self.minimum
+        self.value = max(self.value, self.minimum)
         return self.value
 
     def reset(self) -> float:

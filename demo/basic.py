@@ -19,10 +19,10 @@ def test(mycobot):
 
     angles = [0, 0, 0, 0, 0, 0]
     mycobot.send_angles(angles, 100)
-    print("::send_angles() ==> angles {}, speed 100\n".format(angles))
+    print(f"::send_angles() ==> angles {angles}, speed 100\n")
     time.sleep(3)
 
-    print("::get_angles() ==> degrees: {}\n".format(mycobot.get_angles()))
+    print(f"::get_angles() ==> degrees: {mycobot.get_angles()}\n")
     time.sleep(1)
 
     mycobot.send_angle(Angle.J1.value, 90, 50)
@@ -31,20 +31,20 @@ def test(mycobot):
 
     radians = [1, 1, 1, 1, 1, 1]
     mycobot.send_radians(radians, 100)
-    print("::send_radians() ==> set radians {}, speed 100\n".format(radians))
+    print(f"::send_radians() ==> set radians {radians}, speed 100\n")
     time.sleep(3)
 
-    print("::get_radians() ==> radians: {}\n".format(mycobot.get_radians()))
+    print(f"::get_radians() ==> radians: {mycobot.get_radians()}\n")
     time.sleep(1)
 
     coords = [160, 160, 160, 0, 0, 0]
     mycobot.send_coords(coords, 70, 0)
     print(
-        "::send_coords() ==> send coords {}, speed 70, mode 0\n".format(coords)
+        f"::send_coords() ==> send coords {coords}, speed 70, mode 0\n"
     )
     time.sleep(3)
 
-    print("::get_coords() ==> coords {}\n".format(mycobot.get_coords()))
+    print(f"::get_coords() ==> coords {mycobot.get_coords()}\n")
     time.sleep(0.5)
 
     mycobot.send_coord(Coord.X.value, -40, 70)

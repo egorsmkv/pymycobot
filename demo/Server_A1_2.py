@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# coding:utf-8
 import socket
 import serial
 import time
@@ -24,7 +23,7 @@ Please change the parameters passed in the last line of the Server.py file, Merc
 """
 
 
-class ProtocolCode(object):
+class ProtocolCode:
     # BASIC
     HEADER = 0xFE
     FOOTER = 0xFA
@@ -362,7 +361,7 @@ def get_logger(name):
     return logger
 
 
-class MercuryServer(object):
+class MercuryServer:
     def __init__(self, host, port, serial_num="/dev/ttyAMA1", baud=115200):
         """Server class
 
@@ -409,9 +408,7 @@ class MercuryServer(object):
                             self.mc.open()
                         else:
                             self.logger.info(
-                                "get command: {}".format(
-                                    [hex(v) for v in command]
-                                )
+                                f"get command: {[hex(v) for v in command]}"
                             )
                             # command = self.re_data_2(command)
 
@@ -540,15 +537,14 @@ class MercuryServer(object):
                     if datas == b"":
                         datas += data
                         pre = k
+                    elif k - 1 == pre:
+                        datas += data
                     else:
-                        if k - 1 == pre:
-                            datas += data
-                        else:
-                            datas = b"\xfe"
-                            pre = k
+                        datas = b"\xfe"
+                        pre = k
         if self.conn is not None:
             self.logger.info(
-                "return datas: {}".format([hex(v) for v in datas])
+                f"return datas: {[hex(v) for v in datas]}"
             )
 
             self.conn.sendall(datas)
@@ -574,5 +570,5 @@ if __name__ == "__main__":
         )[20:24]
     )
     PORT = 9000
-    print("ip: {} port: {}".format(HOST, PORT))
+    print(f"ip: {HOST} port: {PORT}")
     MercuryServer(HOST, PORT, "/dev/ttyAMA1", 115200)

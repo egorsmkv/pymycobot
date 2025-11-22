@@ -20,7 +20,7 @@ class MyBuddyCommandGenerator(CommandGenerator):
         )
 
         if genre == 178:
-            # 修改wifi端口
+            # Modify the Wi-Fi port
             command_data = self._encode_int16(command_data)
 
         LEN = len(command_data) + 1
@@ -1193,4 +1193,4 @@ class MyBuddyCommandGenerator(CommandGenerator):
 
     # def init_iic(self):
     #     from smbus2 import SMBus
-    #     i2c = SMBus(1)   # 1 代表 /dev/i2c-1
+    #     i2c = SMBus(1)   # 1 represents /dev/i2c-1

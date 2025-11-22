@@ -1,4 +1,3 @@
-
 import locale
 
 import numpy as np
@@ -12,7 +11,7 @@ from pymycobot.close_loop import CloseLoop
 class MercuryCommandGenerator(CloseLoop):
     def __init__(self, debug=False):
         super(MercuryCommandGenerator, self).__init__(debug)
-        # 同步模式
+        # Synchronous mode
         self.language, _ = locale.getdefaultlocale()
         if self.language not in ["zh_CN", "en_US"]:
             self.language = "en_US"
@@ -78,7 +77,9 @@ class MercuryCommandGenerator(CloseLoop):
 
             # if magnitude > self.arm_span - 10:
             #     if self.language == "zh_CN":
-            #         info += f"当前臂展为{magnitude}超出物理限位, 最大的臂展为{self.arm_span}"
+            #         info += (
+            #             f"Arm span is {magnitude}, exceeds physical limit; max is {self.arm_span}"
+            #         )
             #     else:
             #         info += f"Arm span is {magnitude} exceeds physical limit, max is {self.arm_span}"
             return info
@@ -234,7 +235,7 @@ class MercuryCommandGenerator(CloseLoop):
                     res.append(self._decode_int16(one))
                     i += 2
         elif data_len == 40 and genre == ProtocolCode.MERCURY_ROBOT_STATUS:
-            # 右臂上位机错误
+            # Right arm host controller error
             i = 0
             res = []
             while i < data_len:
@@ -246,7 +247,7 @@ class MercuryCommandGenerator(CloseLoop):
                     res.append(self._decode_int16(one))
                     i += 2
         elif data_len == 41 and genre == ProtocolCode.MERCURY_ROBOT_STATUS:
-            # 图灵右臂上位机错误
+            # Turing right arm host controller error
             i = 0
             res = []
             while i < data_len:

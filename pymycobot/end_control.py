@@ -1,4 +1,3 @@
-
 from pymycobot.common import ProtocolCode, ProGripper, FingerGripper
 
 
@@ -9,17 +8,17 @@ class ForceGripper:
     def _mesg(self, *args, **kwargs):
         pass
 
-    # 设置力矩手爪
+    # Set torque gripper
     def set_pro_gripper(
         self, gripper_id, gripper_address, value=0, has_return=False
     ):
-        # 调用校准参数函数
+        # Call calibration parameter helper
         self.calibration_parameters(
             class_name=self.__class__.__name__,
             gripper_id=gripper_id,
             gripper_address=gripper_address,
         )
-        # 发送设置力矩手爪的指令
+        # Send command to set torque gripper
         return self._mesg(
             ProtocolCode.MERCURY_SET_TOQUE_GRIPPER,
             gripper_id,
@@ -28,37 +27,37 @@ class ForceGripper:
             has_return=has_return,
         )
 
-    # 获取力矩手爪
+    # Get torque gripper
     def get_pro_gripper(self, gripper_id, gripper_address):
-        # 调用校准参数函数
+        # Call calibration parameter helper
         self.calibration_parameters(
             class_name=self.__class__.__name__,
             gripper_id=gripper_id,
             gripper_address=gripper_address,
         )
-        # 发送获取力矩手爪的指令
+        # Send command to get torque gripper
         return self._mesg(
             ProtocolCode.MERCURY_GET_TOQUE_GRIPPER,
             gripper_id,
             [gripper_address],
         )
 
-    # 设置力矩手爪角度
+    # Set torque gripper angle
     def set_pro_gripper_angle(self, gripper_id, gripper_angle):
-        # 调用校准参数函数
+        # Call calibration parameter helper
         self.calibration_parameters(
             class_name=self.__class__.__name__,
             gripper_id=gripper_id,
             gripper_angle=gripper_angle,
         )
-        # 发送设置力矩手爪角度的指令
+        # Send command to set torque gripper angle
         return self.set_pro_gripper(
             gripper_id, ProGripper.SET_GRIPPER_ANGLE, gripper_angle
         )
 
-    # 设置力矩手爪打开
+    # Set torque gripper open
     def set_pro_gripper_open(self, gripper_id):
-        # 调用校准参数函数
+        # Call calibration parameter helper
         self.calibration_parameters(
             class_name=self.__class__.__name__, gripper_id=gripper_id
         )
@@ -67,98 +66,98 @@ class ForceGripper:
         )
 
     def set_pro_gripper_close(self, gripper_id):
-        # 设置力矩手爪关闭
+        # Set torque gripper closed
         self.calibration_parameters(
             class_name=self.__class__.__name__, gripper_id=gripper_id
         )
-        # 调用校准参数函数
+        # Call calibration parameter helper
         return self.set_pro_gripper(
             gripper_id, ProGripper.SET_GRIPPER_ANGLE, 0
         )
-        # 发送设置力矩手爪关闭的指令
+        # Send command to set torque gripper closed
 
     def get_pro_gripper_angle(self, gripper_id):
-        # 获取力矩手爪角度
+        # Get torque gripper angle
         self.calibration_parameters(
             class_name=self.__class__.__name__, gripper_id=gripper_id
         )
-        # 调用校准参数函数
+        # Call calibration parameter helper
         return self.get_pro_gripper(gripper_id, ProGripper.GET_GRIPPER_ANGLE)
-        # 发送获取力矩手爪角度的指令
+        # Send command to get torque gripper angle
 
     def set_pro_gripper_calibration(self, gripper_id):
-        # 设置力矩手爪校准
+        # Set torque gripper calibration
         self.calibration_parameters(
             class_name=self.__class__.__name__, gripper_id=gripper_id
         )
-        # 调用校准参数函数
+        # Call calibration parameter helper
         return self.set_pro_gripper(
             gripper_id, ProGripper.SET_GRIPPER_CALIBRATION
         )
-        # 发送设置力矩手爪校准的指令
+        # Send command to set torque gripper calibration
 
     def get_pro_gripper_status(self, gripper_id):
-        # 获取力矩手爪状态
+        # Get torque gripper status
         self.calibration_parameters(
             class_name=self.__class__.__name__, gripper_id=gripper_id
         )
-        # 调用校准参数函数
+        # Call calibration parameter helper
         return self.get_pro_gripper(gripper_id, ProGripper.GET_GRIPPER_STATUS)
-        # 发送获取力矩手爪状态的指令
+        # Send command to get torque gripper status
 
     def set_pro_gripper_torque(self, gripper_id, torque):
-        # 设置力矩手爪扭矩
+        # Set torque gripper torque
         self.calibration_parameters(
             class_name=self.__class__.__name__,
             gripper_id=gripper_id,
             torque=torque,
         )
-        # 调用校准参数函数
+        # Call calibration parameter helper
         return self.set_pro_gripper(
             gripper_id, ProGripper.SET_GRIPPER_TORQUE, torque
         )
-        # 发送设置力矩手爪扭矩的指令
+        # Send command to set torque gripper torque
 
     def get_pro_gripper_torque(self, gripper_id):
-        # 获取力矩手爪扭矩
+        # Get torque gripper torque
         self.calibration_parameters(
             class_name=self.__class__.__name__, gripper_id=gripper_id
         )
-        # 调用校准参数函数
+        # Call calibration parameter helper
         return self.get_pro_gripper(gripper_id, ProGripper.GET_GRIPPER_TORQUE)
-        # 发送获取力矩手爪扭矩的指令
+        # Send command to get torque gripper torque
 
     def set_pro_gripper_speed(self, gripper_id, speed):
-        # 设置力矩手爪速度
+        # Set torque gripper speed
         self.calibration_parameters(
             class_name=self.__class__.__name__,
             gripper_id=gripper_id,
             speed=speed,
         )
-        # 调用校准参数函数
+        # Call calibration parameter helper
         return self.set_pro_gripper(
             gripper_id, ProGripper.SET_GRIPPER_SPEED, speed
         )
-        # 发送设置力矩手爪速度的指令
+        # Send command to set torque gripper speed
 
     def get_pro_gripper_speed(self, gripper_id):
-        # 获取力矩手爪速度
+        # Get torque gripper speed
         self.calibration_parameters(
             class_name=self.__class__.__name__, gripper_id=gripper_id
         )
-        # 调用校准参数函数
+        # Call calibration parameter helper
         return self.get_pro_gripper(gripper_id, ProGripper.GET_GRIPPER_SPEED)
-        # 发送获取力矩手爪速度的指令
+        # Send command to get torque gripper speed
 
     def set_pro_gripper_abs_angle(self, gripper_id, angle):
-        # 设置力矩手爪绝对角度
+        # Set torque gripper absolute angle
         return self.set_pro_gripper(
             gripper_id,
             ProGripper.SET_GRIPPER_ABS_ANGLE,
             angle,
             has_return=True,
         )
-        # 发送设置力矩手爪绝对角度的指令
+        # Send command to set torque gripper absolute angle
 
     def set_pro_gripper_pause(self, gripper_id):
         return self.set_pro_gripper(gripper_id, ProGripper.SET_GRIPPER_PAUSE)
@@ -508,8 +507,7 @@ class ThreeHand:
         )
 
     def set_hand_gripper_clockwise(self, hand_id, value, gripper_id=14):
-        """state: 0 or 1, 0 - disable, 1 - enable
-        """
+        """state: 0 or 1, 0 - disable, 1 - enable"""
         self.calibration_parameters(
             class_name=self.__class__.__name__, hand_id=hand_id
         )

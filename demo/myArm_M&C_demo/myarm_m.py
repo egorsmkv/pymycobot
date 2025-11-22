@@ -63,7 +63,7 @@ def setup_socket_connect(host, port):
     return socket_api
 
 
-def setup_robotic_connect(comport: str) -> T.Optional[MyArmM]:
+def setup_robotic_connect(comport: str) -> MyArmM | None:
     robotic_api = None
     try:
         robotic_api = MyArmM(comport)

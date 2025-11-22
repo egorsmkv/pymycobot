@@ -80,7 +80,6 @@ time, time.sleep(2)
 mc.set_gpio_pwm_stop()
 time.sleep(1)
 
-#
 iic = mc.set_iic_init(1)
 
 
