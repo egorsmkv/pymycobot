@@ -1,4 +1,3 @@
-# coding=utf-8
 import threading
 import time
 import struct
@@ -44,16 +43,14 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
             self._write(self._flatten(real_command))
 
     def _mesg(self, genre, *args, **kwargs):
-        """
-
-        Args:
-            genre: command type (Command)
-            *args: other data.
-                   It is converted to octal by default.
-                   If the data needs to be encapsulated into hexadecimal,
-                   the array is used to include them. (Data cannot be nested)
-            **kwargs: support `has_reply`
-                has_reply: Whether there is a return value to accept.
+        """Args:
+        genre: command type (Command)
+        *args: other data.
+               It is converted to octal by default.
+               If the data needs to be encapsulated into hexadecimal,
+               the array is used to include them. (Data cannot be nested)
+        **kwargs: support `has_reply`
+            has_reply: Whether there is a return value to accept.
         """
         real_command, has_reply, _async = super(CloseLoop, self)._mesg(
             genre, *args, **kwargs
@@ -331,7 +328,7 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
                                     for d in match:
                                         command_log += hex(ord(d))[2:] + " "
                                     self.log.debug(
-                                        "_read : {}".format(command_log)
+                                        f"_read : {command_log}"
                                     )
                                     # self.log.debug("_read: {}".format([hex(ord(d)) for d in data]))
                                 else:
@@ -339,7 +336,7 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
                                     for d in match:
                                         command_log += hex(d)[2:] + " "
                                     self.log.debug(
-                                        "_read : {}".format(command_log)
+                                        f"_read : {command_log}"
                                     )
                                 res = self._process_received(match)
                                 if res != []:
@@ -349,9 +346,9 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
                                         )
                         elif isinstance(data, bytes):
                             command_log = " ".join(
-                                "{:02X}".format(b) for b in data
+                                f"{b:02X}" for b in data
                             )
-                            self.log.debug("_read : {}".format(command_log))
+                            self.log.debug(f"_read : {command_log}")
                             res = self._process_received(data)
                             if res != []:
                                 with self.lock:
@@ -396,12 +393,11 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
                                 if datas == b"":
                                     datas += data
                                     pre = k
+                                elif k - 1 == pre:
+                                    datas += data
                                 else:
-                                    if k - 1 == pre:
-                                        datas += data
-                                    else:
-                                        datas = b"\xfe"
-                                        pre = k
+                                    datas = b"\xfe"
+                                    pre = k
                         else:
                             time.sleep(0.001)
                     else:
@@ -427,7 +423,7 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
                                 if len(data) != 2:
                                     data = "0" + data
                                 command_log += data + " "
-                            self.log.debug("_read : {}".format(command_log))
+                            self.log.debug(f"_read : {command_log}")
                         else:
                             command_log = ""
                             for d in datas:
@@ -435,7 +431,7 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
                                 if len(data) != 2:
                                     data = "0" + data
                                 command_log += data + " "
-                            self.log.debug("_read : {}".format(command_log))
+                            self.log.debug(f"_read : {command_log}")
                         if datas[3] == 0x5D:
                             debug_data = []
                             for i in range(4, 32, 4):
@@ -973,7 +969,7 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
         return self._mesg(ProtocolCode.GET_QUICK_INFO)
 
     def drag_teach_clean(self):
-        """clear sample"""
+        """Clear sample"""
         return self._mesg(ProtocolCode.MERCURY_DRAG_TEACH_CLEAN)
 
     def get_comm_error_counts(self, joint_id, _type):
@@ -1264,7 +1260,6 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
                 The coord range of `RZ` is -180 ~ 180.
             speed (int): 1 ~ 100
         """
-
         self.calibration_parameters(
             class_name=self.__class__.__name__,
             coord_id=coord_id,
@@ -1672,7 +1667,6 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
                 1 : Adaptive gripper. default to adaptive gripper
                 2 : Parallel Gripper
         """
-
         if gripper_type is not None:
             self.calibration_parameters(
                 class_name=self.__class__.__name__,
@@ -2135,8 +2129,7 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
         return self._mesg(ProtocolCode.GET_FUSION_PARAMETERS, rank_mode)
 
     def set_fusion_parameters(self, rank_mode, value):
-        """
-        rank_mode: 1 ~ 4
+        """rank_mode: 1 ~ 4
         value: 0 ~ 10000
         """
         return self._mesg(
@@ -2144,5 +2137,5 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
         )
 
     def get_system_version(self):
-        """get system version"""
+        """Get system version"""
         return self._mesg(ProtocolCode.SOFTWARE_VERSION)

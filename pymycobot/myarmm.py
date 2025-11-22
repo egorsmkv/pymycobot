@@ -1,5 +1,3 @@
-# coding=utf-8
-from __future__ import division
 
 import time
 
@@ -75,8 +73,7 @@ class MyArmM(MyArmAPI):
         self._mesg(ProtocolCode.SET_ENCODERS, positions, speed)
 
     def set_servos_encoder_drag(self, encoders, speeds):
-        """
-        Set multiple servo motors with a specified speed to the target encoder potential value
+        """Set multiple servo motors with a specified speed to the target encoder potential value
         Args:
             encoders (list[int * 8]): 0 - 4095:
             speeds (list[int * 8]): -10000 - 10000:
@@ -161,7 +158,7 @@ class MyArmM(MyArmAPI):
         return self._mesg(ProtocolCode.GET_JOINT_MIN_ANGLE, has_reply=True)
 
     def is_tool_btn_clicked(self):
-        """get the end button status
+        """Get the end button status
 
         Returns:
             int: 0/1, 1: press, 0: no press

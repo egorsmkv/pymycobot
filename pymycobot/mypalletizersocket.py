@@ -1,6 +1,4 @@
-# coding=utf-8
 
-from __future__ import division
 import time
 import math
 import socket
@@ -55,10 +53,9 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
     _read = read
 
     def __init__(self, ip, netport=9000, debug=False):
-        """
-        Args:
-            ip: Server ip
-            netport: Server port
+        """Args:
+        ip: Server ip
+        netport: Server port
         """
         super(MyPalletizerSocket, self).__init__(debug)
         self.calibration_parameters = calibration_parameters
@@ -73,16 +70,14 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
         return sock
 
     def _mesg(self, genre, *args, **kwargs):
-        """
-
-        Args:
-            genre: command type (Command)
-            *args: other data.
-                   It is converted to octal by default.
-                   If the data needs to be encapsulated into hexadecimal,
-                   the array is used to include them. (Data cannot be nested)
-            **kwargs: support `has_reply`
-                has_reply: Whether there is a return value to accept.
+        """Args:
+        genre: command type (Command)
+        *args: other data.
+               It is converted to octal by default.
+               If the data needs to be encapsulated into hexadecimal,
+               the array is used to include them. (Data cannot be nested)
+        **kwargs: support `has_reply`
+            has_reply: Whether there is a return value to accept.
         """
         real_command, has_reply, _async = super(
             MyPalletizerSocket, self
@@ -179,7 +174,7 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
 
     # Overall Status
     def set_free_mode(self, flag):
-        """set to free mode
+        """Set to free mode
 
         Args:
             flag: 0/1
@@ -345,6 +340,7 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
     # JOG mode and operation
     def jog_angle(self, joint_id, direction, speed):
         """Jog control angle.
+
         Args:
             joint_id: int 1-4.
             direction: 0 - decrease, 1 - increase
@@ -379,7 +375,7 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
         )
 
     def jog_increment(self, joint_id, increment, speed):
-        """step mode
+        """Step mode
 
         Args:
             joint_id: int 1-4.
@@ -438,14 +434,12 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
 
     # Running Status and Settings
     def get_speed(self):
-        """
-        Get speed
+        """Get speed
         """
         return self._mesg(ProtocolCode.GET_SPEED, has_reply=True)
 
     def set_speed(self, speed):
-        """
-        Set speed
+        """Set speed
         :param speed: 0-100
         """
         self.calibration_parameters(
@@ -459,7 +453,7 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
         )
 
     def get_acceleration(self):
-        """get acceleration"""
+        """Get acceleration"""
         return self._process_single(
             self._mesg(ProtocolCode.GET_ACCELERATION, has_reply=True)
         )
@@ -654,13 +648,14 @@ class MyPalletizerSocket(CommandGenerator, sms_sts):
         """Init GPIO module.
         Raspberry Pi version need this.
         """
-        import RPi.GPIO as GPIO  # type: ignore
+        from RPi import GPIO  # type: ignore
 
         GPIO.setmode(GPIO.BCM)
         self.gpio = GPIO
 
     def gpio_output(self, pin, v):
         """Set GPIO output value.
+
         Args:
             pin: port number(int).
             v: Output value(int), 1 - GPIO.HEIGH, 0 - GPIO.LOW

@@ -41,10 +41,10 @@ COMM_TX_ERROR = -4  # Incorrect instruction packet
 COMM_RX_WAITING = -5  # Now recieving status packet
 COMM_RX_TIMEOUT = -6  # There is no status packet
 COMM_RX_CORRUPT = -7  # Incorrect status packet
-COMM_NOT_AVAILABLE = -9  #
+COMM_NOT_AVAILABLE = -9
 
 
-class protocol_packet_handler(object):
+class protocol_packet_handler:
     def __init__(self, portHandler, protocol_end):
         # self.scs_setend(protocol_end)# SCServo bit end(STS/SMS=0, SCS=1)
         self.portHandler = portHandler

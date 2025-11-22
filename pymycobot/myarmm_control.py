@@ -1,4 +1,3 @@
-# coding=utf-8
 import functools
 import sys
 import logging
@@ -66,8 +65,7 @@ class MyArmMProcessor(DataProcessor):
 
     @classmethod
     def __is_return(cls, genre, command):
-        """
-        Check if the command is a return command.
+        """Check if the command is a return command.
         """
         return len(command) == 6 and command[3] == genre
 
@@ -422,7 +420,7 @@ class MyArmMControl(MyArmMProcessor):
         return self._mesg(ProtocolCode.JOG_COORD, coord_id, direction, speed)
 
     def jog_increment(self, joint_id, increment, speed):
-        """step mode
+        """Step mode
 
         Args:
             joint_id(int):
@@ -703,7 +701,6 @@ class MyArmMControl(MyArmMProcessor):
             gripper_value (int): 0 ~ 100
             speed (int): 1 ~ 100
         """
-
         self.calibration_parameters(gripper_value=gripper_value, speed=speed)
         return self._mesg(ProtocolCode.SET_GRIPPER_VALUE, gripper_value, speed)
 
@@ -931,6 +928,7 @@ class MyArmMControl(MyArmMProcessor):
 
     def get_servo_speeds(self):
         """Get the joint speed .
+
         Returns:
              speeds: list[float * 8] +- 3000 step/s
         """
@@ -952,8 +950,8 @@ class MyArmMControl(MyArmMProcessor):
         return self._mesg(ProtocolCode.GET_SERVO_VOLTAGES)
 
     def get_servo_status(self):
-        """
-        Get the joint status.
+        """Get the joint status.
+
         Returns:
              status: list[int] 0 ~ 255
              0 - normal,
@@ -962,8 +960,7 @@ class MyArmMControl(MyArmMProcessor):
         return self._mesg(ProtocolCode.GET_SERVO_STATUS)
 
     def get_servo_temps(self):
-        """
-        Get joint temperature
+        """Get joint temperature
         Returns:
             temperatures: list[float] 0 ~ 255
         """

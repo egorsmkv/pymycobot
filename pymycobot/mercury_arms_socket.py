@@ -32,8 +32,7 @@ def format_hex_log(data):
 
 class MercuryArmsSocket(MercuryCommandGenerator):
     def __init__(self, arm, ip, netport=9000, debug=False):
-        """
-        Arm socket connection
+        """Arm socket connection
         Args:
             arm: 'left_arm' or 'right_arm'
             ip: ip address
@@ -69,7 +68,7 @@ class MercuryArmsSocket(MercuryCommandGenerator):
                 with self.lock:
                     self.read_command.append([result, time.time()])
 
-            except socket.timeout:
+            except TimeoutError:
                 time.sleep(0.1)
 
             except Exception as e:
@@ -95,7 +94,7 @@ class MercuryArmsSocket(MercuryCommandGenerator):
         return b"".join([date_length, data_byter])
 
     def _write(self, command, method=None):
-        self.log.debug("_write: {}".format(format_hex_log(command)))
+        self.log.debug(f"_write: {format_hex_log(command)}")
         self.sock.sendall(self.__format(command))
 
     def _send_command(self, genre, real_command):

@@ -42,7 +42,7 @@ def setup_serial_connect(port, baudrate, timeout=None):
     return serial_api
 
 
-class CommunicationProtocol(object):
+class CommunicationProtocol:
     def write(self, command):
         raise NotImplementedError
 

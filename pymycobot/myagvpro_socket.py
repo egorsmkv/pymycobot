@@ -30,7 +30,7 @@ class MyAGVProSocket(MyAGVProCommandApi):
     def read(self, size=1):
         try:
             return self._socket.recv(size)
-        except socket.timeout:
+        except TimeoutError:
             return b""
 
     def close(self):

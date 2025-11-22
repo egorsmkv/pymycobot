@@ -1,4 +1,3 @@
-# coding=utf-8
 import locale
 import time
 import threading
@@ -347,7 +346,7 @@ class Pro630Api(CloseLoop):
                 return f"The angle of the current joint {joint} is {angle}, and the angle range is: {min_angle} ~ {max_angle}"
         except TypeError:
             return "joint limit error"
-        return "over limit error {}".format(angles)
+        return f"over limit error {angles}"
 
     def _check_coords(self, new_coords, is_print=False):
         if isinstance(new_coords, list):
@@ -399,7 +398,7 @@ class Pro630(Pro630Api):
     ):
         self._serial_port = setup_serial_connect(port, baudrate, timeout)
         super(Pro630, self).__init__(debug, save_serial_log)
-        import RPi.GPIO as GPIO
+        from RPi import GPIO
 
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
@@ -413,21 +412,21 @@ class Pro630(Pro630Api):
         self._serial_port.close()
 
     def power_on(self, delay=2):
-        import RPi.GPIO as GPIO
+        from RPi import GPIO
 
         GPIO.output(self.power_control_2, GPIO.HIGH)
         time.sleep(delay)
         return super(Pro630, self).power_on()
 
     def power_off(self):
-        import RPi.GPIO as GPIO
+        from RPi import GPIO
 
         res = super(Pro630, self).power_off()
         GPIO.output(self.power_control_2, GPIO.LOW)
         return res
 
     def power_on_only(self):
-        import RPi.GPIO as GPIO
+        from RPi import GPIO
 
         GPIO.output(self.power_control_2, GPIO.HIGH)
 
@@ -438,7 +437,7 @@ class Pro630(Pro630Api):
             pin_no: pin port number. range 1 ~ 6
             pin_signal: 0 / 1
         """
-        import RPi.GPIO as GPIO
+        from RPi import GPIO
 
         pin_number = self.pin_numbered_mapping_table.get(pin_no, None)
         if pin_number is None:
@@ -456,7 +455,7 @@ class Pro630(Pro630Api):
             1 - high
             0 - low
         """
-        import RPi.GPIO as GPIO
+        from RPi import GPIO
 
         pin_number = self.pin_numbered_mapping_table.get(pin_no, None)
         if pin_number is None:

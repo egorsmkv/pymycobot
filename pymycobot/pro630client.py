@@ -1,4 +1,3 @@
-# coding=utf-8
 import socket
 import sys
 import time
@@ -31,12 +30,11 @@ def connect_socket(addr, port):
 
 class Pro630Client(Pro630Api):
     def __init__(self, host, port=9000, timeout=0.1, debug=False):
-        """
-        Args:
-            host: host address
-            port: port number
-            timeout: socket timeout
-            debug: debug mode
+        """Args:
+        host: host address
+        port: port number
+        timeout: socket timeout
+        debug: debug mode
         """
         self.sock = connect_socket(host, port)
         self.timeout = timeout
@@ -61,7 +59,7 @@ class Pro630Client(Pro630Api):
 
                 with self.lock:
                     self.read_command.append([result, time.time()])
-            except socket.timeout:
+            except TimeoutError:
                 print("socket timeout")
                 time.sleep(0.1)
             except Exception as e:

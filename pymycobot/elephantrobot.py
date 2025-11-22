@@ -42,7 +42,7 @@ def parse_mixed_list_string(s):
             return None
 
 
-class ElephantRobot(object):
+class ElephantRobot:
     def __init__(self, host, port, debug=False):
         """Initializes the ElephantRobot instance.
 
@@ -121,7 +121,6 @@ class ElephantRobot(object):
         Returns:
             str: Response from the robot.
         """
-
         with mutex:
             if not command.endswith("\n"):
                 command += "\n"
@@ -502,9 +501,7 @@ class ElephantRobot(object):
             content = f.read()
         content_base64 = base64.b64encode(content).decode()
         content_sha256 = hashlib.sha256(content).hexdigest()
-        command = "upload_file({},{},{})".format(
-            content_base64, remote_filename, content_sha256
-        )
+        command = f"upload_file({content_base64},{remote_filename},{content_sha256})"
         res = self.send_command(command)
         return res
 
@@ -988,9 +985,7 @@ class ElephantRobot(object):
         Returns:
             str: return data from socket
         """
-        command = "jog_increment({},{},{},{})\n".format(
-            joint_id, angle, speed, mode
-        )
+        command = f"jog_increment({joint_id},{angle},{speed},{mode})\n"
         return self.send_command(command)
 
     def enable_manual_brake_control(self, enable=True):
@@ -1191,9 +1186,7 @@ class ElephantRobot(object):
         """
         if value < 1 or value > 254:
             raise MyCobot630ProDataException(
-                "The Force_SetId value must be 1 ~ 254, but received {}".format(
-                    value
-                )
+                f"The Force_SetId value must be 1 ~ 254, but received {value}"
             )
         command = "force_SetGripperId(" + str(ID) + "," + str(value) + ")\n"
         return int(self.send_command(command))
@@ -1204,7 +1197,7 @@ class ElephantRobot(object):
         Args:
             ID (int): Robot arm ID.
 
-         Returns:
+        Returns:
             str: return ID value
         """
         command = "force_GetGripperId(" + str(ID) + ")\n"
@@ -1222,9 +1215,7 @@ class ElephantRobot(object):
         """
         if value < 0 or value > 1:
             raise MyCobot630ProDataException(
-                "The Force_SetEnabled value must be 0 ~ 1, but received {}".format(
-                    value
-                )
+                f"The Force_SetEnabled value must be 0 ~ 1, but received {value}"
             )
         command = (
             "force_SetGripperEnabled(" + str(ID) + "," + str(value) + ")\n"
@@ -1243,9 +1234,7 @@ class ElephantRobot(object):
         """
         if value < 0 or value > 100:
             raise MyCobot630ProDataException(
-                "The Force_SetAngle value must be 0 ~ 100, but received {}".format(
-                    value
-                )
+                f"The Force_SetAngle value must be 0 ~ 100, but received {value}"
             )
         command = "force_SetAngle(" + str(ID) + "," + str(value) + ")\n"
         # print(command)
@@ -1293,14 +1282,13 @@ class ElephantRobot(object):
         Args:
             ID (int): Robot arm ID.
             Value (int): Torque value (0~100).
+
         Returns:
             str: return message
         """
         if value < 0 or value > 100:
             raise MyCobot630ProDataException(
-                "The Force_SetTorque value must be 0 ~ 100, but received {}".format(
-                    value
-                )
+                f"The Force_SetTorque value must be 0 ~ 100, but received {value}"
             )
         command = (
             "force_SetGripperTorque(" + str(ID) + "," + str(value) + ")\n"
@@ -1331,9 +1319,7 @@ class ElephantRobot(object):
         """
         if value < 0 or value > 100:
             raise MyCobot630ProDataException(
-                "The Force_SetOpen value must be 0 ~ 100, but received {}".format(
-                    value
-                )
+                f"The Force_SetOpen value must be 0 ~ 100, but received {value}"
             )
         command = "force_SetOpen(" + str(ID) + "," + str(value) + ")\n"
         return int(self.send_command(command))
@@ -1350,9 +1336,7 @@ class ElephantRobot(object):
         """
         if value < 0 or value > 100:
             raise MyCobot630ProDataException(
-                "The Force_SetClose value must be 0 ~ 100, but received {}".format(
-                    value
-                )
+                f"The Force_SetClose value must be 0 ~ 100, but received {value}"
             )
         command = "force_SetClose(" + str(ID) + "," + str(value) + ")\n"
         return int(self.send_command(command))
@@ -1369,9 +1353,7 @@ class ElephantRobot(object):
         """
         if value < 1 or value > 100:
             raise MyCobot630ProDataException(
-                "The Force_SetSpeed value must be 1 ~ 100, but received {}".format(
-                    value
-                )
+                f"The Force_SetSpeed value must be 1 ~ 100, but received {value}"
             )
         command = "force_SetSpeed(" + str(ID) + "," + str(value) + ")\n"
         return int(self.send_command(command))
@@ -1425,9 +1407,7 @@ class ElephantRobot(object):
         """
         if value < 0 or value > 100:
             raise MyCobot630ProDataException(
-                "The SetAbsAngle  value must be 0 ~ 100, but received {}".format(
-                    value
-                )
+                f"The SetAbsAngle  value must be 0 ~ 100, but received {value}"
             )
         command = "force_SetAbsAngle(" + str(ID) + "," + str(value) + ")\n"
         return int(self.send_command(command))
@@ -1453,7 +1433,6 @@ class ElephantRobot(object):
         Returns:
             str: return message
         """
-
         command = "force_Resume(" + str(ID) + ")\n"
         return int(self.send_command(command))
 
@@ -1518,9 +1497,7 @@ class ElephantRobot(object):
         """
         if value < 1 or value > 254:
             raise MyCobot630ProDataException(
-                "The Hand  value must be 1 ~ 254, but received {}".format(
-                    value
-                )
+                f"The Hand  value must be 1 ~ 254, but received {value}"
             )
         command = "Hand_SetId(" + str(ID) + "," + str(value) + ")\n"
         return int(self.send_command(command))
@@ -1549,9 +1526,7 @@ class ElephantRobot(object):
         """
         if value < 0 or value > 1:
             raise MyCobot630ProDataException(
-                "The SetEnabled  value must be 0 ~ 1, but received {}".format(
-                    value
-                )
+                f"The SetEnabled  value must be 0 ~ 1, but received {value}"
             )
         command = "Hand_SetEnabled(" + str(ID) + "," + str(value) + ")\n"
         return int(self.send_command(command))
@@ -1569,15 +1544,11 @@ class ElephantRobot(object):
         """
         if value < 0 or value > 100:
             raise MyCobot630ProDataException(
-                "The Angle value must be 0 ~ 100, but received {}".format(
-                    value
-                )
+                f"The Angle value must be 0 ~ 100, but received {value}"
             )
         if Jiont < 1 or Jiont > 6:
             raise MyCobot630ProDataException(
-                "The Hand Jiont value must be 1 ~ 6, but received {}".format(
-                    Jiont
-                )
+                f"The Hand Jiont value must be 1 ~ 6, but received {Jiont}"
             )
         command = (
             "Hand_SetJointAngle("
@@ -1602,9 +1573,7 @@ class ElephantRobot(object):
         """
         if Jiont < 1 or Jiont > 6:
             raise MyCobot630ProDataException(
-                "The gripper Jiont value must be 1 ~ 6, but received {}".format(
-                    Jiont
-                )
+                f"The gripper Jiont value must be 1 ~ 6, but received {Jiont}"
             )
         command = "Hand_GetJointAngle(" + str(ID) + "," + str(Jiont) + ")\n"
         return int(self.send_command(command))
@@ -1621,9 +1590,7 @@ class ElephantRobot(object):
         """
         if Jiont < 1 or Jiont > 6:
             raise MyCobot630ProDataException(
-                "The Hand Jiont value must be 1 ~ 6, but received {}".format(
-                    Jiont
-                )
+                f"The Hand Jiont value must be 1 ~ 6, but received {Jiont}"
             )
         command = (
             "Hand_SetJointCalibrate(" + str(ID) + "," + str(Jiont) + ")\n"
@@ -1655,15 +1622,11 @@ class ElephantRobot(object):
         """
         if value < 0 or value > 100:
             raise MyCobot630ProDataException(
-                "The hand torque value must be 0 ~ 100, but received {}".format(
-                    value
-                )
+                f"The hand torque value must be 0 ~ 100, but received {value}"
             )
         if Jiont < 1 or Jiont > 6:
             raise MyCobot630ProDataException(
-                "The Hand Jiont value must be 1 ~ 6, but received {}".format(
-                    Jiont
-                )
+                f"The Hand Jiont value must be 1 ~ 6, but received {Jiont}"
             )
         command = (
             "Hand_SetTorque("
@@ -1688,9 +1651,7 @@ class ElephantRobot(object):
         """
         if Jiont < 1 or Jiont > 6:
             raise MyCobot630ProDataException(
-                "The Hand Jiont value must be 1 ~ 6, but received {}".format(
-                    Jiont
-                )
+                f"The Hand Jiont value must be 1 ~ 6, but received {Jiont}"
             )
         command = "Hand_GetTorque(" + str(ID) + "," + str(Jiont) + ")\n"
         return int(self.send_command(command))
@@ -1708,15 +1669,11 @@ class ElephantRobot(object):
         """
         if value < 1 or value > 100:
             raise MyCobot630ProDataException(
-                "The Hand speed value must be 1 ~ 100, but received {}".format(
-                    value
-                )
+                f"The Hand speed value must be 1 ~ 100, but received {value}"
             )
         if Jiont < 1 or Jiont > 6:
             raise MyCobot630ProDataException(
-                "The Hand Jiont value must be 1 ~ 6, but received {}".format(
-                    Jiont
-                )
+                f"The Hand Jiont value must be 1 ~ 6, but received {Jiont}"
             )
         command = (
             "Hand_SetSpeed("
@@ -1741,9 +1698,7 @@ class ElephantRobot(object):
         """
         if Jiont < 1 or Jiont > 6:
             raise MyCobot630ProDataException(
-                "The Hand Jiont value must be 1 ~ 6, but received {}".format(
-                    Jiont
-                )
+                f"The Hand Jiont value must be 1 ~ 6, but received {Jiont}"
             )
         command = "Hand_GetSpeed(" + str(ID) + "," + str(Jiont) + ")\n"
         return int(self.send_command(command))
@@ -1761,16 +1716,12 @@ class ElephantRobot(object):
         """
         if speed < 1 or speed > 100:
             raise MyCobot630ProDataException(
-                "The Hand speed value must be 1 ~ 100, but received {}".format(
-                    speed
-                )
+                f"The Hand speed value must be 1 ~ 100, but received {speed}"
             )
         if len(angles) == 6:
             if any(x < 0 or x > 100 for x in angles):
                 raise MyCobot630ProDataException(
-                    "The FullAngles value must be 0 ~ 100, but received {}".format(
-                        angles
-                    )
+                    f"The FullAngles value must be 0 ~ 100, but received {angles}"
                 )
             else:
                 command = (
@@ -1795,18 +1746,16 @@ class ElephantRobot(object):
                 return int(self.send_command(command))
         else:
             raise MyCobot630ProDataException(
-                "Enter the number of angles must be 6, but received {}".format(
-                    len(angles)
-                )
+                f"Enter the number of angles must be 6, but received {len(angles)}"
             )
 
     def hand_get_fullangles(self, ID):
         """Obtain the total joint angle of three fingers.
 
-                Args:
+        Args:
                     ID (int): Robot arm ID.
 
-                Returns:
+        Returns:
                     str: return All Joint angle value
         。
         """
@@ -1828,24 +1777,17 @@ class ElephantRobot(object):
         """
         if pose < 0 or pose > 4:
             raise MyCobot630ProDataException(
-                "The Hand pose value must be 0 ~ 4, but received {}".format(
-                    pose
-                )
+                f"The Hand pose value must be 0 ~ 4, but received {pose}"
             )
         if pose == 4:
             if value < 1 or value > 20:
                 raise MyCobot630ProDataException(
-                    "The pose is 4 so value must be 1 ~ 20, but received {}".format(
-                        value
-                    )
+                    f"The pose is 4 so value must be 1 ~ 20, but received {value}"
                 )
-        else:
-            if value < 0 or value > 5:
-                raise MyCobot630ProDataException(
-                    "The pose is less than 4 value must be 0 ~ 5, but received {}".format(
-                        value
-                    )
-                )
+        elif value < 0 or value > 5:
+            raise MyCobot630ProDataException(
+                f"The pose is less than 4 value must be 0 ~ 5, but received {value}"
+            )
         if num <= 0:
             command = (
                 "Hand_SetCatch("
@@ -1931,15 +1873,11 @@ class ElephantRobot(object):
         """
         if red < 0 or green < 0 or blue < 0:
             raise MyCobot630ProDataException(
-                "The input RGB parameter should be: 0~255, but received {},{},{}".format(
-                    red, green, blue
-                )
+                f"The input RGB parameter should be: 0~255, but received {red},{green},{blue}"
             )
         if red > 255 or green > 255 or blue > 255:
             raise MyCobot630ProDataException(
-                "The input RGB parameter should be: 0~255, but received {},{},{}".format(
-                    red, green, blue
-                )
+                f"The input RGB parameter should be: 0~255, but received {red},{green},{blue}"
             )
 
         command = (

@@ -1,4 +1,3 @@
-# coding=utf-8
 import locale
 import time
 import threading
@@ -13,11 +12,10 @@ from pymycobot.common import ProtocolCode, ProGripper
 
 class Pro450Client(CloseLoop):
     def __init__(self, ip="192.168.0.232", netport=4500, debug=False):
-        """
-        Args:
-            ip     : Server IP address, default '192.168.0.232'
-            netport : Socket port number, default is 4500
-            debug    : whether show debug info
+        """Args:
+        ip     : Server IP address, default '192.168.0.232'
+        netport : Socket port number, default is 4500
+        debug    : whether show debug info
         """
         super(Pro450Client, self).__init__(debug)
         self.SERVER_IP = ip
@@ -322,8 +320,7 @@ class Pro450Client(CloseLoop):
         value_low=None,
         expect_len=7,
     ):
-        """
-        General Modbus command sending method
+        """General Modbus command sending method
 
         Args:
             gripper_id: Device ID
@@ -412,7 +409,7 @@ class Pro450Client(CloseLoop):
                     return f"current value = {angles[i]}, limit is {self.min_joint[i]} ~ {self.max_joint[i]}"
         except TypeError:
             return "joint limit error"
-        return "over limit error {}".format(angles)
+        return f"over limit error {angles}"
 
     def _Singularity(self, angles):
         try:
@@ -494,8 +491,7 @@ class Pro450Client(CloseLoop):
         return self._mesg(ProtocolCode.SET_MOTOR_ENABLED, joint_id, state)
 
     def set_over_time(self, timeout=1000):
-        """
-        Set the timeout (unit: ms)
+        """Set the timeout (unit: ms)
         Default is 1000ms (1 second)
 
         Args:
@@ -1026,7 +1022,6 @@ class Pro450Client(CloseLoop):
                 The coord range of `RZ` is -180 ~ 180.
             speed (int): 1 ~ 100
         """
-
         self.calibration_parameters(
             class_name=self.__class__.__name__,
             coord_id=coord_id,
@@ -1137,8 +1132,7 @@ class Pro450Client(CloseLoop):
         return self._mesg(ProtocolCode.SET_JOINT_MIN, joint_id, degree)
 
     def set_debug_state(self, log_state):
-        """
-        Set the debug log mode of the robot.
+        """Set the debug log mode of the robot.
 
         Args:
             log_state (int): Debug state as bitmask (0~7)
@@ -1160,8 +1154,7 @@ class Pro450Client(CloseLoop):
         return self._mesg(ProtocolCode.SET_DEBUG_LOG_MODE, log_state)
 
     def get_debug_state(self):
-        """
-        Get the current debug log mode of the robot.
+        """Get the current debug log mode of the robot.
 
         Returns:
             int: Current debug state (0-7), or -1 if failed

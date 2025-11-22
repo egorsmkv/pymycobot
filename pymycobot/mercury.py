@@ -1,4 +1,3 @@
-# coding=utf-8
 
 import time
 import threading
@@ -17,12 +16,11 @@ class Mercury(MercuryCommandGenerator):
         debug=False,
         save_serial_log=False,
     ):
-        """
-        Args:
-            port     : port string
-            baudrate : baud rate string, default '115200'
-            timeout  : default 0.1
-            debug    : whether show debug info
+        """Args:
+        port     : port string
+        baudrate : baud rate string, default '115200'
+        timeout  : default 0.1
+        debug    : whether show debug info
         """
         super(Mercury, self).__init__(debug)
         self.save_serial_log = save_serial_log

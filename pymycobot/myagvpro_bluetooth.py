@@ -21,9 +21,8 @@ class MyAGVProCommandApi(MyAGVProCommandProtocolApi):
             if genre in PLAINTEXT_REPLY_PROTOCOL_CODE:
                 if not reply_data.startswith(b"AGVPro:"):
                     continue
-            else:
-                if reply_data[3] != genre.value:
-                    continue
+            elif reply_data[3] != genre.value:
+                continue
 
             self.log.info(f" read: {' '.join(f'{x:02x}' for x in reply_data)}")
             break
@@ -248,7 +247,6 @@ class MyAGVProCommandApi(MyAGVProCommandProtocolApi):
         Returns:
             int: 1: Success, 0: Failed
         """
-
         if state not in (0, 1):
             raise ValueError("State must be 0 or 1")
 
@@ -485,7 +483,6 @@ class MyAGVProCommandApi(MyAGVProCommandProtocolApi):
         Returns:
             tuple(str, str, str): bluetooth name, service uuid, characteristic uuid
         """
-
         return await self._merge(ProtocolCode.GET_BLUETOOTH_UUID)
 
     async def get_bluetooth_address(self):
@@ -494,7 +491,6 @@ class MyAGVProCommandApi(MyAGVProCommandProtocolApi):
         Returns:
             str: bluetooth MAC address
         """
-
         return await self._merge(ProtocolCode.GET_BLUETOOTH_ADDRESS)
 
     async def set_handle_control_state(self, state):

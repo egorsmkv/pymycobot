@@ -1,4 +1,3 @@
-# coding=utf-8
 
 import time
 import threading
@@ -10,12 +9,11 @@ from pymycobot.common import ProtocolCode
 
 class Pro400Client(CloseLoop):
     def __init__(self, ip, netport=9000, debug=False):
-        """
-        Args:
-            port     : port string
-            baudrate : baud rate string, default '115200'
-            timeout  : default 0.1
-            debug    : whether show debug info
+        """Args:
+        port     : port string
+        baudrate : baud rate string, default '115200'
+        timeout  : default 0.1
+        debug    : whether show debug info
         """
         super(Pro400Client, self).__init__(debug)
         self.SERVER_IP = ip

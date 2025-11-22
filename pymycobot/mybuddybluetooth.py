@@ -1,4 +1,3 @@
-# coding: utf-8
 
 import threading
 
@@ -44,16 +43,14 @@ class MyBuddyBlueTooth(MyBuddyCommandGenerator):
         # self._write(timeout, "socket")
 
     def _mesg(self, genre, *args, **kwargs):
-        """
-
-        Args:
-            genre: command type (Command)
-            *args: other data.
-                   It is converted to octal by default.
-                   If the data needs to be encapsulated into hexadecimal,
-                   the array is used to include them. (Data cannot be nested)
-            **kwargs: support `has_reply`
-                has_reply: Whether there is a return value to accept.
+        """Args:
+        genre: command type (Command)
+        *args: other data.
+               It is converted to octal by default.
+               If the data needs to be encapsulated into hexadecimal,
+               the array is used to include them. (Data cannot be nested)
+        **kwargs: support `has_reply`
+            has_reply: Whether there is a return value to accept.
         """
         real_command, has_reply = super(MyBuddyBlueTooth, self)._mesg(
             genre, *args, **kwargs

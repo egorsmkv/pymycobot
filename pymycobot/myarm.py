@@ -1,6 +1,4 @@
-# coding=utf-8
 
-from __future__ import division
 import time
 import math
 import threading
@@ -49,12 +47,11 @@ class MyArm(CommandGenerator, sms_sts):
     """
 
     def __init__(self, port, baudrate="115200", timeout=0.1, debug=False):
-        """
-        Args:
-            port     : port string
-            baudrate : baud rate string, default '115200'
-            timeout  : default 0.1
-            debug    : whether show debug info
+        """Args:
+        port     : port string
+        baudrate : baud rate string, default '115200'
+        timeout  : default 0.1
+        debug    : whether show debug info
         """
         super(MyArm, self).__init__(debug)
         self.calibration_parameters = calibration_parameters
@@ -73,16 +70,14 @@ class MyArm(CommandGenerator, sms_sts):
     _read = read
 
     def _mesg(self, genre, *args, **kwargs):
-        """
-
-        Args:
-            genre: command type (Command)
-            *args: other data.
-                   It is converted to octal by default.
-                   If the data needs to be encapsulated into hexadecimal,
-                   the array is used to include them. (Data cannot be nested)
-            **kwargs: support `has_reply`
-                has_reply: Whether there is a return value to accept.
+        """Args:
+        genre: command type (Command)
+        *args: other data.
+               It is converted to octal by default.
+               If the data needs to be encapsulated into hexadecimal,
+               the array is used to include them. (Data cannot be nested)
+        **kwargs: support `has_reply`
+            has_reply: Whether there is a return value to accept.
         """
         real_command, has_reply, _async = super(MyArm, self)._mesg(
             genre, *args, **kwargs
@@ -281,7 +276,7 @@ class MyArm(CommandGenerator, sms_sts):
     # Basic for raspberry pi.
     def gpio_init(self):
         """Init GPIO module, and set BCM mode."""
-        import RPi.GPIO as GPIO  # type: ignore
+        from RPi import GPIO  # type: ignore
 
         GPIO.setmode(GPIO.BCM)
         self.gpio = GPIO
@@ -440,7 +435,7 @@ class MyArm(CommandGenerator, sms_sts):
         )
 
     def jog_increment(self, joint_id, increment, speed):
-        """step mode
+        """Step mode
 
         Args:
             joint_id: int 1 - 7.

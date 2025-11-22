@@ -1,4 +1,3 @@
-# coding=utf-8
 
 import locale
 
@@ -43,7 +42,7 @@ class MercuryCommandGenerator(CloseLoop):
                     return f"current value = {angles[i]}, limit is {self.min_joint[i]} ~ {self.max_joint[i]}"
         except TypeError:
             return "joint limit error"
-        return "over limit error {}".format(angles)
+        return f"over limit error {angles}"
 
     def _Singularity(self, angles):
         try:
@@ -105,16 +104,14 @@ class MercuryCommandGenerator(CloseLoop):
         return error_info
 
     def _mesg(self, genre, *args, **kwargs):
-        """
-
-        Args:
-            genre: command type (Command)
-            *args: other data.
-                   It is converted to octal by default.
-                   If the data needs to be encapsulated into hexadecimal,
-                   the array is used to include them. (Data cannot be nested)
-            **kwargs: support `has_reply`
-                has_reply: Whether there is a return value to accept.
+        """Args:
+        genre: command type (Command)
+        *args: other data.
+               It is converted to octal by default.
+               If the data needs to be encapsulated into hexadecimal,
+               the array is used to include them. (Data cannot be nested)
+        **kwargs: support `has_reply`
+            has_reply: Whether there is a return value to accept.
         """
         return_data = super(MercuryCommandGenerator, self)._mesg(
             genre, *args, **kwargs
@@ -492,7 +489,7 @@ class MercuryCommandGenerator(CloseLoop):
 
     @restrict_serial_port
     def get_base_coords(self):
-        """get base coords"""
+        """Get base coords"""
         return self._mesg(ProtocolCode.MERCURY_GET_BASE_COORDS)
 
     @restrict_serial_port

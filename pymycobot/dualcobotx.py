@@ -1,4 +1,3 @@
-# coding=utf-8
 
 import time
 import threading
@@ -13,12 +12,11 @@ class DualMercury(CommandGenerator):
     _read = read
 
     def __init__(self, port, baudrate="115200", timeout=0.1, debug=False):
-        """
-        Args:
-            port     : port string
-            baudrate : baud rate string, default '115200'
-            timeout  : default 0.1
-            debug    : whether show debug info
+        """Args:
+        port     : port string
+        baudrate : baud rate string, default '115200'
+        timeout  : default 0.1
+        debug    : whether show debug info
         """
         super(DualMercury, self).__init__(debug)
         self.calibration_parameters = calibration_parameters
@@ -33,16 +31,14 @@ class DualMercury(CommandGenerator):
         self.lock = threading.Lock()
 
     def _mesg(self, genre, *args, **kwargs):
-        """
-
-        Args:
-            genre: command type (Command)
-            *args: other data.
-                   It is converted to octal by default.
-                   If the data needs to be encapsulated into hexadecimal,
-                   the array is used to include them. (Data cannot be nested)
-            **kwargs: support `has_reply`
-                has_reply: Whether there is a return value to accept.
+        """Args:
+        genre: command type (Command)
+        *args: other data.
+               It is converted to octal by default.
+               If the data needs to be encapsulated into hexadecimal,
+               the array is used to include them. (Data cannot be nested)
+        **kwargs: support `has_reply`
+            has_reply: Whether there is a return value to accept.
         """
         real_command, has_reply = super(Mercury, self)._mesg(
             genre, *args, **kwargs

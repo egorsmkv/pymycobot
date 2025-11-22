@@ -1,6 +1,4 @@
-# coding=utf-8
 
-from __future__ import division
 import time
 import math
 import socket
@@ -93,10 +91,9 @@ class MyCobot280Socket(CommandGenerator):
     _read = read
 
     def __init__(self, ip, netport=9000, debug=False):
-        """
-        Args:
-            ip: Server ip
-            netport: Server port
+        """Args:
+        ip: Server ip
+        netport: Server port
         """
         super(MyCobot280Socket, self).__init__(debug)
         self.calibration_parameters = calibration_parameters
@@ -112,16 +109,14 @@ class MyCobot280Socket(CommandGenerator):
         return sock
 
     def _mesg(self, genre, *args, **kwargs):
-        """
-
-        Args:
-            genre: command type (Command)
-            *args: other data.
-                   It is converted to octal by default.
-                   If the data needs to be encapsulated into hexadecimal,
-                   the array is used to include them. (Data cannot be nested)
-            **kwargs: support `has_reply`
-                has_reply: Whether there is a return value to accept.
+        """Args:
+        genre: command type (Command)
+        *args: other data.
+               It is converted to octal by default.
+               If the data needs to be encapsulated into hexadecimal,
+               the array is used to include them. (Data cannot be nested)
+        **kwargs: support `has_reply`
+            has_reply: Whether there is a return value to accept.
         """
         real_command, has_reply, _async = super(MyCobot280Socket, self)._mesg(
             genre, *args, **kwargs
@@ -286,7 +281,7 @@ class MyCobot280Socket(CommandGenerator):
 
     # Overall Status
     def set_free_mode(self, flag):
-        """set to free mode
+        """Set to free mode
 
         Args:
             flag: 0/1
@@ -399,7 +394,7 @@ class MyCobot280Socket(CommandGenerator):
     # Basic for raspberry pi.
     def gpio_init(self):
         """Init GPIO module, and set BCM mode."""
-        import RPi.GPIO as GPIO  # type: ignore
+        from RPi import GPIO  # type: ignore
 
         GPIO.setmode(GPIO.BCM)
         self.gpio = GPIO
@@ -438,7 +433,7 @@ class MyCobot280Socket(CommandGenerator):
         )
 
     def jog_increment_angle(self, joint_id, increment, speed, _async=False):
-        """angle step mode
+        """Angle step mode
 
         Args:
             joint_id: int 1-6.
@@ -462,7 +457,7 @@ class MyCobot280Socket(CommandGenerator):
         )
 
     def jog_increment_coord(self, id, increment, speed, _async=False):
-        """coord step mode
+        """Coord step mode
 
         Args:
             id: axis id 1 - 6.
@@ -821,6 +816,7 @@ class MyCobot280Socket(CommandGenerator):
 
     def get_gpio_in(self, pin_no):
         """Get pin level status.
+
         Args:
             pin_no: (int) pin id.
         """
@@ -949,7 +945,6 @@ class MyCobot280Socket(CommandGenerator):
         Return:
             Recording queue length
         """
-
         return self._mesg(ProtocolCode.DRAG_START_RECORD, has_reply=True)
 
     def drag_end_record(self):  # TODO need test 2024/11/15
@@ -958,7 +953,6 @@ class MyCobot280Socket(CommandGenerator):
         Return:
              Recording queue length
         """
-
         return self._mesg(ProtocolCode.DRAG_END_RECORD, has_reply=True)
 
     def drag_get_record_data(self):  # TODO need test 2024/11/15
@@ -968,7 +962,6 @@ class MyCobot280Socket(CommandGenerator):
             List of potential values (encoder values) and operating speeds of each joint
             eg: [[J1_encoder,J2_encoder,J3_encoder,J4_encoder, J5_encoder, J6_encoder],[J1_run_speed, J2_run_speed, J3_run_speed, J4_run_speed, J5_run_speed, J6_run_speed]]
         """
-
         return self._mesg(ProtocolCode.DRAG_GET_RECORD_DATA, has_reply=True)
 
     def drag_get_record_len(self):  # TODO need test 2024/11/15
@@ -977,7 +970,6 @@ class MyCobot280Socket(CommandGenerator):
         Return:
             Recording queue length
         """
-
         return self._mesg(ProtocolCode.DRAG_GET_RECORD_LEN, has_reply=True)
 
     def drag_clear_record_data(self):  # TODO need test 2024/11/15
@@ -986,7 +978,6 @@ class MyCobot280Socket(CommandGenerator):
         Return:
             Recording queue length 0
         """
-
         return self._mesg(ProtocolCode.DRAG_CLEAR_RECORD_DATA, has_reply=True)
 
     def get_reboot_count(self):
@@ -1028,7 +1019,7 @@ class MyCobot280Socket(CommandGenerator):
         return self._mesg(ProtocolCode.GET_COORDS_PLAN, has_reply=True)
 
     def get_modify_version(self):
-        """get modify version
+        """Get modify version
 
         Return: int
         """

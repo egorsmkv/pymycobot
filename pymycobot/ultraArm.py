@@ -1,4 +1,3 @@
-# coding: utf-8
 import time
 from pymycobot.common import ProtocolCode
 import math
@@ -7,12 +6,11 @@ import threading
 
 class ultraArm:
     def __init__(self, port, baudrate=115200, timeout=0.1, debug=False):
-        """
-        Args:
-            port     : port string
-            baudrate : baud rate string, default '115200'
-            timeout  : default 0.1
-            debug    : whether show debug info, default: False
+        """Args:
+        port     : port string
+        baudrate : baud rate string, default '115200'
+        timeout  : default 0.1
+        debug    : whether show debug info, default: False
         """
         import serial
 
@@ -177,7 +175,7 @@ class ultraArm:
                     return 0
 
     def _debug(self, data):
-        """whether show info."""
+        """Whether show info."""
         if self.debug:
             print("\n***** Debug Info *****\nsend command: %s" % data)
 
@@ -190,7 +188,7 @@ class ultraArm:
         return self._request("size")
 
     def release_all_servos(self):
-        """relax all joints."""
+        """Relax all joints."""
         with self.lock:
             command = ProtocolCode.RELEASE_SERVOS + ProtocolCode.END
             self._serial_port.write(command.encode())
@@ -208,7 +206,7 @@ class ultraArm:
             self._respone()
 
     def go_zero(self):
-        """back to zero."""
+        """Back to zero."""
         with self.lock:
             command = ProtocolCode.BACK_ZERO + ProtocolCode.END
             self._serial_port.write(command.encode())
@@ -351,7 +349,7 @@ class ultraArm:
             self._respone()
 
     def set_mode(self, mode=None):
-        """set coord mode.
+        """Set coord mode.
 
         Args:
             mode:
@@ -371,7 +369,7 @@ class ultraArm:
             self._respone()
 
     def set_speed_mode(self, mode=None):
-        """set speed mode.
+        """Set speed mode.
 
         Args:
             mode:
@@ -710,18 +708,18 @@ class ultraArm:
         if mode:
             command = (
                 ProtocolCode.SET_SYSTEM_VALUE
-                + " X{} ".format(id)
-                + "Y{} ".format(address)
-                + "Z{} ".format(value)
-                + "P{} ".format(mode)
+                + f" X{id} "
+                + f"Y{address} "
+                + f"Z{value} "
+                + f"P{mode} "
                 + ProtocolCode.END
             )
         else:
             command = (
                 ProtocolCode.SET_SYSTEM_VALUE
-                + " X{} ".format(id)
-                + "Y{} ".format(address)
-                + "Z{} ".format(value)
+                + f" X{id} "
+                + f"Y{address} "
+                + f"Z{value} "
                 + ProtocolCode.END
             )
         self._serial_port.write(command.encode())
@@ -744,16 +742,16 @@ class ultraArm:
         if mode:
             command = (
                 ProtocolCode.GET_SYSTEM_VALUE
-                + " J{} ".format(id)
-                + "S{} ".format(address)
-                + "P{} ".format(mode)
+                + f" J{id} "
+                + f"S{address} "
+                + f"P{mode} "
                 + ProtocolCode.END
             )
         else:
             command = (
                 ProtocolCode.GET_SYSTEM_VALUE
-                + " J{} ".format(id)
-                + "S{} ".format(address)
+                + f" J{id} "
+                + f"S{address} "
                 + ProtocolCode.END
             )
         self._serial_port.write(command.encode())
@@ -762,8 +760,7 @@ class ultraArm:
         return self._request("system")
 
     def get_system_version(self):
-        """
-        Get system firmware version
+        """Get system firmware version
 
         Returns:
             (float) Firmware version
@@ -775,8 +772,7 @@ class ultraArm:
         return self._request("system_version")
 
     def get_modify_version(self):
-        """
-        Get firmware modify version
+        """Get firmware modify version
 
         Returns:
             (int) modify version

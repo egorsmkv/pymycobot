@@ -1,4 +1,3 @@
-# coding=utf-8
 
 import sys
 import logging
@@ -83,9 +82,8 @@ class CommandGenerator(DataProcessor):
     """
 
     def __init__(self, debug=False):
-        """
-        Args:
-            debug    : whether show debug info
+        """Args:
+        debug    : whether show debug info
         """
         self._version = sys.version_info[:2][0]
         self.debug = debug
@@ -95,7 +93,7 @@ class CommandGenerator(DataProcessor):
 
     # System status
     def get_system_version(self):
-        """get system version"""
+        """Get system version"""
         return self._mesg(ProtocolCode.SOFTWARE_VERSION, has_reply=True)
 
     # Overall status
@@ -335,7 +333,7 @@ class CommandGenerator(DataProcessor):
         )
 
     def jog_increment(self, joint_id, increment, speed, _async=False):
-        """step mode
+        """Step mode
 
         Args:
             joint_id: int 1-6.
@@ -656,7 +654,7 @@ class CommandGenerator(DataProcessor):
         return self._mesg(ProtocolCode.SET_DIGITAL_OUTPUT, pin_no, pin_signal)
 
     def get_digital_input(self, pin_no):
-        """singal value"""
+        """Singal value"""
         # TODO pin_no范围未知
         self.calibration_parameters(
             class_name=self.__class__.__name__, pin_no=pin_no

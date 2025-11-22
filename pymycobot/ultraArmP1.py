@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-"""
-ultraArmP1.py
+"""ultraArmP1.py
 
 Python interface for the ultraArmP1 robotic arm.
 
@@ -57,7 +55,6 @@ class UltraArmP1:
             str: 'ok' if the keyword response ("timx") is detected.
             bool: False if the timeout occurs without receiving a valid response.
         """
-
         import time
 
         if not _async:

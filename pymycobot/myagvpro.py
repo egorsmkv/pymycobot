@@ -631,7 +631,6 @@ class MyAGVProCommandApi(MyAGVProCommandProtocolApi):
         Returns:
             int: 1: Success, 0: Failed
         """
-
         if state not in (0, 1):
             raise ValueError("State must be 0 or 1")
 
@@ -871,7 +870,6 @@ class MyAGVProCommandApi(MyAGVProCommandProtocolApi):
         Returns:
             tuple(str, str, str): bluetooth name, service uuid, characteristic uuid
         """
-
         return self._merge(ProtocolCode.GET_BLUETOOTH_UUID)
 
     def get_bluetooth_address(self):
@@ -880,7 +878,6 @@ class MyAGVProCommandApi(MyAGVProCommandProtocolApi):
         Returns:
             str: bluetooth MAC address
         """
-
         return self._merge(ProtocolCode.GET_BLUETOOTH_ADDRESS)
 
     def set_handle_control_state(self, state):

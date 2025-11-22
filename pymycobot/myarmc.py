@@ -1,6 +1,4 @@
-# coding=utf-8
 
-from __future__ import division
 from pymycobot.common import ProtocolCode
 from pymycobot.myarm_api import MyArmAPI
 
@@ -10,7 +8,7 @@ class MyArmC(MyArmAPI):
         super(MyArmC, self).__init__(port, baudrate, timeout, debug)
 
     def is_tool_btn_clicked(self, mode=1):
-        """get the end button status
+        """Get the end button status
         Args:
             1: atom
             2: gripper red button

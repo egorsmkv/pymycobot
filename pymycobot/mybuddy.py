@@ -1,6 +1,4 @@
-# coding=utf-8
 
-from __future__ import division
 import time
 import math
 import logging
@@ -50,12 +48,11 @@ class MyBuddy(MyBuddyCommandGenerator, sms_sts):
     """
 
     def __init__(self, port, baudrate="115200", timeout=0.1, debug=False):
-        """
-        Args:
-            port     : port string
-            baudrate : baud rate string, default '115200'
-            timeout  : default 0.1
-            debug    : whether show debug info
+        """Args:
+        port     : port string
+        baudrate : baud rate string, default '115200'
+        timeout  : default 0.1
+        debug    : whether show debug info
         """
         super(MyBuddy, self).__init__(debug)
         self.calibration_parameters = calibration_parameters
@@ -105,30 +102,27 @@ class MyBuddy(MyBuddyCommandGenerator, sms_sts):
                     if datas == b"":
                         datas += data
                         pre = k
+                    elif k - 1 == pre:
+                        datas += data
                     else:
-                        if k - 1 == pre:
-                            datas += data
-                        else:
-                            datas = b"\xfe"
-                            pre = k
+                        datas = b"\xfe"
+                        pre = k
             except:
                 break
         else:
             datas = b""
-        self.log.debug("_read: {}".format(datas))
+        self.log.debug(f"_read: {datas}")
         return datas
 
     def _mesg(self, genre, *args, **kwargs):
-        """
-
-        Args:
-            genre: command type (Command)
-            *args: other data.
-                   It is converted to octal by default.
-                   If the data needs to be encapsulated into hexadecimal,
-                   the array is used to include them. (Data cannot be nested)
-            **kwargs: support `has_reply`
-                has_reply: Whether there is a return value to accept.
+        """Args:
+        genre: command type (Command)
+        *args: other data.
+               It is converted to octal by default.
+               If the data needs to be encapsulated into hexadecimal,
+               the array is used to include them. (Data cannot be nested)
+        **kwargs: support `has_reply`
+            has_reply: Whether there is a return value to accept.
         """
         real_command, has_reply = super(MyBuddy, self)._mesg(
             genre, *args, **kwargs
@@ -248,14 +242,14 @@ class MyBuddy(MyBuddyCommandGenerator, sms_sts):
 
     # Basic for raspberry pi.
     def set_gpio_init_mode(self, mode=1):
-        """import RPiGPIO,Init GPIO mode
+        """Import RPiGPIO,Init GPIO mode
 
         Args:
             mode(int):0/1
             0 = BCM
             1 = BOAND
         """
-        import RPi.GPIO as GPIO  # type: ignore
+        from RPi import GPIO  # type: ignore
 
         self.gpio = GPIO
         if mode == 0:
@@ -343,8 +337,7 @@ class MyBuddy(MyBuddyCommandGenerator, sms_sts):
         self.pwm.stop()
 
     def set_iic_init(self, IIC_NO):
-        """
-            import SMBUS2
+        """Import SMBUS2
 
             Open IIC_NO port
 

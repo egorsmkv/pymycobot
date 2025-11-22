@@ -1,4 +1,3 @@
-# coding=utf-8
 
 import threading
 import serial
@@ -16,12 +15,11 @@ class Pro400(CloseLoop):
         debug=False,
         save_serial_log=False,
     ):
-        """
-        Args:
-            port     : port string
-            baudrate : baud rate string, default '115200'
-            timeout  : default 0.1
-            debug    : whether show debug info
+        """Args:
+        port     : port string
+        baudrate : baud rate string, default '115200'
+        timeout  : default 0.1
+        debug    : whether show debug info
         """
         super(Pro400, self).__init__(debug)
         self.save_serial_log = save_serial_log

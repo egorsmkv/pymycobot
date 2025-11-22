@@ -225,8 +225,7 @@ class MyAGVCommandApi(MyAGVCommandProtocolApi):
         self.stop()
 
     def go_ahead(self, speed: int, timeout: int = 5):
-        """
-        Control the car to move forward.
+        """Control the car to move forward.
         Send control commands every 100ms.
         with a default motion time of 5 seconds.
 
@@ -239,8 +238,7 @@ class MyAGVCommandApi(MyAGVCommandProtocolApi):
         self.__basic_move_control(128 + speed, 128, 128, timeout=timeout)
 
     def retreat(self, speed, timeout=5):
-        """
-        Control the car back. Send control commands every 100ms.
+        """Control the car back. Send control commands every 100ms.
         with a default motion time of 5 seconds
 
         Args:
@@ -252,8 +250,7 @@ class MyAGVCommandApi(MyAGVCommandProtocolApi):
         self.__basic_move_control(128 - speed, 128, 128, timeout=timeout)
 
     def pan_left(self, speed, timeout=5):
-        """
-        Control the car to pan to the left.
+        """Control the car to pan to the left.
         Send control commands every 100ms. with a default motion time of 5 seconds
 
         Args:
@@ -265,8 +262,7 @@ class MyAGVCommandApi(MyAGVCommandProtocolApi):
         self.__basic_move_control(128, 128 + speed, 128, timeout=timeout)
 
     def pan_right(self, speed: int, timeout=5):
-        """
-        Control the car to pan to the right.
+        """Control the car to pan to the right.
         Send control commands every 100ms. with a default motion time of 5 seconds
 
         Args:
@@ -278,8 +274,7 @@ class MyAGVCommandApi(MyAGVCommandProtocolApi):
         self.__basic_move_control(128, 128 - speed, 128, timeout=timeout)
 
     def clockwise_rotation(self, speed: int, timeout=5):
-        """
-        Control the car to rotate clockwise.
+        """Control the car to rotate clockwise.
         Send control commands every 100ms. with a default motion time of 5 seconds
 
         Args:
@@ -291,8 +286,7 @@ class MyAGVCommandApi(MyAGVCommandProtocolApi):
         self.__basic_move_control(128, 128, 128 - speed, timeout=timeout)
 
     def counterclockwise_rotation(self, speed: int, timeout=5):
-        """
-        Control the car to rotate counterclockwise.
+        """Control the car to rotate counterclockwise.
         Send control commands every 100ms. with a default motion time of 5 seconds
         Args:
             speed (int): 1 ~ 127
@@ -308,8 +302,7 @@ class MyAGVCommandApi(MyAGVCommandProtocolApi):
         self.__movement = False
 
     def get_mcu_info(self):
-        """
-        Get MCU information
+        """Get MCU information
         Returns:
             MCU Version(list):
                 version 1.0:
@@ -382,7 +375,6 @@ class MyAGVCommandApi(MyAGVCommandProtocolApi):
             1 - open
             0 - close
         """
-
         return self._merge(ProtocolCode.GET_AUTO_REPORT_STATE, has_reply=True)
 
 

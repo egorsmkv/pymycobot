@@ -1,4 +1,3 @@
-# coding: utf-8
 import sys
 
 
@@ -36,13 +35,13 @@ class BluetoothConnection:
                 device_info = ""
                 i = 1
                 sys.stdout.write(
-                    "please select the device you want to connect:\n".format(4)
+                    "please select the device you want to connect:\n"
                 )
                 for addr, name in target_address:
-                    device_info += "{} >>> {} - {} \n".format(i, addr, name)
+                    device_info += f"{i} >>> {addr} - {name} \n"
                 sys.stdout.write(device_info)
                 choose_device = input(
-                    "please enter 1-{}:".format(len(target_address))
+                    f"please enter 1-{len(target_address)}:"
                 )
                 target_address = target_address[int(choose_device) - 1][0]
             sock = self.bluetooth.BluetoothSocket(self.bluetooth.RFCOMM)

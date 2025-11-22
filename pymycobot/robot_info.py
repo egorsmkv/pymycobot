@@ -1,7 +1,6 @@
-# coding=utf-8
 
 
-class Robot320Info(object):
+class Robot320Info:
     error_info = {
         "zh_CN": {
             "robot_error": {

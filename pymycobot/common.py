@@ -1,6 +1,4 @@
-# coding=utf-8
 
-from __future__ import division
 import time
 import struct
 import logging
@@ -15,7 +13,7 @@ from pymycobot.log import setup_logging
 from pymycobot.error import calibration_parameters
 
 
-class ProGripper(object):
+class ProGripper:
     SET_GRIPPER_ANGLE = 11
     GET_GRIPPER_ANGLE = 12
     SET_GRIPPER_CALIBRATION = 13
@@ -54,7 +52,7 @@ class ProGripper(object):
     MODBUS_GET_PROTECTION_CURRENT = 0x2C
 
 
-class MyHandGripper(object):
+class MyHandGripper:
     GET_HAND_MAJOR_FIRMWARE_VERSION = 1
     GET_HAND_MINOR_FIRMWARE_VERSION = 2
     SET_HAND_GRIPPER_ID = 3
@@ -89,7 +87,7 @@ class MyHandGripper(object):
     GET_HAND_GRIPPER_ROBOT_MODEL = 0x35
 
 
-class FingerGripper(object):
+class FingerGripper:
     GET_HAND_MAJOR_FIRMWARE_VERSION = 1
     GET_HAND_MINOR_FIRMWARE_VERSION = 2
     SET_HAND_GRIPPER_ID = 3
@@ -123,7 +121,7 @@ class FingerGripper(object):
     SET_HAND_GRIPPER_PINCH_ACTION_SPEED_CONSORT = 0x34
 
 
-class ProtocolCode(object):
+class ProtocolCode:
     # BASIC
     HEADER = 0xFE
     FOOTER = 0xFA
@@ -519,7 +517,7 @@ class ProtocolCode(object):
     SET_JOINT_ENABLE = "*8"
 
 
-class DataProcessor(object):
+class DataProcessor:
     crc_robot_class = [
         "Mercury",
         "MercurySocket",
@@ -532,9 +530,8 @@ class DataProcessor(object):
     ]
 
     def __init__(self, debug=False):
-        """
-        Args:
-            debug    : whether show debug info
+        """Args:
+        debug    : whether show debug info
         """
         self._version = sys.version_info[:2][0]
         self.debug = debug
@@ -543,15 +540,14 @@ class DataProcessor(object):
         self.calibration_parameters = calibration_parameters
 
     def _mesg(self, genre, *args, **kwargs):
-        """
-        Args:
-            genre: command type (Command)
-            *args: other data.
-                   It is converted to octal by default.
-                   If the data needs to be encapsulated into hexadecimal,
-                   the array is used to include them. (Data cannot be nested)
-            **kwargs: support `has_reply`
-                has_reply: Whether there is a return value to accept.
+        """Args:
+        genre: command type (Command)
+        *args: other data.
+               It is converted to octal by default.
+               If the data needs to be encapsulated into hexadecimal,
+               the array is used to include them. (Data cannot be nested)
+        **kwargs: support `has_reply`
+            has_reply: Whether there is a return value to accept.
         """
         command_data = self._process_data_command(
             genre, self.__class__.__name__, args
@@ -693,32 +689,29 @@ class DataProcessor(object):
                         for i in range(len(byte_value)):
                             res.append(byte_value[i])
                         processed_args.extend(res)
+                elif (
+                    _class in self.crc_robot_class
+                    and genre == ProtocolCode.TOOL_SERIAL_WRITE_DATA
+                ):
+                    processed_args.extend(args[index])
                 else:
-                    if (
-                        _class in self.crc_robot_class
-                        and genre == ProtocolCode.TOOL_SERIAL_WRITE_DATA
-                    ):
-                        processed_args.extend(args[index])
-                    else:
-                        processed_args.extend(self._encode_int16(args[index]))
+                    processed_args.extend(self._encode_int16(args[index]))
+            elif isinstance(args[index], str):
+                processed_args.append(args[index])
+            elif (
+                genre == ProtocolCode.SET_SERVO_DATA
+                and _class in self.crc_robot_class
+                and index == 2
+            ):
+                byte_value = args[index].to_bytes(
+                    2, byteorder="big", signed=True
+                )
+                res = []
+                for i in range(len(byte_value)):
+                    res.append(byte_value[i])
+                processed_args.extend(res)
             else:
-                if isinstance(args[index], str):
-                    processed_args.append(args[index])
-                else:
-                    if (
-                        genre == ProtocolCode.SET_SERVO_DATA
-                        and _class in self.crc_robot_class
-                        and index == 2
-                    ):
-                        byte_value = args[index].to_bytes(
-                            2, byteorder="big", signed=True
-                        )
-                        res = []
-                        for i in range(len(byte_value)):
-                            res.append(byte_value[i])
-                        processed_args.extend(res)
-                    else:
-                        processed_args.append(args[index])
+                processed_args.append(args[index])
 
         return processed_args
 
@@ -773,11 +766,10 @@ class DataProcessor(object):
             else:
                 data_pos = header_i + 5
             data_len -= 1
-        else:
-            if arm in [6, 7, 14, 8]:
-                data_pos = header_i + 4
-            elif arm == 12:
-                data_pos = header_i + 5
+        elif arm in [6, 7, 14, 8]:
+            data_pos = header_i + 4
+        elif arm == 12:
+            data_pos = header_i + 5
         valid_data = data[data_pos : data_pos + data_len]
         # process valid data
         res = []
@@ -1124,7 +1116,7 @@ def write(self, command, method=None):
                 log_command += i
             else:
                 log_command += hex(i)[2:] + " "
-        self.log.debug("_write: {}".format(log_command))
+        self.log.debug(f"_write: {log_command}")
 
         py_version = DataProcessor.check_python_version()
         if py_version == 2:
@@ -1161,7 +1153,7 @@ def write(self, command, method=None):
                 if len(data) == 1:
                     data = "0" + data
                 command_log += data + " "
-        self.log.debug("_write: {}".format(command_log))
+        self.log.debug(f"_write: {command_log}")
         try:
             # 检查串口是否打开
             if not self._serial_port.isOpen():
@@ -1296,13 +1288,13 @@ def read(
             command_log = ""
             for d in data:
                 command_log += hex(ord(d))[2:] + " "
-            self.log.debug("_read : {}".format(command_log))
+            self.log.debug(f"_read : {command_log}")
             # self.log.debug("_read: {}".format([hex(ord(d)) for d in data]))
         else:
             command_log = ""
             for d in data:
                 command_log += hex(d)[2:] + " "
-            self.log.debug("_read : {}".format(command_log))
+            self.log.debug(f"_read : {command_log}")
         return data
     else:
         if genre == ProtocolCode.GET_SSID_PWD:
@@ -1349,23 +1341,22 @@ def read(
                 if datas == b"":
                     datas += data
                     pre = k
+                elif k - 1 == pre:
+                    datas += data
                 else:
-                    if k - 1 == pre:
-                        datas += data
-                    else:
-                        datas = b"\xfe"
-                        pre = k
+                    datas = b"\xfe"
+                    pre = k
         else:
             datas = b""
         if DataProcessor.check_python_version() == 2:
             command_log = ""
             for d in datas:
                 command_log += hex(ord(d))[2:] + " "
-            self.log.debug("_read : {}".format(command_log))
+            self.log.debug(f"_read : {command_log}")
         else:
             command_log = ""
             for d in datas:
                 command_log += hex(d)[2:] + " "
-            self.log.debug("_read : {}".format(command_log))
+            self.log.debug(f"_read : {command_log}")
 
         return datas

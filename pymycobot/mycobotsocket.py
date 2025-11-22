@@ -1,6 +1,4 @@
-# coding=utf-8
 
-from __future__ import division
 import time
 import math
 import socket
@@ -51,10 +49,9 @@ class MyCobotSocket(CommandGenerator):
     _read = read
 
     def __init__(self, ip, netport=9000, debug=False):
-        """
-        Args:
-            ip: Server ip
-            netport: Server port
+        """Args:
+        ip: Server ip
+        netport: Server port
         """
         super(MyCobotSocket, self).__init__(debug)
         self.calibration_parameters = calibration_parameters
@@ -69,16 +66,14 @@ class MyCobotSocket(CommandGenerator):
         return sock
 
     def _mesg(self, genre, *args, **kwargs):
-        """
-
-        Args:
-            genre: command type (Command)
-            *args: other data.
-                   It is converted to octal by default.
-                   If the data needs to be encapsulated into hexadecimal,
-                   the array is used to include them. (Data cannot be nested)
-            **kwargs: support `has_reply`
-                has_reply: Whether there is a return value to accept.
+        """Args:
+        genre: command type (Command)
+        *args: other data.
+               It is converted to octal by default.
+               If the data needs to be encapsulated into hexadecimal,
+               the array is used to include them. (Data cannot be nested)
+        **kwargs: support `has_reply`
+            has_reply: Whether there is a return value to accept.
         """
         real_command, has_reply, _async = super(MyCobotSocket, self)._mesg(
             genre, *args, **kwargs
@@ -250,6 +245,7 @@ class MyCobotSocket(CommandGenerator):
 
     def get_gpio_in(self, pin_no):
         """Get pin level status.
+
         Args:
             pin_no: (int) pin id.
         """

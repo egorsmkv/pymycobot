@@ -1,4 +1,3 @@
-# coding=utf-8
 from pymycobot.common import ProtocolCode
 from pymycobot.generate import CommandGenerator
 
@@ -7,16 +6,14 @@ class MyBuddyCommandGenerator(CommandGenerator):
     """MyBuddy Python API"""
 
     def _mesg(self, genre, *args, **kwargs):
-        """
-
-        Args:
-            genre: command type (Command)
-            *args: other data.
-                   It is converted to octal by default.
-                   If the data needs to be encapsulated into hexadecimal,
-                   the array is used to include them. (Data cannot be nested)
-            **kwargs: support `has_reply`
-                has_reply: Whether there is a return value to accept.
+        """Args:
+        genre: command type (Command)
+        *args: other data.
+               It is converted to octal by default.
+               If the data needs to be encapsulated into hexadecimal,
+               the array is used to include them. (Data cannot be nested)
+        **kwargs: support `has_reply`
+            has_reply: Whether there is a return value to accept.
         """
         command_data = self._process_data_command(
             genre, self.__class__.__name__, args
@@ -67,7 +64,6 @@ class MyBuddyCommandGenerator(CommandGenerator):
         Args:
             ids: int,robot id, 0 - ALL
         """
-
         return self._mesg(ProtocolCode.CLEAR_ERROR_INFO, ids, has_reply=True)
 
     def get_system_version(self):
@@ -155,7 +151,7 @@ class MyBuddyCommandGenerator(CommandGenerator):
         return self._mesg(ProtocolCode.GET_FRESH_MODE, id, has_reply=True)
 
     def set_free_mode(self, id, value):
-        """set free mode
+        """Set free mode
 
         Args:
             id: 0/1/2/3 (ALL/L/R/W)
@@ -434,7 +430,7 @@ class MyBuddyCommandGenerator(CommandGenerator):
         )
 
     def jog_increment(self, id, joint_id, increment, speed):
-        """step mode
+        """Step mode
 
         Args:
             id: 1/2 (L/R).
@@ -733,7 +729,7 @@ class MyBuddyCommandGenerator(CommandGenerator):
         )
 
     def get_tool_digital_input(self, id, pin_no):
-        """singal value
+        """Singal value
 
         Args:
             id: 1/2 (L/R)
@@ -1008,6 +1004,7 @@ class MyBuddyCommandGenerator(CommandGenerator):
 
         Args:
             id: 1/2/3 (L/R/W)
+
         Return:
             volts < 24 V
         """
@@ -1124,7 +1121,7 @@ class MyBuddyCommandGenerator(CommandGenerator):
         )
 
     def write_base_coords(self, id, coords, speed):
-        """base coordinate move
+        """Base coordinate move
 
         Args:
             id: 1/2 (L/R)

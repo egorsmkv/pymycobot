@@ -1,6 +1,4 @@
-# coding=utf-8
 
-from __future__ import division
 import time
 import math
 import logging
@@ -94,12 +92,11 @@ class MechArm270(CommandGenerator):
         debug=False,
         thread_lock=True,
     ):
-        """
-        Args:
-            port     : port string
-            baudrate : baud rate string, default '115200'
-            timeout  : default 0.1
-            debug    : whether show debug info
+        """Args:
+        port     : port string
+        baudrate : baud rate string, default '115200'
+        timeout  : default 0.1
+        debug    : whether show debug info
         """
         super(MechArm270, self).__init__(debug)
         self.calibration_parameters = calibration_parameters
@@ -119,16 +116,14 @@ class MechArm270(CommandGenerator):
     _read = read
 
     def _mesg(self, genre, *args, **kwargs):
-        """
-
-        Args:
-            genre: command type (Command)
-            *args: other data.
-                   It is converted to octal by default.
-                   If the data needs to be encapsulated into hexadecimal,
-                   the array is used to include them. (Data cannot be nested)
-            **kwargs: support `has_reply`
-                has_reply: Whether there is a return value to accept.
+        """Args:
+        genre: command type (Command)
+        *args: other data.
+               It is converted to octal by default.
+               If the data needs to be encapsulated into hexadecimal,
+               the array is used to include them. (Data cannot be nested)
+        **kwargs: support `has_reply`
+            has_reply: Whether there is a return value to accept.
         """
         real_command, has_reply, _async = super(MechArm270, self)._mesg(
             genre, *args, **kwargs
@@ -378,7 +373,7 @@ class MechArm270(CommandGenerator):
     # Basic for raspberry pi.
     def gpio_init(self):
         """Init GPIO module, and set BCM mode."""
-        import RPi.GPIO as GPIO  # type: ignore
+        from RPi import GPIO  # type: ignore
 
         GPIO.setmode(GPIO.BCM)
         self.gpio = GPIO
@@ -416,7 +411,7 @@ class MechArm270(CommandGenerator):
         )
 
     def jog_increment_angle(self, joint_id, increment, speed, _async=False):
-        """angle step mode
+        """Angle step mode
 
         Args:
             joint_id: int 1-6.
@@ -435,7 +430,7 @@ class MechArm270(CommandGenerator):
         )
 
     def jog_increment_coord(self, id, increment, speed, _async=False):
-        """coord step mode
+        """Coord step mode
 
         Args:
             id: axis id 1 - 6.
@@ -608,8 +603,7 @@ class MechArm270(CommandGenerator):
         )
 
     def get_transponder_mode(self):
-        """
-        Get basic communication mode
+        """Get basic communication mode
         :return: 0/1
         """
         return self._mesg(ProtocolCode.GET_COMMUNICATE_MODE, has_reply=True)
@@ -890,7 +884,7 @@ class MechArm270(CommandGenerator):
         return self._mesg(ProtocolCode.GET_COORDS_PLAN, has_reply=True)
 
     def get_modify_version(self):
-        """get modify version
+        """Get modify version
 
         Return: int
         """

@@ -1,6 +1,4 @@
-# coding=utf-8
 
-from __future__ import division
 import functools
 import threading
 import time
@@ -21,12 +19,11 @@ def setup_serial_connect(port, baudrate, timeout=None):
 
 class MyArmMCProcessor(DataProcessor):
     def __init__(self, port, baudrate=115200, timeout=0.1, debug=False):
-        """
-        Args:
-            port     : port string
-            baudrate : baud rate string, default '115200'
-            timeout  : default 0.1
-            debug    : whether show debug info
+        """Args:
+        port     : port string
+        baudrate : baud rate string, default '115200'
+        timeout  : default 0.1
+        debug    : whether show debug info
         """
         super(MyArmMCProcessor, self).__init__(debug=debug)
         self.calibration_parameters = functools.partial(
@@ -37,8 +34,7 @@ class MyArmMCProcessor(DataProcessor):
 
     @classmethod
     def __check_command_integrity(cls, command):
-        """
-        Check the integrity of the command.
+        """Check the integrity of the command.
         Instruction format: header + header + length + genre + *data + footer
 
         :param command: the command to check
@@ -111,15 +107,14 @@ class MyArmMCProcessor(DataProcessor):
         self._serial_port.write(command)
 
     def _mesg(self, genre, *args, **kwargs):
-        """
-        Args:
-            genre: command type (Command)
-            *args: other data.
-                   It is converted to octal by default.
-                   If the data needs to be encapsulated into hexadecimal,
-                   the array is used to include them. (Data cannot be nested)
-            **kwargs: support `has_reply`
-                has_reply: Whether there is a return value to accept.
+        """Args:
+        genre: command type (Command)
+        *args: other data.
+               It is converted to octal by default.
+               If the data needs to be encapsulated into hexadecimal,
+               the array is used to include them. (Data cannot be nested)
+        **kwargs: support `has_reply`
+            has_reply: Whether there is a return value to accept.
         """
         real_command, has_reply, _async = super(MyArmMCProcessor, self)._mesg(
             genre, *args, **kwargs
@@ -280,8 +275,7 @@ class MyArmAPI(MyArmMCProcessor):
         return self._mesg(ProtocolCode.CLEAR_RECV_QUEUE)
 
     def get_joint_angle(self, joint_id):
-        """
-        Obtain the current angle of the specified joint, when the obtained angle is 200,
+        """Obtain the current angle of the specified joint, when the obtained angle is 200,
         it means that the joint has no communication
         Args:
             joint_id (int): 0 - 254
@@ -340,8 +334,7 @@ class MyArmAPI(MyArmMCProcessor):
         return self._mesg(ProtocolCode.GET_SERVOS_ENCODER_DRAG, has_reply=True)
 
     def is_all_servos_enabled(self):
-        """
-        Get the connection status of multiple servo motors
+        """Get the connection status of multiple servo motors
 
         Returns:
             status: list[int*8] 0: The connection failed 1: The connection is successful
@@ -544,7 +537,7 @@ class MyArmAPI(MyArmMCProcessor):
         self._mesg(ProtocolCode.SET_MASTER_PIN_STATUS, pin_number, status)
 
     def get_master_in_io_state(self, pin_number):
-        """get the host I/O pin status
+        """Get the host I/O pin status
 
         Args:
             pin_number (int): M750(1 -6), C650(1-2)
@@ -599,8 +592,7 @@ class MyArmAPI(MyArmMCProcessor):
         return self._mesg(ProtocolCode.GET_ATOM_LED_COLOR, r, g, b)
 
     def restore_servo_system_param(self, servo_id):
-        """
-        Restore servo motor system parameters
+        """Restore servo motor system parameters
         Args:
             servo_id: 0 - 255
         """

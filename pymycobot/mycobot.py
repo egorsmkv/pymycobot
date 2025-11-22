@@ -1,6 +1,4 @@
-# coding=utf-8
 
-from __future__ import division
 import time
 import math
 import logging
@@ -56,12 +54,11 @@ class MyCobot(CommandGenerator, PublicCommandGenerator, sms_sts):
         debug=False,
         thread_lock=True,
     ):
-        """
-        Args:
-            port     : port string
-            baudrate : baud rate string, default '115200'
-            timeout  : default 0.1
-            debug    : whether show debug info
+        """Args:
+        port     : port string
+        baudrate : baud rate string, default '115200'
+        timeout  : default 0.1
+        debug    : whether show debug info
         """
         super(MyCobot, self).__init__(debug)
         print(
@@ -85,16 +82,14 @@ class MyCobot(CommandGenerator, PublicCommandGenerator, sms_sts):
     _read = read
 
     def _mesg(self, genre, *args, **kwargs):
-        """
-
-        Args:
-            genre: command type (Command)
-            *args: other data.
-                   It is converted to octal by default.
-                   If the data needs to be encapsulated into hexadecimal,
-                   the array is used to include them. (Data cannot be nested)
-            **kwargs: support `has_reply`
-                has_reply: Whether there is a return value to accept.
+        """Args:
+        genre: command type (Command)
+        *args: other data.
+               It is converted to octal by default.
+               If the data needs to be encapsulated into hexadecimal,
+               the array is used to include them. (Data cannot be nested)
+        **kwargs: support `has_reply`
+            has_reply: Whether there is a return value to accept.
         """
         real_command, has_reply, _async = super(MyCobot, self)._mesg(
             genre, *args, **kwargs
@@ -256,7 +251,7 @@ class MyCobot(CommandGenerator, PublicCommandGenerator, sms_sts):
     # Basic for raspberry pi.
     def gpio_init(self):
         """Init GPIO module, and set BCM mode."""
-        import RPi.GPIO as GPIO  # type: ignore
+        from RPi import GPIO  # type: ignore
 
         GPIO.setmode(GPIO.BCM)
         self.gpio = GPIO
@@ -283,7 +278,7 @@ class MyCobot(CommandGenerator, PublicCommandGenerator, sms_sts):
         self._serial_port.open()
 
     def get_acceleration(self):
-        """get acceleration"""
+        """Get acceleration"""
         return self._process_single(
             self._mesg(ProtocolCode.GET_ACCELERATION, has_reply=True)
         )

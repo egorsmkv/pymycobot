@@ -1,4 +1,3 @@
-# coding=utf-8
 
 from pymycobot.common import ProtocolCode, ProGripper, FingerGripper
 
@@ -509,8 +508,7 @@ class ThreeHand:
         )
 
     def set_hand_gripper_clockwise(self, hand_id, value, gripper_id=14):
-        """
-        state: 0 or 1, 0 - disable, 1 - enable
+        """state: 0 or 1, 0 - disable, 1 - enable
         """
         self.calibration_parameters(
             class_name=self.__class__.__name__, hand_id=hand_id
@@ -606,7 +604,6 @@ class ThreeHand:
                 Idle flag. By default, there is no such byte. When this byte is 1, the idle finger can be freely manipulated.
 
         """
-
         if idle_flag is None:
             self.calibration_parameters(
                 class_name=self.__class__.__name__,

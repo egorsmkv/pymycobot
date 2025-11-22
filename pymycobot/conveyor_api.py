@@ -16,7 +16,7 @@ def setup_serial_connect(port, baudrate, timeout=None):
     return serial_api
 
 
-class CommandGenre(object):
+class CommandGenre:
     SET_SERVO_DIRECTION = 0xA0
     GET_SERVO_DIRECTION = 0xA2
 
@@ -29,7 +29,7 @@ class CommandGenre(object):
     READ_FIRMWARE_VERSION = 0xAA
 
 
-class Command(object):
+class Command:
     HEADER = 0xFF
 
     def __init__(self, genre, address, check_digit, params, length=None):
@@ -104,8 +104,7 @@ class Command(object):
 
     @classmethod
     def check_digit(cls, genre, params):
-        """
-        Calculate the check-code for the command.
+        """Calculate the check-code for the command.
         :param genre: int, function genre
         :param params: bytes, function parameters
         :return: int, check-code
@@ -114,8 +113,7 @@ class Command(object):
 
     @classmethod
     def has_header(cls, buffer: bytes):
-        """
-        Check if the buffer contains a header.
+        """Check if the buffer contains a header.
         :param buffer:
         :return:
         """
@@ -124,7 +122,7 @@ class Command(object):
         return buffer[0] == cls.HEADER and buffer[1] == cls.HEADER
 
 
-class SerialProtocol(object):
+class SerialProtocol:
     def __init__(self, comport, baudrate, timeout=0.5):
         self._comport = comport
         self._baudrate = baudrate
@@ -242,7 +240,7 @@ class ConveyorAPI(SerialProtocol):
         )
 
     def set_motor_speed(self, speed):
-        """modify the speed of the conveyor belt"""
+        """Modify the speed of the conveyor belt"""
         if not 1 <= speed <= 100:
             raise ValueError("speed must be in range [1, 100]")
         return self._merge(
@@ -254,7 +252,7 @@ class ConveyorAPI(SerialProtocol):
         )
 
     def stop(self):
-        """stop the conveyor belt"""
+        """Stop the conveyor belt"""
         return self._merge(
             CommandGenre.SET_SERVO_SPEED,
             self._motor_model,

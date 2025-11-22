@@ -1,6 +1,4 @@
-# coding=utf-8
 
-from __future__ import division
 import time
 import math
 import socket
@@ -109,10 +107,9 @@ class MyCobot320Socket(CommandGenerator):
     _read = read
 
     def __init__(self, ip, netport=9000, debug=False):
-        """
-        Args:
-            ip: Server ip
-            netport: Server port
+        """Args:
+        ip: Server ip
+        netport: Server port
         """
         super(MyCobot320Socket, self).__init__(debug)
         self.calibration_parameters = calibration_parameters
@@ -127,16 +124,14 @@ class MyCobot320Socket(CommandGenerator):
         return sock
 
     def _mesg(self, genre, *args, **kwargs):
-        """
-
-        Args:
-            genre: command type (Command)
-            *args: other data.
-                   It is converted to octal by default.
-                   If the data needs to be encapsulated into hexadecimal,
-                   the array is used to include them. (Data cannot be nested)
-            **kwargs: support `has_reply`
-                has_reply: Whether there is a return value to accept.
+        """Args:
+        genre: command type (Command)
+        *args: other data.
+               It is converted to octal by default.
+               If the data needs to be encapsulated into hexadecimal,
+               the array is used to include them. (Data cannot be nested)
+        **kwargs: support `has_reply`
+            has_reply: Whether there is a return value to accept.
         """
         real_command, has_reply, _async = super(MyCobot320Socket, self)._mesg(
             genre, *args, **kwargs
@@ -415,14 +410,13 @@ class MyCobot320Socket(CommandGenerator):
         )
 
     def jog_increment_angle(self, joint_id, increment, speed):
-        """angle step mode
+        """Angle step mode
 
         Args:
             joint_id: int 1-6.
             increment: Angle increment value
             speed: int (1 - 100)
         """
-
         self.calibration_parameters(
             class_name=self.__class__.__name__,
             id=joint_id,
@@ -436,7 +430,7 @@ class MyCobot320Socket(CommandGenerator):
         )
 
     def jog_increment_coord(self, id, increment, speed):
-        """coord step mode
+        """Coord step mode
 
         Args:
             id: axis id 1 - 6.
@@ -459,7 +453,7 @@ class MyCobot320Socket(CommandGenerator):
     # Basic for raspberry pi.
     def gpio_init(self):
         """Init GPIO module, and set BCM mode."""
-        import RPi.GPIO as GPIO  # type: ignore
+        from RPi import GPIO  # type: ignore
 
         GPIO.setmode(GPIO.BCM)
         self.gpio = GPIO
@@ -731,6 +725,7 @@ class MyCobot320Socket(CommandGenerator):
 
     def get_gpio_in(self, pin_no):
         """Get pin level status.
+
         Args:
             pin_no: (int) pin id.
         """
@@ -807,7 +802,7 @@ class MyCobot320Socket(CommandGenerator):
         return self.set_pro_gripper_angle(100, gripper_id)
 
     def set_pro_gripper_close(self, gripper_id=14):
-        """close force-controlled gripper
+        """Close force-controlled gripper
 
         Args:
             gripper_id (int): 1 ~ 254, defaults to 14

@@ -1,4 +1,3 @@
-# coding=utf-8
 import numpy as np
 
 
@@ -58,8 +57,7 @@ def CvtEulerAngleToRotationMatrix(ptrEulerAngle):
 
 
 def transformation_matrix_from_parameters(rotation_matrix, translation_vector):
-    """
-    Create a 4x4 homogeneous transformation matrix.
+    """Create a 4x4 homogeneous transformation matrix.
 
     :param rotation_matrix: 3x3 numpy array representing rotation.
     :param translation_vector: 1x3 numpy array representing translation.
@@ -72,8 +70,7 @@ def transformation_matrix_from_parameters(rotation_matrix, translation_vector):
 
 
 def get_flange_pose(flange_matrix, tool_pose):
-    """
-    Convert the pose from flange coordinate system to tool coordinate system.
+    """Convert the pose from flange coordinate system to tool coordinate system.
 
     :param flange_to_tool_matrix: 4x4 numpy array, transformation matrix from flange to tool.
     :param flange_pose: 4x4 numpy array, pose in flange coordinate system.
@@ -83,8 +80,7 @@ def get_flange_pose(flange_matrix, tool_pose):
 
 
 def get_tool_pose(flange_matrix, tool_pose):
-    """
-    Convert the pose from tool coordinate system to flange coordinate system.
+    """Convert the pose from tool coordinate system to flange coordinate system.
 
     :param flange_to_tool_matrix: 4x4 numpy array, transformation matrix from flange to tool.
     :param tool_pose: 4x4 numpy array, pose in tool coordinate system.

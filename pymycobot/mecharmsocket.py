@@ -1,6 +1,4 @@
-# coding=utf-8
 
-from __future__ import division
 
 import threading
 import time
@@ -92,10 +90,9 @@ class MechArmSocket(CommandGenerator):
     _read = read
 
     def __init__(self, ip, netport=9000, debug=False):
-        """
-        Args:
-            ip: Server ip
-            netport: Server port
+        """Args:
+        ip: Server ip
+        netport: Server port
         """
         super(MechArmSocket, self).__init__(debug)
         self.calibration_parameters = calibration_parameters
@@ -110,16 +107,14 @@ class MechArmSocket(CommandGenerator):
         return sock
 
     def _mesg(self, genre, *args, **kwargs):
-        """
-
-        Args:
-            genre: command type (Command)
-            *args: other data.
-                   It is converted to octal by default.
-                   If the data needs to be encapsulated into hexadecimal,
-                   the array is used to include them. (Data cannot be nested)
-            **kwargs: support `has_reply`
-                has_reply: Whether there is a return value to accept.
+        """Args:
+        genre: command type (Command)
+        *args: other data.
+               It is converted to octal by default.
+               If the data needs to be encapsulated into hexadecimal,
+               the array is used to include them. (Data cannot be nested)
+        **kwargs: support `has_reply`
+            has_reply: Whether there is a return value to accept.
         """
         real_command, has_reply, _async = super(MechArmSocket, self)._mesg(
             genre, *args, **kwargs
@@ -386,7 +381,7 @@ class MechArmSocket(CommandGenerator):
         )
 
     def jog_increment_angle(self, joint_id, increment, speed, _async=False):
-        """angle step mode
+        """Angle step mode
 
         Args:
             joint_id: int 1-6.
@@ -405,7 +400,7 @@ class MechArmSocket(CommandGenerator):
         )
 
     def jog_increment_coord(self, id, increment, speed, _async=False):
-        """coord step mode
+        """Coord step mode
 
         Args:
             id: axis id 1 - 6.
@@ -578,8 +573,7 @@ class MechArmSocket(CommandGenerator):
         )
 
     def get_transponder_mode(self):
-        """
-        Get basic communication mode
+        """Get basic communication mode
         :return: 0/1
         """
         return self._mesg(ProtocolCode.GET_COMMUNICATE_MODE, has_reply=True)
@@ -750,6 +744,7 @@ class MechArmSocket(CommandGenerator):
 
     def get_gpio_in(self, pin_no):
         """Get pin level status.
+
         Args:
             pin_no: (int) pin id.
         """
@@ -897,7 +892,7 @@ class MechArmSocket(CommandGenerator):
         return self._mesg(ProtocolCode.GET_COORDS_PLAN, has_reply=True)
 
     def get_modify_version(self):
-        """get modify version
+        """Get modify version
 
         Return: int
         """

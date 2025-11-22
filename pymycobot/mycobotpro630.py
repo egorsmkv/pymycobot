@@ -1,4 +1,3 @@
-# # -*- coding: utf-8 -*-
 # v1.0.3
 # 20230830
 # https://linuxcnc.org/docs/2.7/html/config/python-interface.html
@@ -53,7 +52,7 @@ def is_debian_os():
                     return False
                 return True
     except subprocess.CalledProcessError as e:
-        print("Error executing lsb_release -a: {}".format(e))
+        print(f"Error executing lsb_release -a: {e}")
         return False
 
     return None
@@ -182,7 +181,6 @@ class Phoenix:
 
     def _init_hal_gpio(self):
         """Inits HAL pins and parameters in halgpio component."""
-
         self.g = hal.component("halgpio", "halgpio")
 
         for i in range(MAX_PINS):
@@ -1901,9 +1899,7 @@ class Phoenix:
             self.c.wait_complete()
             self.s.poll()
             print(
-                "Warning: Failed Task abort: task_mode={}, exec_status={}, interp_state={}".format(
-                    self.s.task_mode, self.s.exec_state, self.s.interp_state
-                )
+                f"Warning: Failed Task abort: task_mode={self.s.task_mode}, exec_status={self.s.exec_state}, interp_state={self.s.interp_state}"
             )
 
     def task_stop_async(self):
@@ -2799,8 +2795,7 @@ class Phoenix:
         data = []
         messages_num = math.ceil(n / 5)
         data_to_look_for = [2 + n, 0xB4]
-        if data_to_look_for[0] > 7:
-            data_to_look_for[0] = 7
+        data_to_look_for[0] = min(data_to_look_for[0], 7)
         msg = self._receive_can(
             msg_data=data_to_look_for,
             destroy_can=False,

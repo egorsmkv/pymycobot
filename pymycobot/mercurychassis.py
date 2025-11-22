@@ -9,8 +9,7 @@ class MercuryChassisError(Exception):
 
 
 class MercuryChassis:
-    """
-    Mercury X1 mobile chassis car socket class
+    """Mercury X1 mobile chassis car socket class
     """
 
     def __init__(self, ip=None):
@@ -69,9 +68,7 @@ class MercuryChassis:
         """
         if speed < 0 or speed > 1:
             raise MercuryChassisError(
-                "The movement speed range is 0~1, but the received value is {}".format(
-                    speed
-                )
+                f"The movement speed range is 0~1, but the received value is {speed}"
             )
         command = {"goStraight": {"time": exercise_duration, "speed": speed}}
         self._sock.sendall(json.dumps(command).encode())
@@ -85,15 +82,13 @@ class MercuryChassis:
         """
         if speed < 0 or speed > 1:
             raise MercuryChassisError(
-                "The movement speed range is 0~1, but the received value is {}".format(
-                    speed
-                )
+                f"The movement speed range is 0~1, but the received value is {speed}"
             )
         command = {"goBack": {"time": exercise_duration, "speed": speed}}
         self._sock.sendall(json.dumps(command).encode())
 
     def turn_left(self, speed=0.5, exercise_duration=5):
-        """left turn control
+        """Left turn control
 
         Args:
             speed (float, optional): Movement speed. Defaults to 0.25. range 0 ~ 1
@@ -101,9 +96,7 @@ class MercuryChassis:
         """
         if speed < 0 or speed > 1:
             raise MercuryChassisError(
-                "The movement speed range is 0~1, but the received value is {}".format(
-                    speed
-                )
+                f"The movement speed range is 0~1, but the received value is {speed}"
             )
         command = {"turnLeft": {"time": exercise_duration, "speed": speed}}
         self._sock.sendall(json.dumps(command).encode())
@@ -117,15 +110,13 @@ class MercuryChassis:
         """
         if speed < 0 or speed > 1:
             raise MercuryChassisError(
-                "The movement speed range is 0~1, but the received value is {}".format(
-                    speed
-                )
+                f"The movement speed range is 0~1, but the received value is {speed}"
             )
         command = {"turnRight": {"time": exercise_duration, "speed": speed}}
         self._sock.sendall(json.dumps(command).encode())
 
     def stop(self):
-        """stop motion"""
+        """Stop motion"""
         command = {"stop": True}
         self._sock.sendall(json.dumps(command).encode())
 

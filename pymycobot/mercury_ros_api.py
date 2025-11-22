@@ -9,7 +9,7 @@ import os
 import glob
 
 try:
-    with open("/proc/device-tree/model", "r") as model_file:
+    with open("/proc/device-tree/model") as model_file:
         model = (
             model_file.read().strip().lower()
         )  # nvidia jetson xavier nx developer kit
@@ -127,9 +127,7 @@ class MapNavigation:
         self.pub_tempPose.publish(self.pose)
         self.point_count += 1
         rospy.loginfo(
-            " {} 对应 {} 号点位 pose: {}".format(
-                identifier, self.point_count, self.pose
-            )
+            f" {identifier} 对应 {self.point_count} 号点位 pose: {self.pose}"
         )
         return self.point_count
 
@@ -150,9 +148,7 @@ class MapNavigation:
                 curGoalIdx_ = point_index % len(self.pose_array.poses)
                 pose = self.pose_array.poses[curGoalIdx_ - 1]
                 rospy.loginfo(
-                    "{} Retrieving {} point pose: {}".format(
-                        identifier, point_index, pose
-                    )
+                    f"{identifier} Retrieving {point_index} point pose: {pose}"
                 )
 
     def goTopoint(self, identifier, point_index):
@@ -164,7 +160,7 @@ class MapNavigation:
                 goal.pose = self.pose_array.poses[curGoalIdx_ - 1]
                 self.goal_pub.publish(goal)
                 rospy.loginfo(
-                    "Going to {} point:{}".format(identifier, goal.pose)
+                    f"Going to {identifier} point:{goal.pose}"
                 )
 
     def setHomePosition(self, xGoal, yGoal, orientation_z, orientation_w):
@@ -367,8 +363,7 @@ class MapNavigation:
         self.pub.publish(twist)
 
     def vel_control(self, direction=[0, 0, 0], speed=0.0, control_time=0.0):
-        """
-        Function to control velocity.
+        """Function to control velocity.
 
         Parameters:
             - direction (list): An array containing three elements representing the direction of motion.
@@ -530,9 +525,9 @@ class MapNavigation:
 
             tw = euler[2]  # Yaw
 
-            rospy.loginfo("X position{}".format(x))
-            rospy.loginfo("Y position{}".format(y))
-            rospy.loginfo("TW orientation{}".format(tw))
+            rospy.loginfo(f"X position{x}")
+            rospy.loginfo(f"Y position{y}")
+            rospy.loginfo(f"TW orientation{tw}")
 
             return x, y, tw
 
@@ -541,7 +536,7 @@ class MapNavigation:
             tf2_ros.ConnectivityException,
             tf2_ros.ExtrapolationException,
         ) as e:
-            rospy.logerr("TF transformation query failed:{}".format(e))
+            rospy.logerr(f"TF transformation query failed:{e}")
 
     def goToPosition(self, goal_x, goal_y, orientation_z, orientation_w):
         flag_feed_goalReached = self.moveToGoal(

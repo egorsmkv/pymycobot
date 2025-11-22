@@ -1,4 +1,3 @@
-# coding=utf-8
 
 import time
 import socket
@@ -9,10 +8,9 @@ from pymycobot.mercury_api import MercuryCommandGenerator
 
 class MercurySocket(MercuryCommandGenerator):
     def __init__(self, ip, netport=9000, debug=False):
-        """
-        Args:
-            ip: Server ip
-            netport: Server port(default 9000)
+        """Args:
+        ip: Server ip
+        netport: Server port(default 9000)
         """
         super(MercurySocket, self).__init__(debug)
         self.SERVER_IP = ip

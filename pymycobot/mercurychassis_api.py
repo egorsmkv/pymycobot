@@ -1,12 +1,11 @@
 #!/usr/bin/python
-# -*- coding:utf-8 -*-
 import traceback
 from datetime import datetime
 import time
 import serial
 
 
-class ProtocolCode(object):
+class ProtocolCode:
     # send data
     header = 0x7B
     footer = 0x7D
@@ -17,14 +16,12 @@ class ProtocolCode(object):
 
 class ChassisControl:
     def __init__(self, port, baudrate=115200, timeout=0.1, debug=False):
+        """Args:
+        port     : port string
+        baudrate : baud rate string, default '115200'
+        timeout  : default 0.1
+        debug    : whether show debug info, default: False
         """
-        Args:
-            port     : port string
-            baudrate : baud rate string, default '115200'
-            timeout  : default 0.1
-            debug    : whether show debug info, default: False
-        """
-
         self._serial_port = serial.Serial()
         self._serial_port.port = port
         self._serial_port.baudrate = baudrate
@@ -43,7 +40,7 @@ class ChassisControl:
         return data
 
     def _debug(self, data):
-        """whether show info."""
+        """Whether show info."""
         hex_data = " ".join(f"{value:02X}" for value in data)
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         if self.debug:
@@ -58,8 +55,7 @@ class ChassisControl:
         self._serial_port.open()
 
     def _request(self, flag=""):
-        """
-        Read Data
+        """Read Data
         :param flag: Data type parameter variable
         :return:
         """
@@ -124,8 +120,7 @@ class ChassisControl:
     def _extract_frame(
         self, data, frame_header, frame_tail, expected_length=None
     ):
-        """
-        Extract the corresponding data
+        """Extract the corresponding data
         :param data: Get all data
         :param frame_header: Frame Header
         :param frame_tail: Frame tail
@@ -150,8 +145,7 @@ class ChassisControl:
             return []
 
     def _check_sum(self, count_number, mode):
-        """
-        Calculate the check digit
+        """Calculate the check digit
         :param count_number: The total number of bytes before the check digit
         :param mode: Verify whether to send or receive data, 0-Receive data mode, 1-Send data mode
         :return: A byte type
@@ -169,37 +163,31 @@ class ChassisControl:
         return check_sum_result
 
     def get_power_voltage(self):
-        """
-        Get battery voltage
+        """Get battery voltage
         :return: A floating point voltage value, Unit: Volt
         """
         return self._request("voltage")
 
     def get_ultrasonic_value(self):
-        """
-        Get ultrasonic value
+        """Get ultrasonic value
         :return: A list of length 3,Unit: mm
         """
         return self._request("ultrasonic")
 
     def get_base_version(self):
-        """
-        Get base version
+        """Get base version
         :return: A string representing the firmware version in the format 'vX.X' (e.g., 'v1.1').
         """
         return self._request("version")
 
     def go_straight(self, speed=0.2):
-        """
-        Forward control
+        """Forward control
         :param speed: speed (float, optional): Movement speed. Defaults to 0.2. range 0 ~ 0.5 m/s
         :return: None
         """
         if speed < 0 or speed > 0.5:
             raise Exception(
-                "The movement speed range is 0~0.5, but the received value is {}".format(
-                    speed
-                )
+                f"The movement speed range is 0~0.5, but the received value is {speed}"
             )
         self.Send_Data[0] = ProtocolCode.header
         self.Send_Data[1] = 0
@@ -224,19 +212,16 @@ class ChassisControl:
             self._debug(self.Send_Data)
         except serial.SerialException as e:
             e = traceback.format_exc()
-            print("Unable to send data through serial port: {}".format(e))
+            print(f"Unable to send data through serial port: {e}")
 
     def go_back(self, speed=-0.2):
-        """
-        Back control
+        """Back control
         :param speed: speed (float, optional): Movement speed. Defaults to -0.2. range -0.5 ~ 0 m/s
         :return: None
         """
         if not -0.5 <= speed <= 0:
             raise Exception(
-                "The movement speed range is -0.5~0, but the received value is {}".format(
-                    speed
-                )
+                f"The movement speed range is -0.5~0, but the received value is {speed}"
             )
         self.Send_Data = [0] * 11
         self.Send_Data[0] = ProtocolCode.header
@@ -264,20 +249,16 @@ class ChassisControl:
             self._debug(self.Send_Data)
         except serial.SerialException as e:
             e = traceback.format_exc()
-            print("Unable to send data through serial port: {}".format(e))
+            print(f"Unable to send data through serial port: {e}")
 
     def turn_left(self, speed=0.2):
-        """
-        Left turn control
+        """Left turn control
         :param speed: speed (float, optional): Movement speed. Defaults to 0.2. range 0 ~ 0.5 m/s
         :return: None
         """
-
         if speed < 0 or speed > 0.5:
             raise Exception(
-                "The movement speed range is 0~5, but the received value is {}".format(
-                    speed
-                )
+                f"The movement speed range is 0~5, but the received value is {speed}"
             )
         self.Send_Data = [0] * 11
         self.Send_Data[0] = ProtocolCode.header
@@ -303,19 +284,16 @@ class ChassisControl:
             self._debug(self.Send_Data)
         except serial.SerialException as e:
             e = traceback.format_exc()
-            print("Unable to send data through serial port: {}".format(e))
+            print(f"Unable to send data through serial port: {e}")
 
     def turn_right(self, speed=-0.2):
-        """
-        Right turn control
+        """Right turn control
         :param speed: speed (float, optional): Movement speed. Defaults to -0.2. range -0.5 ~ 0 m/s
         :return: None
         """
         if not -0.5 <= speed <= 0:
             raise Exception(
-                "The movement speed range is -0.5~0, but the received value is {}".format(
-                    speed
-                )
+                f"The movement speed range is -0.5~0, but the received value is {speed}"
             )
         self.Send_Data = [0] * 11
 
@@ -344,11 +322,10 @@ class ChassisControl:
             self._debug(self.Send_Data)
         except serial.SerialException as e:
             e = traceback.format_exc()
-            print("Unable to send data through serial port: {}".format(e))
+            print(f"Unable to send data through serial port: {e}")
 
     def stop(self):
-        """
-        stop motion
+        """Stop motion
         :return:
         """
         self.Send_Data = [0] * 11
@@ -374,11 +351,10 @@ class ChassisControl:
             self._debug(self.Send_Data)
         except serial.SerialException as e:
             e = traceback.format_exc()
-            print("Unable to send data through serial port: {}".format(e))
+            print(f"Unable to send data through serial port: {e}")
 
     def set_color(self, r=0, g=0, b=0):
-        """
-        Set the color control of the X1 base light strip.
+        """Set the color control of the X1 base light strip.
         :param r: (int): 0 ~ 255
         :param g: (int): 0 ~ 255
         :param b: (int): 0 ~ 255
@@ -411,4 +387,4 @@ class ChassisControl:
             self._debug(self.Send_Data)
         except serial.SerialException as e:
             e = traceback.format_exc()
-            print("Unable to send data through serial port: {}".format(e))
+            print(f"Unable to send data through serial port: {e}")

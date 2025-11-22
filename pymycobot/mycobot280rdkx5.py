@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-from __future__ import division
 
 import functools
 import socket
@@ -52,16 +51,14 @@ class MyCobot280RDKX5Api(DataProcessor):
         return calibration_parameters(**kwargs)
 
     def _mesg(self, genre, *args, **kwargs):
-        """
-
-        Args:
-            genre: command type (Command)
-            *args: other data.
-                   It is converted to octal by default.
-                   If the data needs to be encapsulated into hexadecimal,
-                   the array is used to include them. (Data cannot be nested)
-            **kwargs: support `has_reply`
-                has_reply: Whether there is a return value to accept.
+        """Args:
+        genre: command type (Command)
+        *args: other data.
+               It is converted to octal by default.
+               If the data needs to be encapsulated into hexadecimal,
+               the array is used to include them. (Data cannot be nested)
+        **kwargs: support `has_reply`
+            has_reply: Whether there is a return value to accept.
         """
         real_command, has_reply, _ = super(MyCobot280RDKX5Api, self)._mesg(
             genre, *args, **kwargs
@@ -201,11 +198,11 @@ class MyCobot280RDKX5Api(DataProcessor):
 class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
     # Overall Status
     def get_modify_version(self):
-        """get modify version"""
+        """Get modify version"""
         return self._mesg(ProtocolCode.ROBOT_VERSION)
 
     def get_system_version(self):
-        """get system version"""
+        """Get system version"""
         return self._mesg(ProtocolCode.SOFTWARE_VERSION)
 
     def clear_queue(self):
@@ -241,8 +238,7 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
         return self._mesg(ProtocolCode.CLEAR_ERROR_INFO, has_reply=True)
 
     def set_monitor_state(self, monitor_state):
-        """
-        Set the monitoring state
+        """Set the monitoring state
         Args:
             monitor_state: 0 - Disable monitoring
                    1 - Enable monitoring
@@ -251,8 +247,7 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
         return self._mesg(ProtocolCode.SET_MONITOR_STATE, monitor_state)
 
     def get_monitor_state(self):
-        """
-        Get the monitoring state
+        """Get the monitoring state
         """
         return self._mesg(ProtocolCode.GET_MONITOR_STATE, has_reply=True)
 
@@ -586,7 +581,7 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
         return self._mesg(ProtocolCode.JOG_COORD, coord_id, direction, speed)
 
     def jog_increment_angle(self, joint_id, increment, speed):
-        """angle step mode
+        """Angle step mode
 
         Args:
             joint_id: int 1-6.
@@ -602,7 +597,7 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
         )
 
     def jog_increment_coord(self, coord_id, increment, speed):
-        """coord step mode
+        """Coord step mode
 
         Args:
             coord_id: coord id 1 - 6.
@@ -804,7 +799,6 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
             value: 0 - 4096
             mode: 0 - indicates that value is one byte(default), 1 - 1 represents a value of two bytes.
         """
-
         unique_address = (0, 1, 2, 3, 4)
         if value in unique_address:
             raise ValueError(
@@ -985,14 +979,12 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
 
     # Atom IO
     def get_tool_system_version(self):
-        """
-        Read the terminal primary and minor version numbers
+        """Read the terminal primary and minor version numbers
         """
         return self._mesg(ProtocolCode.GET_ATOM_VERSION, has_reply=True)
 
     def get_tool_modify_version(self):
-        """
-        Read the terminal modified version number
+        """Read the terminal modified version number
         """
         return self._mesg(ProtocolCode.OVER_LIMIT_RETURN_ZERO, has_reply=True)
 
@@ -1025,7 +1017,6 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
             pin_no     (int): 1 or 2
             pin_signal (int): 0 / 1
         """
-
         if pin_no not in (1, 2):
             raise ValueError("pin_no must be 1 or 2")
 
@@ -1233,7 +1224,6 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
         Return:
             Recording queue length
         """
-
         return self._mesg(ProtocolCode.DRAG_START_RECORD, has_reply=True)
 
     def end_drag_record(self):
@@ -1242,7 +1232,6 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
         Return:
              Recording queue length
         """
-
         return self._mesg(ProtocolCode.DRAG_END_RECORD, has_reply=True)
 
     def get_drag_record_data(self):
@@ -1253,7 +1242,6 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
             eg: [J1_encoder, J1_run_speed,J2_encoder, J2_run_speed,J3_encoder, J3_run_speed,J4_encoder, J4_run_speed,J5_
             encoder, J5_run_speed,J6_encoder, J6_run_speed]
         """
-
         return self._mesg(ProtocolCode.DRAG_GET_RECORD_DATA, has_reply=True)
 
     def get_drag_record_len(self):
@@ -1262,7 +1250,6 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
         Return:
             Recording queue length
         """
-
         return self._mesg(ProtocolCode.DRAG_GET_RECORD_LEN, has_reply=True)
 
     def clear_drag_record_data(self):
@@ -1271,7 +1258,6 @@ class MyCobot280RDKX5CommandGenerator(MyCobot280RDKX5Api):
         Return:
             Recording queue length 0
         """
-
         return self._mesg(ProtocolCode.DRAG_CLEAR_RECORD_DATA, has_reply=True)
 
 
@@ -1284,12 +1270,11 @@ class MyCobot280RDKX5(MyCobot280RDKX5CommandGenerator):
         debug=False,
         thread_lock=True,
     ):
-        """
-        Args:
-            port     : port string
-            baudrate : baud rate int, default 100_0000
-            timeout  : default 0.1
-            debug    : whether show debug info
+        """Args:
+        port     : port string
+        baudrate : baud rate int, default 100_0000
+        timeout  : default 0.1
+        debug    : whether show debug info
         """
         super().__init__(debug, thread_lock)
         self._serial_port = setup_serial_port(
@@ -1324,7 +1309,7 @@ class MyCobot280RDKX5Socket(MyCobot280RDKX5CommandGenerator):
         Args:
             mode: (int) 0 - BCM, 1 - BOARD
 
-        returns:
+        Returns:
             (int) 1 - success, 255 - error
         """
         if mode not in (0, 1):
@@ -1362,8 +1347,10 @@ class MyCobot280RDKX5Socket(MyCobot280RDKX5CommandGenerator):
 
     def get_gpio_input(self, pin_no):
         """Get pin level status.
+
         Args:
             pin_no: (int) pin id.
+
         Returns:
             (int) 0 - low, 1 - high, 255 - error
         """
