@@ -1,3 +1,18 @@
+[project]
+name = "pymycobot"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "bleak~=0.22.3",
+    "crc>=7.1.0",
+    "numpy>=2.3.5",
+    "opencv-python>=4.11.0.86",
+    "pyserial>=3.5",
+    "python-can>=4.6.1",
+]
+
 [tool.ruff]
 # Set the maximum line length to 79.
 line-length = 79
@@ -16,4 +31,10 @@ select = [
 convention = "google"
 
 [tool.ruff.lint.pylint]
+
+[dependency-groups]
+dev = [
+    "flake8>=7.3.0",
+    "pytest>=9.0.1",
+]
 
