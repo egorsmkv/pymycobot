@@ -103,6 +103,11 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
             return 1
         t = time.time()
         wait_time = 0.15
+
+        # Set wait_time from args
+        if "wait_time" in kwargs:
+            wait_time = kwargs["wait_time"]
+
         big_wait_time = False
         if genre == ProtocolCode.POWER_ON:
             wait_time = 8
