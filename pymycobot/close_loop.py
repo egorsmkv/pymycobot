@@ -82,11 +82,12 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
             genre, *args, **kwargs
         )
         self.log.debug(
-            "dispatch %s has_reply=%s async=%s args=%s",
+            "dispatch %s has_reply=%s async=%s args=%s, kwargs=%s",
             self._command_label(genre),
             has_reply,
             _async,
             args,
+            kwargs,
         )
         is_in_position = False
         is_get_return = False
