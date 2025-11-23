@@ -610,9 +610,7 @@ class pro630Server:
         else:
             datas = b""
         if self.conn is not None:
-            self.logger.info(
-                f"return datas: {[hex(v) for v in datas]}"
-            )
+            self.logger.info(f"return datas: {[hex(v) for v in datas]}")
 
             self.conn.sendall(datas)
             datas = b""

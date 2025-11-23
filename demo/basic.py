@@ -39,9 +39,7 @@ def test(mycobot):
 
     coords = [160, 160, 160, 0, 0, 0]
     mycobot.send_coords(coords, 70, 0)
-    print(
-        f"::send_coords() ==> send coords {coords}, speed 70, mode 0\n"
-    )
+    print(f"::send_coords() ==> send coords {coords}, speed 70, mode 0\n")
     time.sleep(3)
 
     print(f"::get_coords() ==> coords {mycobot.get_coords()}\n")

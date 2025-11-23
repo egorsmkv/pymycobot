@@ -153,9 +153,7 @@ def get_joystick():
     return joystick
 
 
-def dispatch_key_action(
-    key: JoyStickKey | JoyStickContinous, value: float
-):
+def dispatch_key_action(key: JoyStickKey | JoyStickContinous, value: float):
     global mc, arm_angle_table, global_states
     # print(f"key : {key} value : {value}")
 

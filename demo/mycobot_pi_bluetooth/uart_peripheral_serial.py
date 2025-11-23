@@ -84,8 +84,7 @@ def read():
 
 
 class PlayCharacteristic(Characteristic):
-    """The characteristic is used for the play page of the app.
-    """
+    """The characteristic is used for the play page of the app."""
 
     def __init__(self, bus, index, service):
         Characteristic.__init__(
@@ -106,8 +105,7 @@ class PlayCharacteristic(Characteristic):
         print(f"[PLAY]recive type: {bytearray(value)}")
 
     def ReadValue(self, options):
-        """Let client to read data from here.
-        """
+        """Let client to read data from here."""
         global get_app_command
         print("[PLAY]send type:", get_app_command)
         serial_obj.flushInput()
@@ -157,8 +155,7 @@ class BasicsCharacteristic(Characteristic):
         )
 
     def WriteValue(self, value, options):
-        """Rewrite the modified value to the file of the cat's setting.
-        """
+        """Rewrite the modified value to the file of the cat's setting."""
         # logger.debug('[BASICS]>>>>>>> Basic Characteristic [write]')
         global get_app_command
         get_app_command = bytes(value)

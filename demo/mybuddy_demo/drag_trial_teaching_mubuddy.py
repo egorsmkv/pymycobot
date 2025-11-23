@@ -1,5 +1,4 @@
-"""Drag and teach in windows version
-"""
+"""Drag and teach in windows version"""
 
 import time
 import os

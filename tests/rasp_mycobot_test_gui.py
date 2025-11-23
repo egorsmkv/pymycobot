@@ -64,28 +64,38 @@ class MycobotTest:
 
         # Calibration.
         self.calibration_num = None
-        self.calibration_label = tkinter.Label(self.win, text="Calibrate servo:")
+        self.calibration_label = tkinter.Label(
+            self.win, text="Calibrate servo:"
+        )
         self.calibration_label.grid(row=5)
         self.calibration_btn = tkinter.Button(
-            self.win, text="Start calibration", command=self.calibration_mycobot
+            self.win,
+            text="Start calibration",
+            command=self.calibration_mycobot,
         )
         self.calibration_btn.grid(row=5, column=1)
 
         # LED.
-        self.set_color_label = tkinter.Label(self.win, text="Test Atom light board:")
+        self.set_color_label = tkinter.Label(
+            self.win, text="Test Atom light board:"
+        )
         self.set_color_label.grid(row=6, columnspan=2)
         self.color_red = tkinter.Button(
             self.win, text="Set red", command=lambda: self.send_color("red")
         )
         self.color_green = tkinter.Button(
-            self.win, text="Set green", command=lambda: self.send_color("green")
+            self.win,
+            text="Set green",
+            command=lambda: self.send_color("green"),
         )
         self.color_red.grid(row=7)
         self.color_green.grid(row=7, column=1)
 
         # Aging test.
         self.aging_stop = False
-        self.movement_label = tkinter.Label(self.win, text="Aging loop action:")
+        self.movement_label = tkinter.Label(
+            self.win, text="Aging loop action:"
+        )
         self.movement_label.grid(row=8)
         self.start_btn = tkinter.Button(
             self.win, text="Start", command=self.start_aging_test
@@ -217,7 +227,9 @@ class MycobotTest:
         time.sleep(0.1)
         self.mycobot.send_angle(self.calibration_num, 0, 20)
         time.sleep(0.1)
-        self.write_log_to_Text("Motor calibration %s finished." % self.calibration_num)
+        self.write_log_to_Text(
+            "Motor calibration %s finished." % self.calibration_num
+        )
 
         if self.calibration_num == 6:
             self.write_log_to_Text("All calibrations completed.")

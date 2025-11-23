@@ -48,8 +48,7 @@ class FailedException(dbus.exceptions.DBusException):
 
 
 class Application(dbus.service.Object):
-    """org.bluez.GattApplication1 interface implementation
-    """
+    """org.bluez.GattApplication1 interface implementation"""
 
     def __init__(self, bus):
         self.path = "/"
@@ -83,8 +82,7 @@ class Application(dbus.service.Object):
 
 
 class Service(dbus.service.Object):
-    """org.bluez.GattService1 interface implementation
-    """
+    """org.bluez.GattService1 interface implementation"""
 
     PATH_BASE = "/org/bluez/example/service"
 
@@ -133,8 +131,7 @@ class Service(dbus.service.Object):
 
 
 class Characteristic(dbus.service.Object):
-    """org.bluez.GattCharacteristic1 interface implementation
-    """
+    """org.bluez.GattCharacteristic1 interface implementation"""
 
     def __init__(self, bus, index, uuid, flags, service):
         self.path = service.path + "/char" + str(index)
@@ -209,8 +206,7 @@ class Characteristic(dbus.service.Object):
 
 
 class Descriptor(dbus.service.Object):
-    """org.bluez.GattDescriptor1 interface implementation
-    """
+    """org.bluez.GattDescriptor1 interface implementation"""
 
     def __init__(self, bus, index, uuid, flags, characteristic):
         self.path = characteristic.path + "/desc" + str(index)
@@ -365,9 +361,7 @@ class HeartRateControlPointChrc(Characteristic):
 
 
 class BatteryService(Service):
-    """Fake Battery service that emulates a draining battery.
-
-    """
+    """Fake Battery service that emulates a draining battery."""
 
     BATTERY_UUID = "180f"
 
@@ -480,9 +474,7 @@ class TestCharacteristic(Characteristic):
 
 
 class TestDescriptor(Descriptor):
-    """Dummy test descriptor. Returns a static value.
-
-    """
+    """Dummy test descriptor. Returns a static value."""
 
     TEST_DESC_UUID = "12345678-1234-5678-1234-56789abcdef2"
 
@@ -501,9 +493,7 @@ class TestDescriptor(Descriptor):
 
 
 class CharacteristicUserDescriptionDescriptor(Descriptor):
-    """Writable CUD descriptor.
-
-    """
+    """Writable CUD descriptor."""
 
     CUD_UUID = "2901"
 
@@ -525,9 +515,7 @@ class CharacteristicUserDescriptionDescriptor(Descriptor):
 
 
 class TestEncryptCharacteristic(Characteristic):
-    """Dummy test characteristic requiring encryption.
-
-    """
+    """Dummy test characteristic requiring encryption."""
 
     TEST_CHRC_UUID = "12345678-1234-5678-1234-56789abcdef3"
 
@@ -556,9 +544,7 @@ class TestEncryptCharacteristic(Characteristic):
 
 
 class TestEncryptDescriptor(Descriptor):
-    """Dummy test descriptor requiring encryption. Returns a static value.
-
-    """
+    """Dummy test descriptor requiring encryption. Returns a static value."""
 
     TEST_DESC_UUID = "12345678-1234-5678-1234-56789abcdef4"
 
@@ -577,9 +563,7 @@ class TestEncryptDescriptor(Descriptor):
 
 
 class TestSecureCharacteristic(Characteristic):
-    """Dummy test characteristic requiring secure connection.
-
-    """
+    """Dummy test characteristic requiring secure connection."""
 
     TEST_CHRC_UUID = "12345678-1234-5678-1234-56789abcdef5"
 
@@ -608,9 +592,7 @@ class TestSecureCharacteristic(Characteristic):
 
 
 class TestSecureDescriptor(Descriptor):
-    """Dummy test descriptor requiring secure connection. Returns a static value.
-
-    """
+    """Dummy test descriptor requiring secure connection. Returns a static value."""
 
     TEST_DESC_UUID = "12345678-1234-5678-1234-56789abcdef6"
 

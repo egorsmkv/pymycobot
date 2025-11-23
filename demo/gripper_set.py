@@ -6,7 +6,10 @@ port = "com8"
 
 mc = MyCobot280(port)
 
-print("Current gripper position before zero-point calibration: ", mc.get_gripper_value())
+print(
+    "Current gripper position before zero-point calibration: ",
+    mc.get_gripper_value(),
+)
 time.sleep(0.1)
 mc.set_gripper_calibration()
 time.sleep(0.1)

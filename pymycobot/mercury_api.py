@@ -106,12 +106,26 @@ class MercuryCommandGenerator(CloseLoop):
         return_data = super(MercuryCommandGenerator, self)._mesg(
             genre, *args, **kwargs
         )
+        self.log.debug(
+            "mercury raw response %s: %s",
+            self._command_label(genre),
+            return_data,
+        )
+
+        def _log_return(value):
+            self.log.debug(
+                "mercury decoded %s -> %s",
+                self._command_label(genre),
+                value,
+            )
+            return value
+
         if isinstance(return_data, tuple):
             valid_data, data_len = return_data
         elif isinstance(return_data, int):
-            return return_data
+            return _log_return(return_data)
         else:
-            return None
+            return _log_return(None)
         res = []
         hand_address = None
         if genre == ProtocolCode.MERCURY_GET_TOQUE_GRIPPER:
@@ -120,7 +134,7 @@ class MercuryCommandGenerator(CloseLoop):
                 valid_data = valid_data[3:]
                 data_len -= 3
             else:
-                return valid_data[0]
+                return _log_return(valid_data[0])
         # print(data_len, valid_data)
         if genre == ProtocolCode.TOOL_SERIAL_READ_DATA:
             for i in range(data_len):
@@ -128,7 +142,7 @@ class MercuryCommandGenerator(CloseLoop):
         elif data_len in [6, 8, 12, 14, 16, 20, 24, 26, 60]:
             if data_len == 8 and (genre == ProtocolCode.IS_INIT_CALIBRATION):
                 if valid_data[0] == 1:
-                    return 1
+                    return _log_return(1)
                 n = len(valid_data)
                 for v in range(1, n):
                     res.append(valid_data[v])
@@ -153,7 +167,7 @@ class MercuryCommandGenerator(CloseLoop):
                     res.append(self._decode_int16(one))
         elif data_len == 2:
             if genre in [ProtocolCode.IS_SERVO_ENABLE]:
-                return self._decode_int8(valid_data[1:2])
+                return _log_return(self._decode_int8(valid_data[1:2]))
             elif genre in [ProtocolCode.GET_LIMIT_SWITCH]:
                 for i in valid_data:
                     res.append(i)
@@ -332,7 +346,7 @@ class MercuryCommandGenerator(CloseLoop):
                     res.append(0xFF & data1 if data1 < 0 else data1)
             res.append(self._decode_int8(valid_data))
         if res == []:
-            return None
+            return _log_return(None)
         if genre in [
             ProtocolCode.ROBOT_VERSION,
             ProtocolCode.GET_ROBOT_ID,
@@ -377,9 +391,9 @@ class MercuryCommandGenerator(CloseLoop):
             ProtocolCode.GET_DYNAMIC_PARAMETERS,
             ProtocolCode.GET_ERROR_INFO,
         ]:
-            return self._process_single(res)
+            return _log_return(self._process_single(res))
         elif genre in [ProtocolCode.GET_DRAG_FIFO]:
-            return [self._int2angle(angle) for angle in res]
+            return _log_return([self._int2angle(angle) for angle in res])
         elif genre in [
             ProtocolCode.GET_COORDS,
             ProtocolCode.MERCURY_GET_BASE_COORDS,
@@ -392,22 +406,22 @@ class MercuryCommandGenerator(CloseLoop):
                     r.append(self._int2coord(res[idx]))
                 for idx in range(3, 6):
                     r.append(self._int2angle(res[idx]))
-                return r
+                return _log_return(r)
             else:
-                return res
+                return _log_return(res)
         elif genre in [ProtocolCode.GET_SERVO_VOLTAGES]:
-            return [self._int2coord(angle) for angle in res]
+            return _log_return([self._int2coord(angle) for angle in res])
         elif genre in [
             ProtocolCode.GET_BASIC_VERSION,
             ProtocolCode.SOFTWARE_VERSION,
             ProtocolCode.GET_ATOM_VERSION,
         ]:
-            return self._int2coord(self._process_single(res))
+            return _log_return(self._int2coord(self._process_single(res)))
         elif genre in [
             ProtocolCode.GET_JOINT_MAX_ANGLE,
             ProtocolCode.GET_JOINT_MIN_ANGLE,
         ]:
-            return self._int2coord(res[0])
+            return _log_return(self._int2coord(res[0]))
         elif genre == ProtocolCode.GET_ANGLES_COORDS:
             r = []
             for index in range(len(res)):
@@ -417,29 +431,29 @@ class MercuryCommandGenerator(CloseLoop):
                     r.append(self._int2coord(res[index]))
                 else:
                     r.append(self._int2angle(res[index]))
-            return r
+            return _log_return(r)
         elif genre == ProtocolCode.GO_ZERO:
             r = []
             if res:
                 if 1 not in res[1:]:
-                    return res[0]
+                    return _log_return(res[0])
                 else:
                     for i in range(1, len(res)):
                         if res[i] == 1:
                             r.append(i)
-            return r
+            return _log_return(r)
         elif genre in [
             ProtocolCode.COBOTX_GET_SOLUTION_ANGLES,
             ProtocolCode.MERCURY_GET_POS_OVER_SHOOT,
             ProtocolCode.GET_SERVO_CW,
         ]:
-            return self._int2angle(res[0])
+            return _log_return(self._int2angle(res[0]))
         elif genre == ProtocolCode.GET_ANGLES:
-            return [self._int3angle(angle) for angle in res]
+            return _log_return([self._int3angle(angle) for angle in res])
         elif genre == ProtocolCode.SOLVE_INV_KINEMATICS:
-            return [self._int2angle(angle) for angle in res]
+            return _log_return([self._int2angle(angle) for angle in res])
         elif genre == ProtocolCode.COBOTX_GET_ANGLE:
-            return self._int2angle(res[0])
+            return _log_return(self._int2angle(res[0]))
         elif genre == ProtocolCode.MERCURY_ROBOT_STATUS:
             if len(res) == 23:
                 index = 9
@@ -457,7 +471,7 @@ class MercuryCommandGenerator(CloseLoop):
                             res[i].append(error_id)
                     if res[i] == []:
                         res[i] = 0
-            return res
+            return _log_return(res)
         elif genre == ProtocolCode.GET_MOTORS_RUN_ERR:
             for i in range(len(res)):
                 if res[i] != 0:
@@ -471,11 +485,11 @@ class MercuryCommandGenerator(CloseLoop):
                             res[i].append(error_id)
                     if res[i] == []:
                         res[i] = 0
-            return res
+            return _log_return(res)
         else:
             if isinstance(res, list) and len(res) == 1:
-                return res[0]
-            return res
+                return _log_return(res[0])
+            return _log_return(res)
 
     @restrict_serial_port
     def get_base_coords(self):

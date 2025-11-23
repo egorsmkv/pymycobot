@@ -70,9 +70,7 @@ def setup_robotic_connect(comport: str) -> MyArmM | None:
     except SerialException as serial_error:
         for error in serial_error.args:
             if error.startswith("could not open port"):
-                print(
-                    f" # (Error) Serial port [{comport}] is not available."
-                )
+                print(f" # (Error) Serial port [{comport}] is not available.")
             else:
                 print(
                     f" # (Error) Error while connecting robotic: {serial_error}"

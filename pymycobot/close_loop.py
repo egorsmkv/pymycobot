@@ -15,6 +15,13 @@ from pymycobot.common import (
 from pymycobot.end_control import ForceGripper, ThreeHand
 
 
+COMMAND_NAME_MAP = {
+    value: name
+    for name, value in ProtocolCode.__dict__.items()
+    if name.isupper() and not name.startswith("_")
+}
+
+
 class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
     _write = write
     _read = read
@@ -32,14 +39,33 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
         self.lock_out = threading.Lock()
         self.lock = threading.Lock()
 
+    def _command_label(self, genre):
+        return COMMAND_NAME_MAP.get(genre, f"0x{genre:02X}")
+
+    def _format_bytes(self, payload):
+        try:
+            return " ".join(f"{b:02X}" for b in payload)
+        except TypeError:
+            return str(payload)
+
     def _send_command(self, genre, real_command):
         self.write_command.append(genre)
         if (
             "Socket" in self.__class__.__name__
             or "Client" in self.__class__.__name__
         ):
+            self.log.debug(
+                "send %s over socket: %s",
+                self._command_label(genre),
+                self._format_bytes(real_command),
+            )
             self._write(self._flatten(real_command), method="socket")
         else:
+            self.log.debug(
+                "send %s over serial: %s",
+                self._command_label(genre),
+                self._format_bytes(real_command),
+            )
             self._write(self._flatten(real_command))
 
     def _mesg(self, genre, *args, **kwargs):
@@ -55,6 +81,13 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
         real_command, has_reply, _async = super(CloseLoop, self)._mesg(
             genre, *args, **kwargs
         )
+        self.log.debug(
+            "dispatch %s has_reply=%s async=%s args=%s",
+            self._command_label(genre),
+            has_reply,
+            _async,
+            args,
+        )
         is_in_position = False
         is_get_return = False
         lost_times = 0
@@ -64,6 +97,9 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
             with self.lock:
                 if genre in self.write_command:
                     self.write_command.remove(genre)
+            self.log.debug(
+                "async send for %s completed", self._command_label(genre)
+            )
             return 1
         t = time.time()
         wait_time = 0.15
@@ -211,6 +247,12 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
                     if moving != 0:
                         continue
                 # Motion command lost, resend
+                self.log.debug(
+                    "no response for %s within %.2fs, resending (attempt %s)",
+                    self._command_label(genre),
+                    timeout,
+                    lost_times + 1,
+                )
                 # print("Motion command lost, resend", flush=True)
                 lost_times += 1
                 # print("Motion command lost, resend")
@@ -222,6 +264,11 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
             if lost_times > 2:
                 # Retransmission failed three times, return -1
                 # print("Retransmission failed three times, return -1", flush=True)
+                self.log.warning(
+                    "command %s failed after %s retries",
+                    self._command_label(genre),
+                    lost_times,
+                )
                 return -1
             # if t < self.is_stop and genre != ProtocolCode.STOP:
             #     # Interrupt waiting for commands other than stop
@@ -255,13 +302,25 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
                         with self.lock:
                             if genre in self.write_command:
                                 self.write_command.remove(genre)
+                        self.log.debug(
+                            "command %s stopped moving before in-position feedback",
+                            self._command_label(genre),
+                        )
                         return -2
             time.sleep(0.001)
         else:
             # print("ERROR: ---timeout---")
+            self.log.warning(
+                "timeout waiting for %s after %.2fs",
+                self._command_label(genre),
+                wait_time,
+            )
             pass
         if data is None:
             # print("No data received")
+            self.log.debug(
+                "no data received for %s", self._command_label(genre)
+            )
             return data
         data = bytearray(data)
         data_len = data[2] - 3
@@ -289,9 +348,26 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
             elif data[2] == 4:
                 res = self._status_explain(data[4])
                 if res != "":
+                    if "error" in res.lower():
+                        self.log.error(
+                            "received status for %s: %s",
+                            self._command_label(genre),
+                            res,
+                        )
+                    else:
+                        self.log.debug(
+                            "received status for %s: %s",
+                            self._command_label(genre),
+                            res,
+                        )
                     print(res)
                 return data[4]
         valid_data = data[data_pos : data_pos + data_len]
+        self.log.debug(
+            "received response for %s: %s",
+            self._command_label(genre),
+            self._format_bytes(valid_data),
+        )
         return (valid_data, data_len)
 
     def read_thread(self, method=None):
@@ -466,7 +542,7 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
 
             except Exception as e:
                 # self.log.error("read error: {}".format(traceback.format_exc()))
-                pass
+                self.log.debug("read_thread encountered exception: %s", e)
             time.sleep(0.001)
 
     def _process_received(self, data):
