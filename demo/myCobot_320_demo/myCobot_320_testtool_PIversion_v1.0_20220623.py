@@ -25,12 +25,12 @@ class MycobotTest:
         self.mycobot = None
 
         self.win = tkinter.Tk()
-        self.win.title("树莓派版 Mycobot 测试工具")
+        self.win.title("Raspberry Pi Mycobot Test Tool")
         self.win.geometry(
             "918x600+10+10"
         )  # 290x160 as window size; +10 +10 sets the default popup location
 
-        self.port_label = tkinter.Label(self.win, text="选择串口：")
+        self.port_label = tkinter.Label(self.win, text="Select serial port:")
         self.port_label.grid(row=0)
         self.port_list = ttk.Combobox(
             self.win, width=15, postcommand=self.get_serial_port_list
@@ -39,7 +39,7 @@ class MycobotTest:
         self.port_list.current(0)
         self.port_list.grid(row=0, column=1)
 
-        self.baud_label = tkinter.Label(self.win, text="选择波特率：")
+        self.baud_label = tkinter.Label(self.win, text="Select baud rate:")
         self.baud_label.grid(row=1)
         self.baud_list = ttk.Combobox(self.win, width=15)
         self.baud_list["value"] = ("1000000", "115200")
@@ -47,68 +47,68 @@ class MycobotTest:
         self.baud_list.grid(row=1, column=1)
 
         # Connect
-        self.connect_label = tkinter.Label(self.win, text="连接mycobot：")
+        self.connect_label = tkinter.Label(self.win, text="Connect mycobot:")
         self.connect_label.grid(row=2)
         self.connect = tkinter.Button(
-            self.win, text="连接", command=self.connect_mycobot
+            self.win, text="Connect", command=self.connect_mycobot
         )
         self.disconnect = tkinter.Button(
-            self.win, text="断开", command=self.disconnect_mycobot
+            self.win, text="Disconnect", command=self.disconnect_mycobot
         )
         self.connect.grid(row=3)
         self.disconnect.grid(row=3, column=1)
 
         # Check servo.
-        self.check_label = tkinter.Label(self.win, text="检测连接：")
+        self.check_label = tkinter.Label(self.win, text="Check connection:")
         self.check_label.grid(row=4)
         self.check_btn = tkinter.Button(
-            self.win, text="开始检测", command=self.check_mycobot_servos
+            self.win, text="Start checking", command=self.check_mycobot_servos
         )
         self.check_btn.grid(row=4, column=1)
 
         # Calibration.
         self.calibration_num = None
-        self.calibration_label = tkinter.Label(self.win, text="校准舵机：")
+        self.calibration_label = tkinter.Label(self.win, text="Calibrate servo:")
         self.calibration_label.grid(row=5)
         self.calibration_btn = tkinter.Button(
-            self.win, text="开始校准", command=self.calibration_mycobot
+            self.win, text="Start calibration", command=self.calibration_mycobot
         )
         self.calibration_btn.grid(row=5, column=1)
 
         # LED.
-        self.set_color_label = tkinter.Label(self.win, text="测试Atom灯板：")
+        self.set_color_label = tkinter.Label(self.win, text="Test Atom light board:")
         self.set_color_label.grid(row=6, columnspan=2)
         self.color_red = tkinter.Button(
-            self.win, text="设置红色", command=lambda: self.send_color("red")
+            self.win, text="Set red", command=lambda: self.send_color("red")
         )
         self.color_green = tkinter.Button(
-            self.win, text="设置绿色", command=lambda: self.send_color("green")
+            self.win, text="Set green", command=lambda: self.send_color("green")
         )
         self.color_red.grid(row=7)
         self.color_green.grid(row=7, column=1)
 
         # Aging test.
         self.aging_stop = False
-        self.movement_label = tkinter.Label(self.win, text="老化循环动作：")
+        self.movement_label = tkinter.Label(self.win, text="Aging loop action:")
         self.movement_label.grid(row=8)
         self.start_btn = tkinter.Button(
-            self.win, text="开始", command=self.start_aging_test
+            self.win, text="Start", command=self.start_aging_test
         )
         self.start_btn.grid(row=9)
         self.stop_btn = tkinter.Button(
-            self.win, text="停止", command=self.stop_aging_test
+            self.win, text="Stop", command=self.stop_aging_test
         )
         self.stop_btn.grid(row=9, column=1)
 
         # Release
         self.release_btn = tkinter.Button(
-            self.win, text="放松所有电机", command=self.release_mycobot
+            self.win, text="Relax all motors", command=self.release_mycobot
         )
         self.release_btn.grid(row=10)
 
         # Focus
         self.focus_btn = tkinter.Button(
-            self.win, text="所有电机上电", command=self.focus_mycobot
+            self.win, text="Power on all motors", command=self.focus_mycobot
         )
         self.focus_btn.grid(row=10, column=1)
 
@@ -119,19 +119,19 @@ class MycobotTest:
         # self.rectify_btn.grid(row=10, column=1)
 
         # I/O
-        self.test_IO_label = tkinter.Label(self.win, text="测试I/O：")
+        self.test_IO_label = tkinter.Label(self.win, text="Test I/O:")
         self.test_IO_label.grid(row=11)
         self.test_basic_btn = tkinter.Button(
-            self.win, text="测试底部I/O", command=self.test_basic
+            self.win, text="Test base I/O", command=self.test_basic
         )
         self.test_atom_btn = tkinter.Button(
-            self.win, text="测试末端I/O", command=self.test_atom
+            self.win, text="Test end-effector I/O", command=self.test_atom
         )
         self.test_basic_btn.grid(row=12)
         self.test_atom_btn.grid(row=12, column=1)
 
         # Log output.
-        self.log_label = tkinter.Label(self.win, text="日志：")
+        self.log_label = tkinter.Label(self.win, text="Log:")
         self.log_label.grid(row=0, column=12)
         _f = tkinter.Frame(self.win)
         _bar = tkinter.Scrollbar(_f, orient=tkinter.VERTICAL)
@@ -153,11 +153,11 @@ class MycobotTest:
     def connect_mycobot(self):
         self.prot = port = self.port_list.get()
         if not port:
-            self.write_log_to_Text("请选择串口")
+            self.write_log_to_Text("Please select the serial port")
             return
         self.baud = baud = self.baud_list.get()
         if not baud:
-            self.write_log_to_Text("请选择波特率")
+            self.write_log_to_Text("Please select the baud rate")
             return
         baud = int(baud)
 
@@ -168,10 +168,10 @@ class MycobotTest:
             self.mycobot._write([255, 255, 3, 22, 1, 250])
             time.sleep(0.5)
             # self.mycobot = MyCobot("/dev/cu.usbserial-0213245D", 115200)
-            self.write_log_to_Text("连接成功 !")
+            self.write_log_to_Text("Connection successful!")
         except Exception as e:
             err_log = f"""\
-                \r连接失败 !!!
+                \rConnection failed!!!
                 \r=================================================
                 {e}
                 \r=================================================
@@ -185,9 +185,9 @@ class MycobotTest:
         try:
             del self.mycobot
             self.mycobot = None
-            self.write_log_to_Text("断开连接成功 !")
+            self.write_log_to_Text("Disconnected successfully!")
         except AttributeError:
-            self.write_log_to_Text("还没有连接mycobot！！！")
+            self.write_log_to_Text("mycobot is not connected!!!")
 
     # ============================================================
     #  Function method
@@ -233,9 +233,9 @@ class MycobotTest:
             if _data != i:
                 res.append(i)
         if res:
-            self.write_log_to_Text(f"关节 {res} 无法通信！！！")
+            self.write_log_to_Text(f"Joint {res} cannot communicate!!!")
         else:
-            self.write_log_to_Text("所有关节连接正常。")
+            self.write_log_to_Text("All joints are connected normally.")
 
     def calibration_mycobot(self):
         """Calibration button click event.
@@ -257,11 +257,11 @@ class MycobotTest:
         time.sleep(0.5)
         pos = self.mycobot.get_angles()
         self.write_log_to_Text(
-            "校准电机" + str(self.calibration_num) + "结束."
+            f"Calibrating motor {self.calibration_num} finished."
         )
 
         if self.calibration_num == 6:
-            self.write_log_to_Text("全部校准完成.")
+            self.write_log_to_Text("All calibrations completed.")
             self.calibration_num = None
             # self.rectify_mycobot()
             self._calibration_test()
@@ -276,7 +276,7 @@ class MycobotTest:
             "blue": [0, 0, 255],
         }
         self.mycobot.set_color(*color_dict[color])
-        self.write_log_to_Text(f"发送颜色: {color}.")
+        self.write_log_to_Text(f"Send color: {color}.")
 
     def start_aging_test(self):
         if not self.has_mycobot():
@@ -286,7 +286,7 @@ class MycobotTest:
         self.aging = threading.Thread(target=self._aging_test, daemon=True)
         self.aging.start()
         # self._aging_test()
-        self.write_log_to_Text("开始循环老化测试 ...")
+        self.write_log_to_Text("Start loop aging test ...")
 
     def stop_aging_test(self):
         try:
@@ -295,9 +295,9 @@ class MycobotTest:
             os.system("sudo rm /home/ubuntu/Desktop/aging_test.py")
             os.system("sudo rm /etc/systemd/system/aging_test.service")
             os.system("sudo systemctl daemon-reload")
-            self.write_log_to_Text("结束循环老化测试.")
+            self.write_log_to_Text("End loop aging test.")
         except:
-            self.write_log_to_Text("结束老化测试失败 ！！！")
+            self.write_log_to_Text("Failed to end aging test!!!")
 
     def rectify_mycobot(self):
         if not self.has_mycobot():
@@ -335,24 +335,24 @@ class MycobotTest:
     def test_basic(self):
         pin_no = [1, 2, 3, 4, 5, 6]
         for p in pin_no:
-            self.write_log_to_Text("设置引脚 %s 为 0 " % p)
+            self.write_log_to_Text("Set pin %s to 0 " % p)
             self.mycobot.set_basic_output(p, 0)
             time.sleep(0.5)
         time.sleep(1)
         for p in pin_no:
             self.write_log_to_Text(
-                "读取引脚 %s 为 : %s" % (p, self.mycobot.get_basic_input(p))
+                "Read pin %s as : %s" % (p, self.mycobot.get_basic_input(p))
             )
             time.sleep(0.5)
         time.sleep(1)
         for p in pin_no:
-            self.write_log_to_Text("设置引脚 %s 为 1 " % p)
+            self.write_log_to_Text("Set pin %s to 1 " % p)
             self.mycobot.set_basic_output(p, 1)
             time.sleep(0.5)
         time.sleep(1)
         for p in pin_no:
             self.write_log_to_Text(
-                "读取引脚 %s 为 : %s" % (p, self.mycobot.get_basic_input(p))
+                "Read pin %s as : %s" % (p, self.mycobot.get_basic_input(p))
             )
             time.sleep(0.5)
 
@@ -360,24 +360,24 @@ class MycobotTest:
         pin_in = [19, 22]
         pin_out = [23, 33]
         for p in pin_out:
-            self.write_log_to_Text("设置引脚 %s 为 0 " % p)
+            self.write_log_to_Text("Set pin %s to 0 " % p)
             self.mycobot.set_digital_output(p, 0)
             time.sleep(0.5)
         time.sleep(1)
         for p in pin_in:
             self.write_log_to_Text(
-                "读取引脚 %s 为 : %s" % (p, self.mycobot.get_digital_input(p))
+                "Read pin %s as : %s" % (p, self.mycobot.get_digital_input(p))
             )
             time.sleep(0.5)
         time.sleep(1)
         for p in pin_out:
-            self.write_log_to_Text("设置引脚 %s 为 1 " % p)
+            self.write_log_to_Text("Set pin %s to 1 " % p)
             self.mycobot.set_digital_output(p, 1)
             time.sleep(0.5)
         time.sleep(1)
         for p in pin_in:
             self.write_log_to_Text(
-                "读取引脚 %s 为 : %s" % (p, self.mycobot.get_digital_input(p))
+                "Read pin %s as : %s" % (p, self.mycobot.get_digital_input(p))
             )
             time.sleep(0.5)
         time.sleep(1)
@@ -388,7 +388,7 @@ class MycobotTest:
     def has_mycobot(self):
         """Check whether it is connected on mycobot"""
         if not self.mycobot:
-            self.write_log_to_Text("还没有连接mycobot！！！")
+            self.write_log_to_Text("mycobot is not connected!!!")
             return False
         return True
 
@@ -562,7 +562,7 @@ class MycobotTest:
         os.system("sudo systemctl start aging_test.service")
 
     def _calibration_test(self):
-        self.write_log_to_Text("开始测试校准.")
+        self.write_log_to_Text("Start calibration test.")
         self.mycobot.set_fresh_mode(1)
         time.sleep(0.5)
         angles = [0, 0, 0, 0, 0, 0]
@@ -572,7 +572,7 @@ class MycobotTest:
                 angles[i] = test_angle[j]
                 self.mycobot.send_angles(angles, 0)
                 time.sleep(2)
-        self.write_log_to_Text("测试校准结束.")
+        self.write_log_to_Text("Calibration test finished.")
 
     def get_serial_port_list(self):
         plist = [

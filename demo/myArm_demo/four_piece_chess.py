@@ -6,9 +6,7 @@ time.sleep(0.1)
 
 
 def main():
-    """模仿myarm与人类下棋输赢状态的动作
-    :return: None
-    """
+    """Imitate myArm's win/lose motions while playing chess with a human."""
     init_angles = [
         [-60, 0, 0, -90, 0, -90, -0.79],  # first init point
         # [0, 49, 0, -104, 0, -45, -0.79],  # second init point

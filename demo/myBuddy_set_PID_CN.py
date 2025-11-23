@@ -54,15 +54,15 @@ def get_pid():
         for j in range(1, 7):  # servo
             for p in range(3):  # pid
                 data = mb.get_servo_data(i, j, pid[p])
-                arm = "右臂"
+                arm = "Right arm"
                 if i == 1:
-                    arm = "左臂"
-                print(f"{arm},关节{j}，data_id：{pid[p]}   data: {data}")
+                    arm = "Left arm"
+                print(f"{arm}, joint {j}, data_id: {pid[p]}   data: {data}")
                 time.sleep(0.05)
 
     for p in range(3):  # waist pid
         data = mb.get_servo_data(3, 1, pid[p])
-        print(f"腰部,data_id：{pid[p]}   data: {data}")
+        print(f"Waist, data_id: {pid[p]}   data: {data}")
         time.sleep(0.05)
 
 
@@ -71,22 +71,22 @@ if __name__ == "__main__":
     status = True
     while status:
         print(
-            "请选择PID操作=======================\n"
-            "1  设置出厂PID\n"
-            "2  设置高精度PID\n"
-            "3  设置拖动示教（高稳定）PID\n"
-            "4  读取当前PID\n"
+            "Please choose a PID operation =======================\n"
+            "1  Set factory PID\n"
+            "2  Set high-precision PID\n"
+            "3  Set drag-teach (high stability) PID\n"
+            "4  Read the current PID\n"
             "=================================================="
         )
-        print("请选择数字1-4，按下ENTER键确认：")
+        print("Enter a number 1-4 and press ENTER to confirm:")
         key = input()
         key = int(key)
         if key <= 0 or key > 4:
-            print("没有该选项，请重新选择！")
+            print("Invalid option, please choose again!")
         else:
             status = False
     if key != 4:
-        print("正在设置中！！")
+        print("Applying settings...")
     if key == 1:
         set_pid_factory()
     elif key == 2:
@@ -96,4 +96,4 @@ if __name__ == "__main__":
     elif key == 4:
         get_pid()
     if key != 4:
-        print("设置完成！！")
+        print("Settings finished!")

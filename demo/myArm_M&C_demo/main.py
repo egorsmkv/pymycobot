@@ -89,7 +89,7 @@ class MyWindow(QWidget, Ui_Form):
         self.serial_obj = {1: None, 2: None, 3: None, 4: None}
 
     def control_serial(self, index, status):
-        """串口控制"""
+        """Serial port control"""
         if index == 1:
             if self.comboBox.currentText() != "":
                 if status:
@@ -162,7 +162,7 @@ class MyWindow(QWidget, Ui_Form):
                 self.switch_button_3.reset_state()
 
     def add_row(self, data):
-        """更新表格数据"""
+        """Update table data"""
         # print("get: ",data)
         if "1" in data.keys():
             # if '1' in data.keys() or '3' in data.keys():

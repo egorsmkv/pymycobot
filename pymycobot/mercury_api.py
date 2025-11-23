@@ -29,16 +29,12 @@ class MercuryCommandGenerator(CloseLoop):
         offset = 3
         try:
             for i in range(7):
-                if (
+                if not (
                     self.min_joint[i] + offset
                     < angles[i]
                     < self.max_joint[i] - offset
                 ):
-                    pass
-                else:
-                    if self.language == "zh_CN":
-                        return f"当前角度为{angles[i]}, 角度范围为： {self.min_joint[i]} ~ {self.max_joint[i]}"
-                    return f"current value = {angles[i]}, limit is {self.min_joint[i]} ~ {self.max_joint[i]}"
+                    return f"Current value = {angles[i]}, limit is {self.min_joint[i]} ~ {self.max_joint[i]}"
         except TypeError:
             return "joint limit error"
         return f"over limit error {angles}"
@@ -51,8 +47,6 @@ class MercuryCommandGenerator(CloseLoop):
             offset = 5
             for singular in singular_angles:
                 if singular - offset < angles[5] < singular + offset:
-                    if self.language == "zh_CN":
-                        return f"在关节 6 处检测到奇点：{angles[5]} 度"
                     return (
                         f"Singularity detected at joint 6: {angles[5]} degrees"
                     )
@@ -68,12 +62,7 @@ class MercuryCommandGenerator(CloseLoop):
             # Calculate the Euclidean norm (magnitude)
             magnitude = np.linalg.norm(first_three)
             if is_print == 1:
-                if self.language == "zh_CN":
-                    info += (
-                        f"当前臂展为{magnitude}, 最大的臂展为{self.arm_span}"
-                    )
-                else:
-                    info += f"Arm span is {magnitude}, max is {self.arm_span}"
+                info += f"Arm span is {magnitude}, max is {self.arm_span}"
 
             # if magnitude > self.arm_span - 10:
             #     if self.language == "zh_CN":

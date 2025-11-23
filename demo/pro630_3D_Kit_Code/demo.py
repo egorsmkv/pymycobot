@@ -50,7 +50,7 @@ def get_send_TCP(sock_rvs):
     print("data_arr =", data_arr)
     if data_arr[1] == "false":
         exit()
-        print("未识别到工件")
+        print("No workpiece detected")
     pose_offet = [0, 0, 0, 0, 0, 0]
     pose_real = [0, 0, 0, 0, 0, 0]
 
@@ -122,9 +122,9 @@ if __name__ == "__main__":
         while 1:
             start_time = time.time()
             exec_index = exec_index + 1
-            print("第 %d 次拍照" % exec_index)
+            print("Taking photo #%d" % exec_index)
 
-            print("移动到1号拍照位")
+            print("Move to photo position 1")
             erobot.write_angles(photo_point, robot_speed)
 
             erobot.command_wait_done()

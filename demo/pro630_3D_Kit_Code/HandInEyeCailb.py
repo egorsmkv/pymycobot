@@ -134,8 +134,8 @@ if __name__ == "__main__":
 
     while exec_index < len(point):
         exec_index = exec_index + 1
-        print("第 %d 次拍照" % exec_index)
-        print("移动到拍照位")
+        print("Taking photo #%d" % exec_index)
+        print("Move to the photo position")
         # Move
         erobot.write_angles(point[exec_index - 1], robot_speed)
         time.sleep(3)

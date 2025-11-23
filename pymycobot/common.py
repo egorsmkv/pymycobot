@@ -853,11 +853,11 @@ class DataProcessor:
                                 error_list.append(bit)
                                 if locale_lang == "zh_CN":
                                     print(
-                                        "错误: 关节{} - {}".format(
+                                        "Error: Joint{} - {}".format(
                                             i + 1,
                                             robot_320_info[locale_lang][
                                                 error_key
-                                            ].get(bit, "未知错误"),
+                                            ].get(bit, "Unknown error"),
                                         )
                                     )
                                 else:
@@ -928,11 +928,11 @@ class DataProcessor:
                                 error_list.append(bit)
                                 if locale_lang == "zh_CN":
                                     print(
-                                        "错误: 关节{} - {}".format(
+                                        "Error: Joint{} - {}".format(
                                             i + 1,
                                             robot_320_info[locale_lang][
                                                 error_key
-                                            ].get(bit, "未知错误"),
+                                            ].get(bit, "Unknown error"),
                                         )
                                     )
                                 else:

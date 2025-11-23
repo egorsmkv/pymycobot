@@ -341,8 +341,6 @@ class Pro630Api(CloseLoop):
                 if min_angle + offset < angle < max_angle - offset:
                     continue
 
-                if self.language == "zh_CN":
-                    return f"当前关节{joint}角度为{angle}, 角度范围为: {min_angle} ~ {max_angle}"
                 return f"The angle of the current joint {joint} is {angle}, and the angle range is: {min_angle} ~ {max_angle}"
         except TypeError:
             return "joint limit error"
@@ -360,12 +358,9 @@ class Pro630Api(CloseLoop):
             first_three
         )  # Calculate the Euclidean norm (magnitude)
         if is_print == 1:
-            if self.language == "zh_CN":
-                error_info += f"当前臂展为{magnitude}, 最大的臂展为{self.arm_span_maximum}"
-            else:
-                error_info += (
-                    f"Arm span is {magnitude}, max is {self.arm_span_maximum}"
-                )
+            error_info += (
+                f"Arm span is {magnitude}, max is {self.arm_span_maximum}"
+            )
 
         return error_info
 
@@ -380,10 +375,9 @@ class Pro630Api(CloseLoop):
             error_info += self._check_coords(error_coords, is_print=True)
         elif status == 36:
             angles = self.get_angles()
-            if self.language == "zh_CN":
-                error_info += f"当前角度为{angles}, 检测到奇异点"
-            else:
-                error_info += f"The current angle is {angles}, and a singularity is detected"
+            error_info += (
+                f"The current angle is {angles}, and a singularity is detected"
+            )
         return error_info
 
 

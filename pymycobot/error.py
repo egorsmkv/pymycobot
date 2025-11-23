@@ -3403,7 +3403,7 @@ def calibration_parameters(**kwargs):
 
 
 def restrict_serial_port(func):
-    """装饰器，用于限制特定串口号、socket的函数调用。"""
+    """Decorator used to restrict function calls to specific serial ports or sockets."""
 
     @functools.wraps(func)
     def wrapper(self, *args, **kwargs):

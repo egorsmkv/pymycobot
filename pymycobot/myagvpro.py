@@ -80,6 +80,7 @@ class MyAGVProCommandProtocolApi(CommunicationProtocol):
     language_prompt_tips = {
         "en_US": {
             ProtocolCode.POWER_ON: {
+                0: "[Power-on Tips]: Power on success",
                 1: "[Power-on Tips]: Power on success",
                 2: "[Power-on Tips]: Emergency stop triggered",
                 3: "[Power-on Tips]: The battery is too low",
@@ -89,11 +90,11 @@ class MyAGVProCommandProtocolApi(CommunicationProtocol):
         },
         "zh_CN": {
             ProtocolCode.POWER_ON: {
-                0: "[上电提示]: 上电成功",
-                2: "[上电提示]: 紧急触发",
-                3: "[上电提示]: 电量过低",
-                4: "[上电提示]: CAN初始化异常",
-                5: "[上电提示]: 电机初始化异常",
+                0: "[Power-on Tips]: Power on success",
+                2: "[Power-on Tips]: Emergency stop triggered",
+                3: "[Power-on Tips]: The battery is too low",
+                4: "[Power-on Tips]: CAN initialization is abnormal",
+                5: "[Power-on Tips]: Motor initialization exception",
             }
         },
     }

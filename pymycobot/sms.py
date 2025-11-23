@@ -25,93 +25,93 @@ class sms_sts(protocol_packet_handler):
         protocol_packet_handler.__init__(self, portHandler, 0)
 
     def get_servo_baud(self, id):
-        """获取舵机波特率
+        """Get the servo baud rate
 
         Args:
-            id: 电机Id
+            id: Motor ID.
 
         Return:
-            None: 获取失败
+            None: Failed to fetch.
         """
         res = self.read1ByteTxRx(id, BAUD)
         return res[0] if res[1] != -2 else None
 
     def set_servo_baud(self, id, value):
-        """设置舵机波特率"""
+        """Set the servo baud rate"""
         return self.write1ByteTxRx(id, BAUD, value)
 
     def get_servo_response_speed(self, id):
-        """获取舵机响应速度
+        """Get the servo response speed
 
         Args:
-            id: 电机Id
+            id: Motor ID.
 
         Return:
-            None: 获取失败
+            None: Failed to fetch.
         """
         res = self.read1ByteTxRx(id, RETURN_DELAY)
         return res[0] if res[1] != -2 else None
 
     def set_servo_response_speed(self, id, value):
-        """设置舵机响应速度"""
+        """Set the servo response speed"""
         return self.write1ByteTxRx(id, RETURN_DELAY, value)
 
     def get_servo_phase(self, id):
-        """获取舵机相位
+        """Get the servo phase
 
         Args:
-            id: 电机Id
+            id: Motor ID.
 
         Return:
-            None: 获取失败
+            None: Failed to fetch.
         """
         res = self.read1ByteTxRx(id, PHASE)
         return res[0] if res[1] != -2 else None
 
     def set_servo_phase(self, id, value):
-        """设置舵机相位"""
+        """Set the servo phase"""
         return self.write1ByteTxRx(id, PHASE, value)
 
     def get_servo_max_temperature(self, id):
-        """获取舵机最大温度
+        """Get the maximum temperature for the servo
 
         Args:
-            id: 电机Id
+            id: Motor ID.
 
         Return:
-            None: 获取失败
+            None: Failed to fetch.
         """
         res = self.read1ByteTxRx(id, MAX_TEMPERATURE)
         return res[0] if res[1] != -2 else None
 
     def set_servo_max_temperature(self, id, value):
-        """设置舵机最大温度"""
+        """Set the maximum temperature for the servo"""
         return self.write1ByteTxRx(id, MAX_TEMPERATURE, value)
 
     def get_servo_max_voltage(self, id):
-        """获取舵机最大电压
+        """Get the maximum voltage for the servo
 
         Args:
-            id: 电机Id
+            id: Motor ID.
 
         Return:
-            None: 获取失败
+            None: Failed to fetch.
         """
         res = self.read1ByteTxRx(id, MAX_VOLTAGE)
         return res[0] if res[1] != -2 else None
 
     def set_servo_max_voltage(self, id, value):
-        """设置舵机最大电压"""
+        """Set the maximum voltage for the servo"""
         return self.write1ByteTxRx(id, MAX_VOLTAGE, value)
 
     def get_servo_pid(self, id):
-        """获取舵机pid
+        """Get the servo PID values
 
         Args:
-            id: 电机Id
+            id: Motor ID.
 
         Return:
-            None: 获取失败
+            None: Failed to fetch.
         """
         res_p = self.read1ByteTxRx(id, SERVO_P)
         res_i = self.read1ByteTxRx(id, SERVO_I)
@@ -123,69 +123,69 @@ class sms_sts(protocol_packet_handler):
         ]
 
     def set_servo_pid(self, id, pid):
-        """设置舵机pid"""
+        """Set the servo PID values"""
         self.write1ByteTxRx(id, SERVO_P, pid[0])
         self.write1ByteTxRx(id, SERVO_I, pid[1])
         self.write1ByteTxRx(id, SERVO_D, pid[2])
 
     def get_servo_clockwise(self, id):
-        """获取舵机顺时针不灵敏区
+        """Get the servo clockwise dead zone
 
         Args:
-            id: 电机Id
+            id: Motor ID.
 
         Return:
-            None: 获取失败
+            None: Failed to fetch.
         """
         res = self.read1ByteTxRx(id, CLOCKWISE_INSENSITIVE_ZONE)
         return res[0] if res[1] != -2 else None
 
     def set_servo_clockwise(self, id, value):
-        """设置舵机顺时针不灵敏区"""
+        """Set the servo clockwise dead zone"""
         return self.write1ByteTxRx(id, CLOCKWISE_INSENSITIVE_ZONE, value)
 
     def get_servo_counter_clockwise(self, id):
-        """获取舵机逆时针不灵敏区
+        """Get the servo counterclockwise dead zone
 
         Args:
-            id: 电机Id
+            id: Motor ID.
 
         Return:
-            None: 获取失败
+            None: Failed to fetch.
         """
         res = self.read1ByteTxRx(id, COUNTERCLOCKWISE_INSENSITIVE_ZONE)
         return res[0] if res[1] != -2 else None
 
     def set_servo_counter_clockwise(self, id, value):
-        """设置舵机逆时针不灵敏区"""
+        """Set the servo counterclockwise dead zone"""
         return self.write1ByteTxRx(
             id, COUNTERCLOCKWISE_INSENSITIVE_ZONE, value
         )
 
     def get_servo_d_time(self, id):
-        """获取舵机D控制时间
+        """Get the servo D control time
 
         Args:
-            id: 电机Id
+            id: Motor ID.
 
         Return:
-            None: 获取失败
+            None: Failed to fetch.
         """
         res = self.read1ByteTxRx(id, D_CONTROL_TIME)
         return res[0] if res[1] != -2 else None
 
     def set_servo_d_time(self, id, value):
-        """设置舵机D控制时间"""
+        """Set the servo D control time"""
         return self.write1ByteTxRx(id, D_CONTROL_TIME, value)
 
     def get_servo_min_start(self, id):
-        """获取舵机最小启动力
+        """Get the minimum starting force for the servo
 
         Args:
-            id: 电机Id
+            id: Motor ID.
 
         Return:
-            None: 获取失败
+            None: Failed to fetch.
         """
         scs_present_speed, scs_comm_result, scs_error = self.read2ByteTxRx(
             id, MIN_START_FORCE
@@ -197,19 +197,19 @@ class sms_sts(protocol_packet_handler):
         )
 
     def set_servo_min_start(self, id, value):
-        """设置舵机最小启动力"""
+        """Set the minimum starting force for the servo"""
         return self.write2ByteTxRx(id, MIN_START_FORCE, value)
 
     def search_servo(self, id):
-        """搜索舵机是否存在
+        """Check whether the servo exists
 
         Args:
-            id：舵机ID号.
+            id: Servo ID.
 
         Return:
-            0: 存在.
-            -6：不存在.
-            None: 获取失败.
+            0: Exists.
+            -6: Does not exist.
+            None: Failed to fetch.
         """
         res = self.ping(id)
         if res == -2:
@@ -217,13 +217,13 @@ class sms_sts(protocol_packet_handler):
         return res
 
     def get_servo_error(self, id):
-        """获取舵机错误信息
+        """Get servo error information
 
         Return:
-            error_info: 将返回的十进制数据转换为二进制
-                Bit0  Bit1  Bit2 Bit3 Bit4 Bit5 对应位被置1表示相应错误出现\n
-                电压  传感器 温度 电流 角度  过载 对应位0为无相应该错误\n
-                None:表示获取失败
+            error_info: The returned decimal data converted to binary.\n
+                Bit0  Bit1  Bit2 Bit3 Bit4 Bit5. If the bit is 1, the corresponding error occurred.\n
+                Voltage  Sensor Temperature Current Angle Overload. A 0 bit means no related error.\n
+                None: Failed to fetch.
         """
         res = self.read1ByteTxRx(id, 0x41)
         if res[1] == -2:
@@ -231,10 +231,10 @@ class sms_sts(protocol_packet_handler):
         return res[0]
 
     def get_servo_firmware_version(self, id):
-        """获取电机固件版本信息
+        """Get motor firmware version information
 
         Return:
-            list: [固件主版本号, 固件次版本号, 舵机主版本号, 舵机次版本号], -1 表示获取失败
+            list: [Firmware major version, firmware minor version, servo major version, servo minor version], -1 means failure
         """
         res = []
         command = [FIRMWARE_MAJOR, FIRMWARE_MINOR, SERVO_MAJOR, SERVO_MINOR]

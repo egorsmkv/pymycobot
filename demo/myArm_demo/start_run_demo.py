@@ -7,9 +7,7 @@ time.sleep(0.1)
 
 
 def main():
-    """展示MyArm各个关节的运动状态
-    :return: None
-    """
+    """Show the motion state of each MyArm joint."""
     angles_list = [
         [98, 7, 68, -92, 164, 5, -2],
         [0, 35, 0, -75, 164, 5, -2],

@@ -35,9 +35,7 @@ timet = 3
 
 
 def main():
-    """体现myarm三种不同速度的多种运动姿态
-    :return: None
-    """
+    """Showcase various myArm motions at three different speeds."""
     mc.send_angles(init_angles[0], medium_speed)
     time.sleep(3 + timet)
 

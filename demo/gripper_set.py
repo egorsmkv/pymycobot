@@ -6,16 +6,16 @@ port = "com8"
 
 mc = MyCobot280(port)
 
-print("零位矫正前当前所在位置: ", mc.get_gripper_value())
+print("Current gripper position before zero-point calibration: ", mc.get_gripper_value())
 time.sleep(0.1)
 mc.set_gripper_calibration()
 time.sleep(0.1)
 print(
-    "零位矫正后当前所在位置（矫正成功夹爪会锁住，并且位置接近100）: ",
+    "Current gripper position after zero-point calibration (the gripper will lock if calibration succeeds and the position will be close to 100): ",
     mc.get_gripper_value(),
 )
 time.sleep(0.1)
-print("开始夹爪参数更新...")
+print("Start updating gripper parameters...")
 datas = [10, 0, 1, 150]
 address = [21, 22, 23, 16]
 current_datas = []
@@ -23,11 +23,11 @@ new_datas = []
 for addr in address:
     current_datas.append(mc.get_servo_data(7, addr))
     time.sleep(0.1)
-print("当前夹爪参数为: ", current_datas)
+print("Current gripper parameters: ", current_datas)
 for addr in range(len(address)):
     mc.set_servo_data(7, address[addr], datas[addr])
     time.sleep(0.1)
 for addr in address:
     new_datas.append(mc.get_servo_data(7, addr))
     time.sleep(0.1)
-print("更新后夹爪参数为: ", new_datas)
+print("Updated gripper parameters: ", new_datas)

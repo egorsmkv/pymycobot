@@ -101,7 +101,7 @@ def safe_stop():
         mc.stop()
         time.sleep(0.02)
     except Exception as e:
-        print("stop 出错：", e)
+        print("Error during stop:", e)
 
 
 # Handler for joystick input events
@@ -184,7 +184,7 @@ if pygame.joystick.get_count() > 0:
     joystick = pygame.joystick.Joystick(0)
     joystick.init()
 else:
-    print("没有检测到手柄")
+    print("Controller not detected")
     pygame.quit()
     sys.exit()
 # Main loop to process events

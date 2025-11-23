@@ -42,8 +42,7 @@ def pump_off():
 
 
 def move():
-    """myarm使用吸泵模拟aikitV2套装抓取木块
-    """
+    """Use myArm with a suction pump to simulate the aikitV2 kit grabbing wooden blocks."""
     # mc.send_angles(init_angles[0], 50)
     # time.sleep(3)
 

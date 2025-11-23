@@ -127,7 +127,7 @@ class MapNavigation:
         self.pub_tempPose.publish(self.pose)
         self.point_count += 1
         rospy.loginfo(
-            f" {identifier} 对应 {self.point_count} 号点位 pose: {self.pose}"
+            f"{identifier} corresponds to waypoint {self.point_count} pose: {self.pose}"
         )
         return self.point_count
 
