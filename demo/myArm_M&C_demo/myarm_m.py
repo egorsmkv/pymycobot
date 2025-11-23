@@ -71,7 +71,7 @@ def setup_robotic_connect(comport: str) -> MyArmM | None:
         for error in serial_error.args:
             if error.startswith("could not open port"):
                 print(
-                    f" # (Error) Serial port 【{comport}】 is not available."
+                    f" # (Error) Serial port [{comport}] is not available."
                 )
             else:
                 print(
@@ -120,7 +120,7 @@ def main(host: str = Config.host, port: int = Config.port):
     print(
         f" # (Info) Start listening for changes in the angle of the robotic arm"
     )
-    print(f" # (Info) Press 【Ctrl+C】 to exit")
+    print(f" # (Info) Press [Ctrl+C] to exit")
     while True:
         try:
             data = socket_api.recv(1024)

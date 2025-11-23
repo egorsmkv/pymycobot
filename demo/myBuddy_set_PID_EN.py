@@ -57,12 +57,12 @@ def get_pid():
                 arm = "right arm"
                 if i == 1:
                     arm = "left arm"
-                print(f"{arm},Joint{j}，data_id：{pid[p]}   data: {data}")
+                print(f"{arm},Joint{j}, data_id: {pid[p]}   data: {data}")
                 time.sleep(0.05)
 
     for p in range(3):  # waist pid
         data = mb.get_servo_data(3, 1, pid[p])
-        print(f"# waist,data_id：{pid[p]}   data: {data}")
+        print(f"# waist,data_id: {pid[p]}   data: {data}")
         time.sleep(0.05)
 
 
@@ -78,7 +78,7 @@ if __name__ == "__main__":
             "4  read current PID\n"
             "=================================================="
         )
-        print("Please select numbers 1-4 and press ENTER to confirm：")
+        print("Please select numbers 1-4 and press ENTER to confirm:")
         key = input()
         key = int(key)
         if key <= 0 or key > 4:

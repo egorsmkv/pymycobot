@@ -236,7 +236,7 @@ class MyCobot(CommandGenerator, PublicCommandGenerator, sms_sts):
         Args:
             coords: a list of coord values(List[float])
             speed: (int) 0 ~ 100
-            mode: (int): 0 - angular（default）, 1 - linear
+            mode: (int): 0 - angular (default), 1 - linear
             timeout: default 7s.
         """
         t = time.time()

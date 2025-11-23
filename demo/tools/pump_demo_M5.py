@@ -19,7 +19,7 @@ import time
 # if use PC and M5 control
 mc = MyCobot280(
     "COM3", 115200
-)  # WINDOWS use ，need check port number when you PC
+)  # WINDOWS use, need check port number when you PC
 # mc = MyCobot('/dev/ttyUSB0',115200)        #VM linux use
 
 # init robot

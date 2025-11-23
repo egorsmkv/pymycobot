@@ -107,7 +107,7 @@ def main():
     print(
         " # (Info) Start listening for changes in the angle of the robotic arm"
     )
-    print(" # (Info) Press 【Ctrl+C】 to exit")
+    print(" # (Info) Press [Ctrl+C] to exit")
     transport_server = SocketTransportServer(
         host=Config.host,
         port=Config.port,

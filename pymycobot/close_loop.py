@@ -778,7 +778,7 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
         return self._mesg(ProtocolCode.TOOL_SERIAL_READ_DATA, data_len)
 
     def tool_serial_write_data(self, command):
-        """End 485 sends data， Data length range is 1 ~ 45 bytes
+        """Send 485 data; data length range is 1 ~ 45 bytes
 
         Args:
             command (list) : data instructions
@@ -1078,7 +1078,7 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
         """Set joint collision threshold
 
         Args:
-            joint_id (int): joint ID， range 1 ~ 6
+            joint_id (int): joint ID, range 1 ~ 6
             threshold_value (int): Collision threshold, range is 50 ~ 250, default is 100, the smaller the value, the easier it is to trigger a collision
         """
         self.calibration_parameters(
@@ -1098,7 +1098,7 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
         """Set joint torque compensation
 
         Args:
-            joint_id (int): joint ID， range 1 ~ 6
+            joint_id (int): joint ID, range 1 ~ 6
             comp_value (int): Compensation value, range is 0 ~ 250, default is 100, The smaller the value, the harder it is to drag the joint
         """
         self.calibration_parameters(
@@ -1221,7 +1221,7 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
         """Send one angle of joint to robot arm.
 
         Args:
-            joint_id : Joint id(genre.Angle)， int 1-7.
+            joint_id : Joint id(genre.Angle), int 1-7.
             angle : angle value(float).
             speed : (int) 1 ~ 100
         """

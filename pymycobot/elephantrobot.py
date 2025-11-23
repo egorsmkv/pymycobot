@@ -1759,7 +1759,7 @@ class ElephantRobot:
 
         Returns:
                     str: return All Joint angle value
-        。
+
         """
         command = "Hand_GetFullAngles(" + str(ID) + ")\n"
         angle_list = parse_mixed_list_string(self.send_command(command))
@@ -1866,9 +1866,9 @@ class ElephantRobot:
         """Obtain the end color.
 
         Args:
-            red (int): (0 ~ 255)。
-            green (int): (0 ~ 255)。
-            blue (int): (0 ~ 255)。
+            red (int): (0 ~ 255).
+            green (int): (0 ~ 255).
+            blue (int): (0 ~ 255).
 
         Returns:
             str: return message

@@ -428,7 +428,7 @@ class MyAGVProCommandApi(MyAGVProCommandProtocolApi):
 
         Returns:
             tuple: (list[int] | int, float)
-                0 - list[int] | int: machine status，Normally 0
+                0 - list[int] | int: machine status, normally 0
                     0 - (int)Emergency stop status
                     1 - (int)Power status
                     2 - (int)Front bumper strip

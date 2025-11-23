@@ -978,7 +978,7 @@ class Pro450Client(CloseLoop):
         """Send one angle of joint to robot arm.
 
         Args:
-            joint_id : Joint id(genre.Angle)， int 1-6.
+            joint_id : Joint id(genre.Angle), int 1-6.
             angle : angle value(float).
             speed : (int) 1 ~ 100
         """

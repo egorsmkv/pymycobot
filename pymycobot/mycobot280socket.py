@@ -375,7 +375,7 @@ class MyCobot280Socket(CommandGenerator):
         Args:
             coords: a list of coord values(List[float])
             speed: (int) 0 ~ 100
-            mode: (int): 0 - angular（default）, 1 - linear
+            mode: (int): 0 - angular (default), 1 - linear
             timeout: default 15s.
         """
         t = time.time()
@@ -595,7 +595,7 @@ class MyCobot280Socket(CommandGenerator):
         """Set basic communication mode
 
         Args:
-            mode: 0 - Turn off transparent transmission，1 - Open transparent transmission
+            mode: 0 - Turn off transparent transmission, 1 - Open transparent transmission
         """
         self.calibration_parameters(
             class_name=self.__class__.__name__, mode=mode
@@ -678,7 +678,7 @@ class MyCobot280Socket(CommandGenerator):
         """Get joint temperature
 
         Return:
-            A list unit ℃
+            A list of joint temperatures in Celsius
         """
         return self._mesg(ProtocolCode.GET_SERVO_TEMPS, has_reply=True)
 

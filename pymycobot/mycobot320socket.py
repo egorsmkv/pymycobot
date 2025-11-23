@@ -374,7 +374,7 @@ class MyCobot320Socket(CommandGenerator):
         Args:
             coords: a list of coord values(List[float])
             speed: (int) 0 ~ 100
-            mode: (int): 0 - angular（default）, 1 - linear
+            mode: (int): 0 - angular (default), 1 - linear
             timeout: default 15s.
         """
         t = time.time()
@@ -567,7 +567,7 @@ class MyCobot320Socket(CommandGenerator):
         """Get joint temperature
 
         Return:
-            A list unit ℃
+            A list of joint temperatures in Celsius
         """
         return self._mesg(ProtocolCode.GET_SERVO_TEMPS, has_reply=True)
 

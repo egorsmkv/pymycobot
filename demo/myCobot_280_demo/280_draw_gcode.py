@@ -20,7 +20,7 @@ from pymycobot.mycobot280 import (
 # use PC and M5 control
 mc = MyCobot280(
     "COM14", 115200
-)  # WINDOWS use ，need check port number when you PC
+)  # WINDOWS use, need check port number when you PC
 # mc = MyCobot('/dev/ttyUSB0',115200)           # VM linux use
 time.sleep(0.5)
 
@@ -86,7 +86,7 @@ def process_gcode(file_path):
 
 
 type = int(
-    input("Please input 1-4（1-square 2-triangle 3-five point star 4-quit）:")
+    input("Please input 1-4 (1-square 2-triangle 3-five point star 4-quit):")
 )
 if type == 1:
     # Pass in the gcode file path and obtain the coordinate data

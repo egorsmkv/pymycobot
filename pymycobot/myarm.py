@@ -755,7 +755,7 @@ class MyArm(CommandGenerator, sms_sts):
         """Get joint temperature
 
         Return:
-            A list unit ℃
+            A list of joint temperatures in Celsius
         """
         return self._mesg(ProtocolCode.GET_SERVO_TEMPS, has_reply=True)
 

@@ -86,5 +86,5 @@ iic = mc.set_iic_init(1)
 # print all encoders and speeds
 print(mc.get_encoders(0))
 
-# set run demo encoders，init robot
+# set run demo encoders, init robot
 mc.set_encoders(0, encoders, speeds)
