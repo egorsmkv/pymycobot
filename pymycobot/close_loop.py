@@ -354,13 +354,14 @@ class CloseLoop(DataProcessor, ForceGripper, ThreeHand):
                             self._command_label(genre),
                             res,
                         )
+
+                        raise Exception(f"Robot returned error status: {res}")
                     else:
                         self.log.debug(
                             "received status for %s: %s",
                             self._command_label(genre),
                             res,
                         )
-                    print(res)
                 return data[4]
         valid_data = data[data_pos : data_pos + data_len]
         self.log.debug(
